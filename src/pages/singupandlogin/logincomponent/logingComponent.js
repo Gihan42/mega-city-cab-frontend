@@ -7,6 +7,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import IconButton from '@mui/material/IconButton';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
+import mainPage  from '../../admin/main/mainPage';
 
 function LogingComponent() {
 
@@ -21,6 +22,10 @@ function LogingComponent() {
   const handleMouseUpPassword = (event) => {
     event.preventDefault();
   };
+
+  const navigatePage = () => {
+      alert('ok')
+  }
 
   return (
     <div className='flex items-center justify-center flex-col w-full mb-12'>
@@ -74,6 +79,7 @@ function LogingComponent() {
 
         {/* Submit Button */}
         <button
+          onClick={navigatePage}
           type="submit"
           className="btn btn-primary"
           style={{
@@ -88,7 +94,7 @@ function LogingComponent() {
             width: '100%',
           }}
         >
-          Submit
+          Log in
         </button>
       </form>
     </div>
