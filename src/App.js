@@ -1,5 +1,5 @@
 import './App.css';
-import Login from './pages/singup/loging';
+import Login from './pages/singupandlogin/loging';
 
 function App() {
   return (
