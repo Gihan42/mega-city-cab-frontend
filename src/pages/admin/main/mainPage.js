@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './mainPage.css';
 import {
   MenuFoldOutlined,
@@ -16,16 +16,28 @@ import { Button, Layout, Menu, theme } from 'antd';
 import Booking from '../component/booking/booking';
 import DashBoard from "../component/dashboard/dashboard";
 import Customer from '../component/customers/customer';
-import PageNotSupport from '../component/notspported/notsupported'
+import NotSupported from '../component/notspported/notsupported';
 
 const { Header, Sider, Content } = Layout;
 
 function MainPage() {
   const [collapsed, setCollapsed] = useState(false);
-  const [selectedMenu, setSelectedMenu] = useState('Dashboard'); 
+  const [selectedMenu, setSelectedMenu] = useState('Dashboard');
+  const [isScreenSupported, setIsScreenSupported] = useState(true);
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsScreenSupported(window.innerWidth > 1030);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const menuItems = [
     { key: 'Dashboard', icon: <HomeOutlined style={{ fontSize: '24px' }} />, label: 'Dashboard' },
@@ -41,11 +53,11 @@ function MainPage() {
   const renderContent = () => {
     switch (selectedMenu) {
       case 'Dashboard':
-        return <DashBoard/>;
+        return <DashBoard />;
       case 'Bookings':
         return <Booking />;
       case 'Customers':
-        return <Customer/>;
+        return <Customer />;
       case 'Drivers':
         return <div>Drivers Content</div>;
       case 'Vehicles':
@@ -61,8 +73,16 @@ function MainPage() {
     }
   };
 
+  if (!isScreenSupported) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-gray-100">
+        <NotSupported />
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full overflow-hidden">
       <Layout className="h-screen w-screen">
         <Sider trigger={null} collapsible collapsed={collapsed}>
           <div className="demo-logo-vertical" />
@@ -73,14 +93,14 @@ function MainPage() {
             mode="inline"
             defaultSelectedKeys={['Dashboard']}
             items={menuItems}
-            onClick={(e) => setSelectedMenu(e.key)} 
+            onClick={(e) => setSelectedMenu(e.key)}
           />
         </Sider>
         <Layout>
           <Header style={{ padding: 0, background: colorBgContainer }}>
             <Button
               type="text"
-              icon={collapsed ? <MenuUnfoldOutlined style={{ fontSize: '24px' }}/> : <MenuFoldOutlined style={{ fontSize: '24px' }}/>}
+              icon={collapsed ? <MenuUnfoldOutlined style={{ fontSize: '24px' }} /> : <MenuFoldOutlined style={{ fontSize: '24px' }} />}
               onClick={() => setCollapsed(!collapsed)}
               style={{ fontSize: '16px', width: 64, height: 64 }}
             />

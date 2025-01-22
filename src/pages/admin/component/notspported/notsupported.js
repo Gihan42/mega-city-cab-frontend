@@ -5,36 +5,20 @@ function NotSupported() {
 
     useEffect(() => {
         const checkScreenSize = () => {
-            if (window.innerWidth < 768) {
-                setIsSupported(false);
-            } else {
-                setIsSupported(true);
-            }
+            setIsSupported(window.innerWidth > 1030);
         };
 
         checkScreenSize();
-
         window.addEventListener('resize', checkScreenSize);
-
-        return () => {
-            window.removeEventListener('resize', checkScreenSize);
-        };
+        return () => window.removeEventListener('resize', checkScreenSize);
     }, []);
 
     return (
-        <>
-            {isSupported ? (
-                <div>
-                    <h1>Oops!</h1>
-                </div>
-            ) : (
-                <div className="not-supported-container">
-                    <h1>Page Not Supported</h1>
-                    <p>This page is not supported on your device or screen size.</p>
-                    <p>Please access it on a larger screen or supported device.</p>
-                </div>
-            )}
-        </>
+        <div className="p-8 text-center">
+            <h1 className="text-3xl font-bold mb-4">Page Not Supported</h1>
+            <p className="text-lg mb-2">This page is not supported on your device or screen size.</p>
+            <p className="text-lg">Please access it on a screen wider than 1030px.</p>
+        </div>
     );
 }
 
