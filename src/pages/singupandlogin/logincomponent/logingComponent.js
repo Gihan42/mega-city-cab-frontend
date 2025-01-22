@@ -3,7 +3,6 @@ import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import IconButton from '@mui/material/IconButton';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -27,16 +26,16 @@ function LogingComponent() {
     <div className='flex items-center justify-center flex-col w-full mb-12'>
       <form className='flex items-start justify-center flex-col w-full max-w-md px-4 py-8'>
         {/* Username Input Field */}
-        <label for="outlined-basic" className="form-label">your email*</label>
+        <label for="outlined-basic" className="form-label">email*</label>
         <TextField
           id="outlined-basic"
-          label="Username"
+          label="eamil"
           variant="outlined"
           fullWidth
           sx={{
             marginBottom: '1rem',
             '& .MuiInputLabel-root': {
-              fontWeight: 'bold',
+              
             },
             '& .MuiOutlinedInput-root': {
               borderRadius: '8px',
@@ -46,8 +45,8 @@ function LogingComponent() {
         />
 
         {/* Password Input Field */}
-        <label for="outlined-adornment-password" className="form-label">your password*</label>
-        <FormControl sx={{ m: 1, width: '100%' }} variant="outlined">
+        <label for="outlined-adornment-password" className="form-label"> password*</label>
+        <FormControl sx={{ m: 0, width: '100%' }} variant="outlined" className='mb-4'>
           <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
           <OutlinedInput
             id="outlined-adornment-password"
@@ -68,6 +67,7 @@ function LogingComponent() {
             label="Password"
             sx={{
               borderRadius: '8px',
+              
             }}
           />
         </FormControl>
