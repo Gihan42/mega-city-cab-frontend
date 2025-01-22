@@ -10,6 +10,8 @@
     "@mui/lab": "^6.0.0-beta.24",
     "@mui/material": "^6.4.1",
     "@popperjs/core": "^2.11.8",
+    "animate.css": "^4.1.1",
+    "animejs": "^3.2.2",
     "antd": "^5.23.2",
     "bootstrap": "^5.3.3",
     "cra-template": "1.2.0",

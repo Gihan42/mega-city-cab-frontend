@@ -14,6 +14,9 @@ import {
 } from '@ant-design/icons';
 import { Button, Layout, Menu, theme } from 'antd';
 import Booking from '../component/booking/booking';
+import DashBoard from "../component/dashboard/dashboard";
+import Customer from '../component/customers/customer';
+import PageNotSupport from '../component/notspported/notsupported'
 
 const { Header, Sider, Content } = Layout;
 
@@ -38,11 +41,11 @@ function MainPage() {
   const renderContent = () => {
     switch (selectedMenu) {
       case 'Dashboard':
-        return <div>Dashboard Content</div>;
+        return <DashBoard/>;
       case 'Bookings':
         return <Booking />;
       case 'Customers':
-        return <div>Customers Content</div>;
+        return <Customer/>;
       case 'Drivers':
         return <div>Drivers Content</div>;
       case 'Vehicles':
@@ -65,7 +68,7 @@ function MainPage() {
           <div className="demo-logo-vertical" />
           <div className="ml-1 mr-1 h-10 mt-4 mb-6 rounded-lg shadow-lg shadow-blue-500/50 bg-slate-700"></div>
           <Menu
-            className="text-2xl custom-menu	"
+            className="text-2xl custom-menu"
             theme="dark"
             mode="inline"
             defaultSelectedKeys={['Dashboard']}
