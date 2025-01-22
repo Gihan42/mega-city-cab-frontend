@@ -1,0 +1,9 @@
+.custom-menu .ant-menu-item {
+    margin-bottom: 25px; 
+  }
+  
+  
+  .custom-menu .ant-menu-item:last-child {
+    margin-bottom: 0;
+  }
+  

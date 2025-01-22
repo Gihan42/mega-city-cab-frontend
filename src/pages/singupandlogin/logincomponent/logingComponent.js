@@ -8,10 +8,12 @@ import IconButton from '@mui/material/IconButton';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
 import mainPage  from '../../admin/main/mainPage';
+import { useNavigate } from 'react-router-dom';
 
 function LogingComponent() {
 
   const [showPassword, setShowPassword] = React.useState(false);
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -24,7 +26,7 @@ function LogingComponent() {
   };
 
   const navigatePage = () => {
-      alert('ok')
+      navigate('/admin')
   }
 
   return (
