@@ -12,6 +12,130 @@ import { Alert, Button, Space } from 'antd';
 function Customer() {
   const [pdfAlertVisible, pdfSetAlertVisible] = useState(false);
   const [csvAlertVisible, csvSetAlertVisible] = useState(false);
+  const [filteredTableData, setFilteredData] = useState(
+    Array.from({ length: 20 }).map((_, index) => ({
+      bookingId: `BID-${index + 1}`,
+      customer: `Customer ${index + 1}`,
+      driver: `Driver ${index + 1}`,
+      vehicle: `Vehicle ${index + 1}`,
+      date: new Date().toISOString().slice(0, 10),
+    }))
+  );
+  
+  const handleResetFilters = () => {
+    setSearchFilters({
+      customerId: '',
+      customerEmail: '',
+      customerName: '',
+      customerNic: '',
+      customerContact: '',
+    });
+  
+    setFilteredData(data); 
+  };
+
+  const [searchFilters, setSearchFilters] = useState({
+    customerId: '',
+    customerEmail: '',
+    customerName: '',
+    customerNic: '',
+    customerContact: '',
+  });
+
+  const [data] = useState(
+    Array.from({ length: 20 }).map((_, index) => ({
+      customerId: `CID-${index + 1}`,
+      customerEmail: `Customer ${index + 1}`,
+      customerName: `Customer ${index + 1}`,
+      customerNic: `Customer ${index + 1}`,
+      customerContact: `Customer ${index + 1}`,
+      customerAddress: `Customer ${index + 1}`,
+    }))
+  );
+
+  const filteredData = data.filter((item) => {
+    return (
+      (!searchFilters.customerId || item.customerId.toLowerCase().includes(searchFilters.customerId.toLowerCase())) &&
+      (!searchFilters.customerEmail || item.customerEmail.toLowerCase().includes(searchFilters.customerEmail.toLowerCase())) &&
+      (!searchFilters.customerName || item.customerName.toLowerCase().includes(searchFilters.customerName.toLowerCase())) &&
+      (!searchFilters.customerNic || item.customerNic.toLowerCase().includes(searchFilters.customerNic.toLowerCase())) &&
+      (!searchFilters.customerContact || item.customerContact.toLowerCase().includes(searchFilters.customerContact.toLowerCase())) &&
+      (!searchFilters.customerAddress || item.customerAddress.toLowerCase().includes(searchFilters.customerAddress.toLowerCase())) 
+
+    );
+  });
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setSearchFilters((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleRowClick = (item) => {
+    setSearchFilters({
+      customerId: item.customerId,
+      customerEmail: item.customerEmail,
+      customerName: item.customerName,
+      customerNic: item.customerNic,
+      customerContact: item.customerContact,
+      customerAddress:item.customerAddress
+    });
+  };
+
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    doc.text('customer Table', 14, 10); 
+    doc.autoTable({
+      startY: 20,
+      head: [['#', ' ID', 'Email', 'Name', 'Nic', 'Contact','Address']],
+      body: filteredData.map((item, index) => [
+        index + 1,
+        item.customerId,
+        item.customerEmail,
+        item.customerName,
+        item.customerNic,
+        item.customerContact,
+        item.customerAddress,
+      ]),
+    });
+    doc.save('customer_table.pdf');
+      
+        pdfSetAlertVisible(true);
+
+   
+        setTimeout(() => {
+          pdfSetAlertVisible(false);
+        }, 3000);
+  };
+
+  const downloadCSV = () => {
+    const csvData = Papa.unparse(
+      filteredData.map((item, index) => ({
+        '#': index + 1,
+        ' ID': item.customerId,
+        customerEmail:item.customerEmail,
+        customerName:item.customerName,
+        customerNic:item.customerNic,
+        customerContact:item.customerContact,
+        customerAddress:item.customerAddress
+      }))
+    )
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'booking_table.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    csvSetAlertVisible(true);
+        setTimeout(() => {
+          csvSetAlertVisible(false);
+        }, 3000);
+  };
 
   
   return (
@@ -57,8 +181,8 @@ function Customer() {
               label="Search by  ID"
               variant="outlined"
               fullWidth
-              value={''}
-              onChange={''}
+              value={searchFilters.customerId}
+              onChange={handleInputChange}
               sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
               InputProps={{
                 endAdornment: (
@@ -73,8 +197,8 @@ function Customer() {
               label="Search by Eamil"
               variant="outlined"
               fullWidth
-              value={''}
-              onChange={''}
+              value={searchFilters.customerEmail}
+              onChange={handleInputChange}
               sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
               InputProps={{
                 endAdornment: (
@@ -89,8 +213,8 @@ function Customer() {
               label="Search by  Name"
               variant="outlined"
               fullWidth
-              value={''}
-              onChange={''}
+              value={searchFilters.customerName}
+              onChange={handleInputChange}
               sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
               InputProps={{
                 endAdornment: (
@@ -105,8 +229,8 @@ function Customer() {
               label="Search by  Nic"
               variant="outlined"
               fullWidth
-              value={''}
-              onChange={''}
+              value={searchFilters.customerNic}
+              onChange={handleInputChange}
               sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
               InputProps={{
                 endAdornment: (
@@ -121,8 +245,8 @@ function Customer() {
               label="Search by  Contact"
               variant="outlined"
               fullWidth
-              value={''}
-              onChange={''}
+              value={searchFilters.customerContact}
+              onChange={handleInputChange}
               sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
               InputProps={{
                 endAdornment: (
@@ -152,7 +276,7 @@ function Customer() {
         <div className="justify-start items-start mb-4">
           <h3 className="text-lg font-normal text-sky-900">All Customers</h3>
         </div>
-        <div className='justify-end items-center mb-4 flex gap-5 w-full '>
+        <div className='justify-end items-center mb-4 flex gap-5 w-full animate__animated animate__backInRight'>
           <button type="button" className="btn btn-primary dcButton"
             style={{
               id: 'dcButton',
@@ -164,7 +288,7 @@ function Customer() {
               cursor: 'pointer',
               width: '10%',
             }}
-            onClick={''}
+            onClick={downloadPDF}
           >
             get pdf
           </button>
@@ -179,7 +303,7 @@ function Customer() {
               cursor: 'pointer',
               width: '10%',
             }}
-            onClick={''}
+            onClick={downloadCSV}
           >
             get csv
           </button>
@@ -194,7 +318,7 @@ function Customer() {
               cursor: 'pointer',
               width: '13%',
             }}
-            onClick={''}
+            onClick={handleResetFilters}
           >
             get back
           </button>
@@ -211,23 +335,30 @@ function Customer() {
               <thead className="bg-gray-100 sticky top-0">
                 <tr>
                   <th className="border px-4 py-2">#</th>
-                  <th className="border px-4 py-2">Customer ID</th>
-                  <th className="border px-4 py-2"> Name</th>
+                  <th className="border px-4 py-2"> ID</th>
+                  <th className="border px-4 py-2">Eamil</th>
+                  <th className="border px-4 py-2">Name</th>
                   <th className="border px-4 py-2">Nic</th>
                   <th className="border px-4 py-2">Contact</th>
                   <th className="border px-4 py-2">Address</th>
-                  <th className="border px-4 py-2">Eamil</th>
                 </tr>
               </thead>
               <tbody>
-                  <tr>
-                    <td className="border px-4 py-2"></td>
-                    <td className="border px-4 py-2"></td>
-                    <td className="border px-4 py-2"></td>
-                    <td className="border px-4 py-2"></td>
-                    <td className="border px-4 py-2"></td>
-                    <td className="border px-4 py-2"></td>
+                {filteredData.map((item, index) => (
+                  <tr
+                    key={index}
+                    className={`hover:bg-gray-50 cursor-pointer ${index % 2 === 0 ? 'bg-gray-50' : ''}`}
+                    onClick={() => handleRowClick(item)}
+                  >
+                    <td className="border px-4 py-2">{index + 1}</td>
+                    <td className="border px-4 py-2">{item.customerId}</td>
+                    <td className="border px-4 py-2">{item.customerEmail}</td>
+                    <td className="border px-4 py-2">{item.customerName}</td>
+                    <td className="border px-4 py-2">{item.customerNic}</td>
+                    <td className="border px-4 py-2">{item.customerContact}</td>
+                    <td className="border px-4 py-2">{item.customerAddress}</td>
                   </tr>
+                ))}
               </tbody>
             </table>
           </div>

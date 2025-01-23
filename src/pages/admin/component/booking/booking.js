@@ -250,7 +250,7 @@ function Booking() {
         <h3 className="text-lg font-normal text-sky-900">All Bookings</h3>
       </div>
 
-      <div className='justify-end items-center mb-4 flex gap-5 w-full '>
+      <div className='justify-end items-center mb-4 flex gap-5 w-full animate__animated animate__backInRight'>
         <button type="button" className="btn btn-primary dcButton"
           style={{
             id:'dcButton',
