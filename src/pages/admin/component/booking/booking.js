@@ -32,7 +32,7 @@ function Booking() {
       bookingDate: '',
     });
   
-    setFilteredData(data); // Reset table to show all data
+    setFilteredData(data); 
   };
 
   const [searchFilters, setSearchFilters] = useState({
@@ -83,7 +83,7 @@ function Booking() {
 
   const downloadPDF = () => {
     const doc = new jsPDF();
-    doc.text('Booking Table', 14, 10); // Title
+    doc.text('Booking Table', 14, 10); 
     doc.autoTable({
       startY: 20,
       head: [['#', 'Booking ID', 'Customer', 'Driver', 'Vehicle', 'Date']],
