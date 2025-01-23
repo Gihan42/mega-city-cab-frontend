@@ -120,7 +120,7 @@ function Dashboard() {
 
         {/* Sidebar */}
         <Col className="w-full lg:w-72 bg-stone-200 rounded-xl p-4 animate__animated animate__backInRight">
-          <h4 className="text-sky-900 font-light">all active drivers</h4>
+          <h4 className="text-sky-900 font-normal">all active drivers</h4>
         </Col>
       </Row>
     </div>
