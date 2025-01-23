@@ -7,8 +7,34 @@ import 'animate.css';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import Papa from 'papaparse';
+import { Alert, Button, Space } from 'antd';
+import './booking.css'
 
 function Booking() {
+  const [pdfAlertVisible, pdfSetAlertVisible] = useState(false);
+  const [csvAlertVisible, csvSetAlertVisible] = useState(false);
+  const [filteredTableData, setFilteredData] = useState(
+    Array.from({ length: 20 }).map((_, index) => ({
+      bookingId: `BID-${index + 1}`,
+      customer: `Customer ${index + 1}`,
+      driver: `Driver ${index + 1}`,
+      vehicle: `Vehicle ${index + 1}`,
+      date: new Date().toISOString().slice(0, 10),
+    }))
+  );
+  
+  const handleResetFilters = () => {
+    setSearchFilters({
+      bookingId: '',
+      customerId: '',
+      driverId: '',
+      vehicleId: '',
+      bookingDate: '',
+    });
+  
+    setFilteredData(data); // Reset table to show all data
+  };
+
   const [searchFilters, setSearchFilters] = useState({
     bookingId: '',
     customerId: '',
@@ -71,6 +97,13 @@ function Booking() {
       ]),
     });
     doc.save('booking_table.pdf');
+      
+        pdfSetAlertVisible(true);
+
+   
+        setTimeout(() => {
+          pdfSetAlertVisible(false);
+        }, 3000);
   };
 
   const downloadCSV = () => {
@@ -92,10 +125,47 @@ function Booking() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    csvSetAlertVisible(true);
+        setTimeout(() => {
+          csvSetAlertVisible(false);
+        }, 3000);
   };
 
   return (
     <div className="h-full w-full p-4 md:p-8 lg:p-12">
+    <div className='flex justify-center items-center animate__animated animate__backInDown'>
+      {pdfAlertVisible && (
+         <Alert
+        className='w-96 mb-5'
+         message="PDF File Saved"
+         type="success"
+         showIcon
+         action={
+           <Button size="small" type="text">
+             UNDO
+           </Button>
+         }
+         closable
+       />
+      )}
+    </div>
+    <div className='flex justify-center items-center animate__animated animate__backInDown'>
+      {csvAlertVisible && (
+         <Alert
+        className='w-96 mb-5'
+         message="CSV File Saved"
+         type="success"
+         showIcon
+         action={
+           <Button size="small" type="text">
+             UNDO
+           </Button>
+         }
+         closable
+       />
+      )}
+    </div>
       <Row>
         <Col xs={24} sm={24} md={24} lg={24} className="bg-white rounded-xl mb-4 shadow-lg flex flex-col md:flex-row justify-center items-center p-2 h-auto animate__animated animate__backInDown">
           <form className="flex flex-col md:flex-row justify-center items-center p-2 h-auto gap-4 md:gap-20 w-full">
@@ -180,9 +250,10 @@ function Booking() {
         <h3 className="text-lg font-normal text-sky-900">All Bookings</h3>
       </div>
 
-      <div className='justify-end items-end mb-4 flex gap-5'>
-        <button type="button" className="btn btn-primary"
+      <div className='justify-end items-center mb-4 flex gap-5 w-full '>
+        <button type="button" className="btn btn-primary dcButton"
           style={{
+            id:'dcButton',
             backgroundColor: '#0D3B66',
             color: '#fff',
             padding: '10px 20px',
@@ -195,8 +266,9 @@ function Booking() {
         >
           get pdf
         </button>
-        <button type="button" className="btn btn-warning"
+        <button type="button" className="btn btn-warning dcButton"
           style={{
+            id:'dcButton',
             backgroundColor: '#FCA000',
             color: '#0D3B66',
             padding: '10px 20px',
@@ -209,12 +281,27 @@ function Booking() {
         >
           get csv
         </button>
+        <button type="button" className="btn btn-warning dcButton"
+          style={{
+            id:'dcButton',
+            backgroundColor: '#008000',
+            color: '#fff',
+            padding: '10px 20px',
+            borderRadius: '10px',
+            border: 'none',
+            cursor: 'pointer',
+            width: '13%',
+          }}
+          onClick={handleResetFilters}
+        >
+          get back
+        </button>
       </div>
 
       <Row>
         <Col xs={24} sm={24} md={24} lg={24} className="flex justify-center items-center p-2 h-full animate__animated animate__backInUp">
           <div
-            className="overflow-x-auto max-h-[500px] w-full border border-gray-300 rounded-lg"
+            className="overflow-x-auto table-container max-h-[450px] w-full border border-gray-300 rounded-lg"
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: '#0D3B66 #E4E4E7',
