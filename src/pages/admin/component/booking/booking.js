@@ -9,6 +9,11 @@ import 'jspdf-autotable';
 import Papa from 'papaparse';
 import { Alert, Button, Space } from 'antd';
 import './booking.css'
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
 
 function Booking() {
   const [pdfAlertVisible, pdfSetAlertVisible] = useState(false);
@@ -20,9 +25,10 @@ function Booking() {
       driver: `Driver ${index + 1}`,
       vehicle: `Vehicle ${index + 1}`,
       date: new Date().toISOString().slice(0, 10),
+      status: 'close'
     }))
   );
-  
+
   const handleResetFilters = () => {
     setSearchFilters({
       bookingId: '',
@@ -30,9 +36,10 @@ function Booking() {
       driverId: '',
       vehicleId: '',
       bookingDate: '',
+      status: ''
     });
-  
-    setFilteredData(data); 
+
+    setFilteredData(data);
   };
 
   const [searchFilters, setSearchFilters] = useState({
@@ -41,6 +48,7 @@ function Booking() {
     driverId: '',
     vehicleId: '',
     bookingDate: '',
+    status: ''
   });
 
   const [data] = useState(
@@ -50,6 +58,10 @@ function Booking() {
       driver: `Driver ${index + 1}`,
       vehicle: `Vehicle ${index + 1}`,
       date: new Date().toISOString().slice(0, 10),
+      pickUpLocation: 'null',
+      destination: 'null',
+      totalAmount: 'null',
+      status: 'close'
     }))
   );
 
@@ -59,7 +71,9 @@ function Booking() {
       (!searchFilters.customerId || item.customer.toLowerCase().includes(searchFilters.customerId.toLowerCase())) &&
       (!searchFilters.driverId || item.driver.toLowerCase().includes(searchFilters.driverId.toLowerCase())) &&
       (!searchFilters.vehicleId || item.vehicle.toLowerCase().includes(searchFilters.vehicleId.toLowerCase())) &&
+      (!searchFilters.status || item.status.toLowerCase().includes(searchFilters.status.toLowerCase())) &&
       (!searchFilters.bookingDate || item.date === searchFilters.bookingDate)
+
     );
   });
 
@@ -78,15 +92,18 @@ function Booking() {
       driverId: item.driver,
       vehicleId: item.vehicle,
       bookingDate: item.date,
+      status: item.status
+
     });
   };
 
   const downloadPDF = () => {
     const doc = new jsPDF();
-    doc.text('Booking Table', 14, 10); 
+    doc.text('Booking Table', 14, 10);
     doc.autoTable({
       startY: 20,
-      head: [['#', 'Booking ID', 'Customer', 'Driver', 'Vehicle', 'Date']],
+      head: [['#', 'Booking ID', 'Customer', 'Driver', 'Vehicle', 'Date', 'pick up location',
+        'Destination', 'Total amount', 'Status']],
       body: filteredData.map((item, index) => [
         index + 1,
         item.bookingId,
@@ -94,27 +111,40 @@ function Booking() {
         item.driver,
         item.vehicle,
         item.date,
+        item.pickUpLocation,
+        item.destination,
+        item.totalAmount,
+        item.status
       ]),
     });
     doc.save('booking_table.pdf');
-      
-        pdfSetAlertVisible(true);
 
-   
-        setTimeout(() => {
-          pdfSetAlertVisible(false);
-        }, 3000);
+    pdfSetAlertVisible(true);
+
+
+    setTimeout(() => {
+      pdfSetAlertVisible(false);
+    }, 3000);
   };
-
+  const handleStatusChange = (e) => {
+    setSearchFilters((prev) => ({
+      ...prev,
+      status: e.target.value,
+    }));
+  };
   const downloadCSV = () => {
     const csvData = Papa.unparse(
       filteredData.map((item, index) => ({
         '#': index + 1,
         'Booking ID': item.bookingId,
-        Customer: item.customer,
-        Driver: item.driver,
-        Vehicle: item.vehicle,
-        Date: item.date,
+        customerId: item.customer,
+        driverId: item.driver,
+        vehicleId: item.vehicle,
+        bookingDate: item.date,
+        pickUpLocation: item.pickUpLocation,
+        destination: item.destination,
+        totalAmount: item.totalAmount,
+        status: item.status
       }))
     )
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
@@ -127,45 +157,45 @@ function Booking() {
     document.body.removeChild(link);
 
     csvSetAlertVisible(true);
-        setTimeout(() => {
-          csvSetAlertVisible(false);
-        }, 3000);
+    setTimeout(() => {
+      csvSetAlertVisible(false);
+    }, 3000);
   };
 
   return (
     <div className="h-full w-full p-4 md:p-8 lg:p-12">
-    <div className='flex justify-center items-center animate__animated animate__backInDown'>
-      {pdfAlertVisible && (
-         <Alert
-        className='w-96 mb-5'
-         message="PDF File Saved"
-         type="success"
-         showIcon
-         action={
-           <Button size="small" type="text">
-             UNDO
-           </Button>
-         }
-         closable
-       />
-      )}
-    </div>
-    <div className='flex justify-center items-center animate__animated animate__backInDown'>
-      {csvAlertVisible && (
-         <Alert
-        className='w-96 mb-5'
-         message="CSV File Saved"
-         type="success"
-         showIcon
-         action={
-           <Button size="small" type="text">
-             UNDO
-           </Button>
-         }
-         closable
-       />
-      )}
-    </div>
+      <div className='flex justify-center items-center animate__animated animate__backInDown'>
+        {pdfAlertVisible && (
+          <Alert
+            className='w-96 mb-5'
+            message="PDF File Saved"
+            type="success"
+            showIcon
+            action={
+              <Button size="small" type="text">
+                UNDO
+              </Button>
+            }
+            closable
+          />
+        )}
+      </div>
+      <div className='flex justify-center items-center animate__animated animate__backInDown'>
+        {csvAlertVisible && (
+          <Alert
+            className='w-96 mb-5'
+            message="CSV File Saved"
+            type="success"
+            showIcon
+            action={
+              <Button size="small" type="text">
+                UNDO
+              </Button>
+            }
+            closable
+          />
+        )}
+      </div>
       <Row>
         <Col xs={24} sm={24} md={24} lg={24} className="bg-white rounded-xl mb-4 shadow-lg flex flex-col md:flex-row justify-center items-center p-2 h-auto animate__animated animate__backInDown">
           <form className="flex flex-col md:flex-row justify-center items-center p-2 h-auto gap-4 md:gap-20 w-full">
@@ -242,6 +272,23 @@ function Booking() {
               onChange={handleInputChange}
               sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
             />
+            <Select
+              labelId="demo-simple-select-helper-label"
+              id="status"
+              label="Search by Status"
+              fullWidth
+              value={searchFilters.status}
+              onChange={handleStatusChange}
+              displayEmpty
+              sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+            >
+              <MenuItem value="" disabled>
+                Select Status
+              </MenuItem>
+              <MenuItem value={'pending'}>Pending</MenuItem>
+              <MenuItem value={'close'}>Close</MenuItem>
+            </Select>
+
           </form>
         </Col>
       </Row>
@@ -253,7 +300,7 @@ function Booking() {
       <div className='justify-end items-center mb-4 flex gap-5 w-full animate__animated animate__backInRight'>
         <button type="button" className="btn btn-primary dcButton"
           style={{
-            id:'dcButton',
+            id: 'dcButton',
             backgroundColor: '#0D3B66',
             color: '#fff',
             padding: '10px 20px',
@@ -268,7 +315,7 @@ function Booking() {
         </button>
         <button type="button" className="btn btn-warning dcButton"
           style={{
-            id:'dcButton',
+            id: 'dcButton',
             backgroundColor: '#FCA000',
             color: '#0D3B66',
             padding: '10px 20px',
@@ -283,7 +330,7 @@ function Booking() {
         </button>
         <button type="button" className="btn btn-warning dcButton"
           style={{
-            id:'dcButton',
+            id: 'dcButton',
             backgroundColor: '#008000',
             color: '#fff',
             padding: '10px 20px',
@@ -316,6 +363,12 @@ function Booking() {
                   <th className="border px-4 py-2">Driver</th>
                   <th className="border px-4 py-2">Vehicle</th>
                   <th className="border px-4 py-2">Date</th>
+                  <th className="border px-4 py-2">Pick Up Location</th>
+                  <th className="border px-4 py-2">Destination</th>
+                  <th className="border px-4 py-2">Total Amount</th>
+                  <th className="border px-4 py-2">Status</th>
+                  <th className="border px-4 py-2"></th>
+
                 </tr>
               </thead>
               <tbody>
@@ -331,6 +384,17 @@ function Booking() {
                     <td className="border px-4 py-2">{item.driver}</td>
                     <td className="border px-4 py-2">{item.vehicle}</td>
                     <td className="border px-4 py-2">{item.date}</td>
+                    <td className="border px-4 py-2">{item.pickUpLocation}</td>
+                    <td className="border px-4 py-2">{item.destination}</td>
+                    <td className="border px-4 py-2">{item.totalAmount}</td>
+                    <td className="border px-4 py-2">{item.status}</td>
+                    <td className="border px-4 py-2">
+                      <button type="button"
+                        className="btn btn-success"
+                        disabled={item.status !== 'pending'}>update</button>
+                    </td>
+
+
                   </tr>
                 ))}
               </tbody>

@@ -17,6 +17,7 @@ import Booking from '../component/booking/booking';
 import DashBoard from "../component/dashboard/dashboard";
 import Customer from '../component/customers/customer';
 import NotSupported from '../component/notspported/notsupported';
+import Drivers from '../component/drivers/drivers';
 
 const { Header, Sider, Content } = Layout;
 
@@ -59,7 +60,7 @@ function MainPage() {
       case 'Customers':
         return <Customer />;
       case 'Drivers':
-        return <div>Drivers Content</div>;
+        return <Drivers/>;
       case 'Vehicles':
         return <div>Vehicles Content</div>;
       case 'Profile':
