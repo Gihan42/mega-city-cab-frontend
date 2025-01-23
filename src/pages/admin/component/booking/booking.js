@@ -8,12 +8,6 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import Papa from 'papaparse';
 
-
-
-
-
-
-
 function Booking() {
   const [searchFilters, setSearchFilters] = useState({
     bookingId: '',
@@ -78,8 +72,7 @@ function Booking() {
     });
     doc.save('booking_table.pdf');
   };
-  
-  // Function to download CSV
+
   const downloadCSV = () => {
     const csvData = Papa.unparse(
       filteredData.map((item, index) => ({
@@ -90,7 +83,7 @@ function Booking() {
         Vehicle: item.vehicle,
         Date: item.date,
       }))
-    );
+    )
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -102,10 +95,10 @@ function Booking() {
   };
 
   return (
-    <div className="h-full w-full justify-center item-center">
+    <div className="h-full w-full p-4 md:p-8 lg:p-12">
       <Row>
-        <Col span={24} className="bg-white rounded-xl mb-4 shadow-lg flex justify-center item-center p-2 h-auto animate__animated animate__backInDown">
-          <form className="flex justify-center item-center p-2 h-auto gap-20">
+        <Col xs={24} sm={24} md={24} lg={24} className="bg-white rounded-xl mb-4 shadow-lg flex flex-col md:flex-row justify-center items-center p-2 h-auto animate__animated animate__backInDown">
+          <form className="flex flex-col md:flex-row justify-center items-center p-2 h-auto gap-4 md:gap-20 w-full">
             <TextField
               id="bookingId"
               label="Search by Booking ID"
@@ -182,13 +175,14 @@ function Booking() {
           </form>
         </Col>
       </Row>
-      <div className="justify-start item-start">
+
+      <div className="justify-start items-start mb-4">
         <h3 className="text-lg font-normal text-sky-900">All Bookings</h3>
       </div>
-      <div className='justify-end item-end mb-2 flex gap-5'>
+
+      <div className='justify-end items-end mb-4 flex gap-5'>
         <button type="button" className="btn btn-primary"
           style={{
-            marginTop: '1rem',
             backgroundColor: '#0D3B66',
             color: '#fff',
             padding: '10px 20px',
@@ -196,11 +190,13 @@ function Booking() {
             border: 'none',
             cursor: 'pointer',
             width: '10%',
-          }}onClick={downloadPDF}
-        >get pdf</button>
+          }}
+          onClick={downloadPDF}
+        >
+          get pdf
+        </button>
         <button type="button" className="btn btn-warning"
           style={{
-            marginTop: '1rem',
             backgroundColor: '#FCA000',
             color: '#0D3B66',
             padding: '10px 20px',
@@ -208,12 +204,15 @@ function Booking() {
             border: 'none',
             cursor: 'pointer',
             width: '10%',
-          }}onClick={downloadCSV}
-        >get csv</button>
-
+          }}
+          onClick={downloadCSV}
+        >
+          get csv
+        </button>
       </div>
+
       <Row>
-        <Col span={24} className="flex justify-center item-center p-2 h-full animate__animated animate__backInUp">
+        <Col xs={24} sm={24} md={24} lg={24} className="flex justify-center items-center p-2 h-full animate__animated animate__backInUp">
           <div
             className="overflow-x-auto max-h-[500px] w-full border border-gray-300 rounded-lg"
             style={{
