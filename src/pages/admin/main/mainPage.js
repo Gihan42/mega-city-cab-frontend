@@ -18,6 +18,7 @@ import DashBoard from "../component/dashboard/dashboard";
 import Customer from '../component/customers/customer';
 import NotSupported from '../component/notspported/notsupported';
 import Drivers from '../component/drivers/drivers';
+import Vehicle from '../component/vehicles/vehicle';
 
 const { Header, Sider, Content } = Layout;
 
@@ -62,7 +63,7 @@ function MainPage() {
       case 'Drivers':
         return <Drivers/>;
       case 'Vehicles':
-        return <div>Vehicles Content</div>;
+        return <Vehicle/>;
       case 'Profile':
         return <div>Profile Content</div>;
       case 'Report':

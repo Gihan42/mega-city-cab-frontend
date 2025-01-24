@@ -40,7 +40,18 @@ function Drivers() {
       driverAddress: `DA ${index + 1}`
     }))
   );
-
+  // const [data] = useState(
+  //   Array.from({ length: 20 }).map((_, index) => ({
+  //     driverId: `DID-${index + 1}`,
+  //     driverName: `Driver ${index + 1}`,
+  //     driverAge: `${index + 1}`,
+  //     driverEmail: `DeMAIL ${index + 1}`,
+  //     driverLicenseNumber: `DL ${index + 1}`,
+  //     driverNicNumber: `DN ${index + 1}`,
+  //     driverContact: `DC ${index + 1}`,
+  //     driverAddress: `DA ${index + 1}`
+  //   }))
+  // );
   const handleResetFilters = () => {
     setSearchFilters({
       driverId: '',
@@ -409,7 +420,7 @@ function Drivers() {
       </div>
 
       <Row>
-        <Col xs={24} sm={24} md={24} lg={24} className="flex justify-center items-center p-2 h-full animate__animated animate__backInUp">
+        <Col xs={24} sm={24} md={24} lg={24} className="flex h-full justify-center items-center p-2 h-full animate__animated animate__backInUp">
           <div
             className="overflow-x-auto table-container max-h-[450px] w-full border border-gray-300 rounded-lg"
             style={{

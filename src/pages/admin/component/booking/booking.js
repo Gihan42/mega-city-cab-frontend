@@ -18,13 +18,16 @@ import FormControl from '@mui/material/FormControl';
 function Booking() {
   const [pdfAlertVisible, pdfSetAlertVisible] = useState(false);
   const [csvAlertVisible, csvSetAlertVisible] = useState(false);
-  const [filteredTableData, setFilteredData] = useState(
+  const [data, setFilteredData] = useState(
     Array.from({ length: 20 }).map((_, index) => ({
       bookingId: `BID-${index + 1}`,
       customer: `Customer ${index + 1}`,
       driver: `Driver ${index + 1}`,
       vehicle: `Vehicle ${index + 1}`,
       date: new Date().toISOString().slice(0, 10),
+      pickUpLocation: 'null',
+      destination: 'null',
+      totalAmount: 'null',
       status: 'close'
     }))
   );
@@ -51,19 +54,19 @@ function Booking() {
     status: ''
   });
 
-  const [data] = useState(
-    Array.from({ length: 20 }).map((_, index) => ({
-      bookingId: `BID-${index + 1}`,
-      customer: `Customer ${index + 1}`,
-      driver: `Driver ${index + 1}`,
-      vehicle: `Vehicle ${index + 1}`,
-      date: new Date().toISOString().slice(0, 10),
-      pickUpLocation: 'null',
-      destination: 'null',
-      totalAmount: 'null',
-      status: 'close'
-    }))
-  );
+  // const [data] = useState(
+  //   Array.from({ length: 20 }).map((_, index) => ({
+  //     bookingId: `BID-${index + 1}`,
+  //     customer: `Customer ${index + 1}`,
+  //     driver: `Driver ${index + 1}`,
+  //     vehicle: `Vehicle ${index + 1}`,
+  //     date: new Date().toISOString().slice(0, 10),
+  //     pickUpLocation: 'null',
+  //     destination: 'null',
+  //     totalAmount: 'null',
+  //     status: 'close'
+  //   }))
+  // );
 
   const filteredData = data.filter((item) => {
     return (
