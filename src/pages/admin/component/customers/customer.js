@@ -127,7 +127,7 @@ function Customer() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'booking_table.csv');
+    link.setAttribute('download', 'cutomer_table.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

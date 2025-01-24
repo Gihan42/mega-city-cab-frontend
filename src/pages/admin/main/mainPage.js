@@ -19,6 +19,7 @@ import Customer from '../component/customers/customer';
 import NotSupported from '../component/notspported/notsupported';
 import Drivers from '../component/drivers/drivers';
 import Vehicle from '../component/vehicles/vehicle';
+import AdminPrfoile from '../profile/adminPrfoile';
 
 const { Header, Sider, Content } = Layout;
 
@@ -65,7 +66,7 @@ function MainPage() {
       case 'Vehicles':
         return <Vehicle/>;
       case 'Profile':
-        return <div>Profile Content</div>;
+        return <AdminPrfoile/>;
       case 'Report':
         return <div>Report Content</div>;
       case 'log-out':

@@ -101,7 +101,7 @@ function Drivers() {
   };
   const downloadPDF = () => {
     const doc = new jsPDF();
-    doc.text('customer Table', 14, 10); 
+    doc.text('driver Table', 14, 10); 
     doc.autoTable({
       startY: 20,
       head: [['#', ' ID', 'Name', 'Age', 'Email', 'Licenece Number	','Nic Number	','Contact	','Address']],
@@ -117,7 +117,7 @@ function Drivers() {
         item.driverAddress
       ]),
     });
-    doc.save('customer_table.pdf');
+    doc.save('driver_table.pdf');
       
         pdfCsvSetAlertVisible(true);
 
@@ -145,7 +145,7 @@ function Drivers() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', 'booking_table.csv');
+      link.setAttribute('download', 'driver.csv');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

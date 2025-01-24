@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
 
-function SignUpComponent() {  // Capitalized 'SignUpComponent'
+function SignUpComponent() {  
 
     const [showPassword, setShowPassword] = useState(false);
 
