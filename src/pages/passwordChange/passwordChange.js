@@ -7,17 +7,18 @@ import IconButton from '@mui/material/IconButton';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
 
-function PasswordChange() {
-  // State to manage visibility for each password field
+function PasswordChange ({
+  currentPassword, setCurrentPassword,
+  newPassword, setNewPassword,
+  confirmPassword, setConfirmPassword,
+  resetInputs
+}) {
   const [showPassword, setShowPassword] = useState({
     current: false,
     new: false,
     confirm: false,
   });
 
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   // Handlers for toggling visibility
   const handleClickShowPassword = (field) => {
     setShowPassword((prev) => ({
@@ -43,6 +44,8 @@ function PasswordChange() {
         <OutlinedInput
           id="current-password"
           type={showPassword.current ? 'text' : 'password'}
+          value={currentPassword}  // controlled input
+          onChange={(e) => setCurrentPassword(e.target.value)}  // update state on change
           endAdornment={
             <InputAdornment position="end">
               <IconButton
@@ -66,6 +69,8 @@ function PasswordChange() {
         <OutlinedInput
           id="new-password"
           type={showPassword.new ? 'text' : 'password'}
+          value={newPassword}  // controlled input
+          onChange={(e) => setNewPassword(e.target.value)}  // update state on change
           endAdornment={
             <InputAdornment position="end">
               <IconButton
@@ -89,6 +94,8 @@ function PasswordChange() {
         <OutlinedInput
           id="confirm-password"
           type={showPassword.confirm ? 'text' : 'password'}
+          value={confirmPassword}  // controlled input
+          onChange={(e) => setConfirmPassword(e.target.value)}  // update state on change
           endAdornment={
             <InputAdornment position="end">
               <IconButton
@@ -127,4 +134,4 @@ function PasswordChange() {
   );
 }
 
-export default PasswordChange;
+export default PasswordChange;

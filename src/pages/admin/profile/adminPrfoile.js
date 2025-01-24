@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -15,11 +15,17 @@ function AdminPrfoile() {
 
     const [pdfAndCsvAlertVisible, pdfCsvSetAlertVisible] = useState(false);
     const [error, somethingError] = useState(false);
-    const [showModal, setShowModal] = useState(false);
+      const [currentPassword, setCurrentPassword] = useState('');
+      const [newPassword, setNewPassword] = useState('');
+      const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleShow = () => setShowModal(true);
-    const handleClose = () => setShowModal(false);
-
+      const resetInputs = () => {
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      };
+  
+    
     const [searchFilters, setSearchFilters] = useState({
         adminId: '',
         adminName: '',
@@ -143,6 +149,7 @@ function AdminPrfoile() {
         }, 3000);
     };
 
+  
 
     return (
         <div className='h-full w-full p-4 md:p-8 lg:p-12'>
@@ -344,12 +351,22 @@ function AdminPrfoile() {
             <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
-                        <div className="modal-header">
+                        <div className="modal-header"> 
                             <h1 className="modal-title fs-5" id="exampleModalLabel" >Change Your Password</h1>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" 
+                            aria-label="Close" onClick={resetInputs}></button>
                         </div>
                         <div className="modal-body">
-                            <PasswordChange/>
+                            <PasswordChange
+                            
+                            currentPassword={currentPassword}
+                            setCurrentPassword={setCurrentPassword}
+                            newPassword={newPassword}
+                            setNewPassword={setNewPassword}
+                            confirmPassword={confirmPassword}
+                            setConfirmPassword={setConfirmPassword}
+                            resetInputs={resetInputs}
+                            />
                         </div>
 
                     </div>
