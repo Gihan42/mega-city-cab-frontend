@@ -347,107 +347,107 @@ function Vehicle() {
             </div>
             <div className='justify-end flex items-center mb-4 flex gap-5 w-full animate__animated animate__backInRight'>
 
-                                <button
-                                    type="button"
-                                    className="btn btn-primary dcButton"
-                                    style={{
-                                        id: 'dcButton',
-                                        backgroundColor: '#0D3B66',
-                                        color: '#fff',
-                                        padding: '10px 20px',
-                                        borderRadius: '10px',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        width: '10%',
-                                    }}
-                                    onClick={downloadPDF}
-                                >
-                                    get pdf
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-warning dcButton"
-                                    style={{
-                                        id: 'dcButton',
-                                        backgroundColor: '#FCA000',
-                                        color: '#0D3B66',
-                                        padding: '10px 20px',
-                                        borderRadius: '10px',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        width: '10%',
-                                    }}
-                                    onClick={downloadCSV}
-                                >
-                                    get csv
-                                </button>
-                                <button type="button" className="btn btn-primary dcButton"
-                                            style={{
-                                                id: 'dcButton',
-                                                backgroundColor: '#008000',
-                                                color: '#fff',
-                                                padding: '10px 20px',
-                                                borderRadius: '10px',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                width: '10%',
-                                            }}
-                                            onClick={handleResetFilters}
-                                        >
-                                            clear
-                                        </button>
+                <button
+                    type="button"
+                    className="btn btn-primary dcButton"
+                    style={{
+                        id: 'dcButton',
+                        backgroundColor: '#0D3B66',
+                        color: '#fff',
+                        padding: '10px 20px',
+                        borderRadius: '10px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        width: '10%',
+                    }}
+                    onClick={downloadPDF}
+                >
+                    get pdf
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-warning dcButton"
+                    style={{
+                        id: 'dcButton',
+                        backgroundColor: '#FCA000',
+                        color: '#0D3B66',
+                        padding: '10px 20px',
+                        borderRadius: '10px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        width: '10%',
+                    }}
+                    onClick={downloadCSV}
+                >
+                    get csv
+                </button>
+                <button type="button" className="btn btn-primary dcButton"
+                    style={{
+                        id: 'dcButton',
+                        backgroundColor: '#008000',
+                        color: '#fff',
+                        padding: '10px 20px',
+                        borderRadius: '10px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        width: '10%',
+                    }}
+                    onClick={handleResetFilters}
+                >
+                    clear
+                </button>
             </div>
 
             <Row>
-                    <Col xs={24} sm={24} md={24} lg={24} className="flex h-full justify-center items-center p-2 h-full animate__animated animate__backInUp">
+                <Col xs={24} sm={24} md={24} lg={24} className="flex justify-center items-center p-2 h-full animate__animated animate__backInUp">
                     <div
-            className="overflow-x-auto table-container max-h-[450px] w-full border border-gray-300 rounded-lg"
-            style={{
-              scrollbarWidth: 'thin',
-              scrollbarColor: '#0D3B66 #E4E4E7',
-            }}
-          >
-                                 <table className="table-auto w-full  text-lg text-left border-collapse" >
-                                   <thead className="bg-gray-100 sticky top-0">
-                                       <tr>
-                                           <th className="border px-4 py-2">#</th>
-                                            <th className="border px-4 py-2" >ID</th>
-                                           <th className="border px-4 py-2" >Model</th>
-                                           <th className="border px-4 py-2" >Plate Number</th>
-                                           <th className="border px-4 py-2" >Category</th>
-                                       <th className="border px-4 py-2" >Price Per Km</th>
-                                          <th className="border px-4 py-2" >Passengers Count</th>
-                                           <th className="border px-4 py-2" >Image</th>
-                                      </tr>
-                                   </thead>
-                                   <tbody>
-                                       {filteredData.map((item, index) => (
-                                            <tr
-                                                key={index}
-                                                className={`hover:bg-gray-50 cursor-pointer ${index % 2 === 0 ? 'bg-gray-50' : ''
-                                                    }`}
-                                                onClick={() => handleRowClick(item)}
-                                            >
-                                                <td className="border px-4 py-2">{index + 1}</td>
-                                                <td className="border px-4 py-2">{item.vehicleId}</td>
-                                                <td className="border px-4 py-2">{item.model}</td>
-                                                <td className="border px-4 py-2">{item.plateNumber}</td>
-                                                <td className="border px-4 py-2">{item.category}</td>
-                                                <td className="border px-4 py-2">{item.pricePerKm}</td>
-                                                <td className="border px-4 py-2">{item.passengersCount}</td>
-                                                <td className="border px-4 py-2">
-                                                    <img
-                                                        src={item.image}
-                                                        alt="Vehicle"
-                                                        style={{ width: '50px', height: '50px', borderRadius: '50%' }}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-          </div>
-                    </Col>
+                        className="overflow-x-auto table-container max-h-[450px] w-full border border-gray-300 rounded-lg"
+                        style={{
+                            scrollbarWidth: 'thin',
+                            scrollbarColor: '#0D3B66 #E4E4E7',
+                        }}
+                    >
+                        <table className="table-auto w-full text-lg text-left border-collapse">
+                            <thead className="bg-gray-100 sticky top-0">
+                                <tr>
+                                    <th className="border px-4 py-2">#</th>
+                                    <th className="border px-4 py-2" >ID</th>
+                                    <th className="border px-4 py-2" >Model</th>
+                                    <th className="border px-4 py-2" >Plate Number</th>
+                                    <th className="border px-4 py-2" >Category</th>
+                                    <th className="border px-4 py-2" >Price Per Km</th>
+                                    <th className="border px-4 py-2" >Passengers Count</th>
+                                    <th className="border px-4 py-2" >Image</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredData.map((item, index) => (
+                                    <tr
+                                        key={index}
+                                        className={`hover:bg-gray-50 cursor-pointer ${index % 2 === 0 ? 'bg-gray-50' : ''}`}
+                                        onClick={() => handleRowClick(item)}
+                                    >
+                                        <td className="border px-4 py-2">{index + 1}</td>
+                                        <td className="border px-4 py-2">{item.vehicleId}</td>
+                                        <td className="border px-4 py-2">{item.model}</td>
+                                        <td className="border px-4 py-2">{item.plateNumber}</td>
+                                        <td className="border px-4 py-2">{item.category}</td>
+                                        <td className="border px-4 py-2">{item.pricePerKm}</td>
+                                        <td className="border px-4 py-2">{item.passengersCount}</td>
+                                        <td className="border px-4 py-2">
+                                            <img
+                                                src={item.image}
+                                                alt="Vehicle"
+                                                style={{ width: '50px', height: '50px', borderRadius: '50%' }}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </Col>
             </Row>
         </div>
     )

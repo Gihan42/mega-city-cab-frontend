@@ -21,6 +21,9 @@ import Drivers from '../component/drivers/drivers';
 import Vehicle from '../component/vehicles/vehicle';
 import AdminPrfoile from '../component/profile/adminPrfoile';
 import Income from '../component/report/income'
+import { useNavigate } from 'react-router-dom';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+
 
 const { Header, Sider, Content } = Layout;
 
@@ -28,6 +31,7 @@ function MainPage() {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState('Dashboard');
   const [isScreenSupported, setIsScreenSupported] = useState(true);
+  const navigate = useNavigate();
 
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -42,6 +46,7 @@ function MainPage() {
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
+
 
   const menuItems = [
     { key: 'Dashboard', icon: <HomeOutlined style={{ fontSize: '24px' }} />, label: 'Dashboard' },
@@ -71,7 +76,7 @@ function MainPage() {
       case 'Income':
         return <Income/>;
       case 'log-out':
-        return <div>Logging Out...</div>;
+        return handleLogout();
       default:
         return <div>Welcome</div>;
     }
@@ -85,9 +90,14 @@ function MainPage() {
     );
   }
 
+  const handleLogout = () => {
+    navigate('/');
+  }
   return (
     <div className="h-full w-full overflow-hidden">
+
       <Layout className="h-screen w-screen">
+
         <Sider trigger={null} collapsible collapsed={collapsed}>
           <div className="demo-logo-vertical" />
           <div className="ml-1 mr-1 h-10 mt-4 mb-6 rounded-lg shadow-lg shadow-blue-500/50 bg-slate-700"></div>
@@ -101,13 +111,19 @@ function MainPage() {
           />
         </Sider>
         <Layout>
-          <Header style={{ padding: 0, background: colorBgContainer }}>
+          <Header style={{ padding: 0, background: colorBgContainer }} className='flex'>
             <Button
               type="text"
               icon={collapsed ? <MenuUnfoldOutlined style={{ fontSize: '24px' }} /> : <MenuFoldOutlined style={{ fontSize: '24px' }} />}
               onClick={() => setCollapsed(!collapsed)}
               style={{ fontSize: '16px', width: 64, height: 64 }}
             />
+                  <div className='w-full  flex justify-end items-center pr-4 '>
+                        <div className=' bg-sky-950 w-36 flex justify-center items-center gap-2 rounded-xl  shadow-lg p-2 text-lg'>
+                          <AccountCircleIcon fontSize="large" sx={{ color: '#fff' }}/>
+                          <h1 className='text-lg font-bold text-white mt-2'>Admin</h1>
+                        </div>
+                  </div>
           </Header>
           <Content
             style={{
@@ -120,6 +136,7 @@ function MainPage() {
           >
             {renderContent()}
           </Content>
+
         </Layout>
       </Layout>
     </div>
