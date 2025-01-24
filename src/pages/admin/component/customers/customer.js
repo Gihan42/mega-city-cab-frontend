@@ -12,13 +12,14 @@ import { Alert, Button, Space } from 'antd';
 function Customer() {
   const [pdfAlertVisible, pdfSetAlertVisible] = useState(false);
   const [csvAlertVisible, csvSetAlertVisible] = useState(false);
-  const [filteredTableData, setFilteredData] = useState(
+  const [data, setFilteredData] = useState(
     Array.from({ length: 20 }).map((_, index) => ({
-      bookingId: `BID-${index + 1}`,
-      customer: `Customer ${index + 1}`,
-      driver: `Driver ${index + 1}`,
-      vehicle: `Vehicle ${index + 1}`,
-      date: new Date().toISOString().slice(0, 10),
+      customerId: `CID-${index + 1}`,
+      customerEmail: `Customer ${index + 1}`,
+      customerName: `Customer ${index + 1}`,
+      customerNic: `Customer ${index + 1}`,
+      customerContact: `Customer ${index + 1}`,
+      customerAddress: `Customer ${index + 1}`,
     }))
   );
   
@@ -42,16 +43,16 @@ function Customer() {
     customerContact: '',
   });
 
-  const [data] = useState(
-    Array.from({ length: 20 }).map((_, index) => ({
-      customerId: `CID-${index + 1}`,
-      customerEmail: `Customer ${index + 1}`,
-      customerName: `Customer ${index + 1}`,
-      customerNic: `Customer ${index + 1}`,
-      customerContact: `Customer ${index + 1}`,
-      customerAddress: `Customer ${index + 1}`,
-    }))
-  );
+  // const [data] = useState(
+  //   Array.from({ length: 20 }).map((_, index) => ({
+  //     customerId: `CID-${index + 1}`,
+  //     customerEmail: `Customer ${index + 1}`,
+  //     customerName: `Customer ${index + 1}`,
+  //     customerNic: `Customer ${index + 1}`,
+  //     customerContact: `Customer ${index + 1}`,
+  //     customerAddress: `Customer ${index + 1}`,
+  //   }))
+  // );
 
   const filteredData = data.filter((item) => {
     return (

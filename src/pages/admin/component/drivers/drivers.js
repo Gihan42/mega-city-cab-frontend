@@ -28,11 +28,11 @@ function Drivers() {
     driverContact: '',
     driverAddress: ''
   });
-  const [filteredTableData, setFilteredData] = useState(
+  const [data, setFilteredData] = useState(
     Array.from({ length: 20 }).map((_, index) => ({
       driverId: `DID-${index + 1}`,
       driverName: `Driver ${index + 1}`,
-      driverAge: `DAge ${index + 1}`,
+      driverAge: `${index + 1}`,
       driverEmail: `DeMAIL ${index + 1}`,
       driverLicenseNumber: `DL ${index + 1}`,
       driverNicNumber: `DN ${index + 1}`,
@@ -40,18 +40,7 @@ function Drivers() {
       driverAddress: `DA ${index + 1}`
     }))
   );
-  const [data] = useState(
-    Array.from({ length: 20 }).map((_, index) => ({
-      driverId: `DID-${index + 1}`,
-      driverName: `Driver ${index + 1}`,
-      driverAge: `DAge ${index + 1}`,
-      driverEmail: `DeMAIL ${index + 1}`,
-      driverLicenseNumber: `DL ${index + 1}`,
-      driverNicNumber: `DN ${index + 1}`,
-      driverContact: `DC ${index + 1}`,
-      driverAddress: `DA ${index + 1}`
-    }))
-  );
+
   const handleResetFilters = () => {
     setSearchFilters({
       driverId: '',
