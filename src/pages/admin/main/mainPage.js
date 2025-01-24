@@ -19,8 +19,8 @@ import Customer from '../component/customers/customer';
 import NotSupported from '../component/notspported/notsupported';
 import Drivers from '../component/drivers/drivers';
 import Vehicle from '../component/vehicles/vehicle';
-import AdminPrfoile from '../profile/adminPrfoile';
-import Report from '../report/rport';
+import AdminPrfoile from '../component/profile/adminPrfoile';
+import Income from '../component/report/income'
 
 const { Header, Sider, Content } = Layout;
 
@@ -50,7 +50,7 @@ function MainPage() {
     { key: 'Drivers', icon: <UserSwitchOutlined style={{ fontSize: '24px' }} />, label: 'Drivers' },
     { key: 'Vehicles', icon: <CarOutlined style={{ fontSize: '24px' }} />, label: 'Vehicles' },
     { key: 'Profile', icon: <ProfileOutlined style={{ fontSize: '24px' }} />, label: 'Profile' },
-    { key: 'Report', icon: <LineChartOutlined style={{ fontSize: '24px' }} />, label: 'Report' },
+    { key: 'Income', icon: <LineChartOutlined style={{ fontSize: '24px' }} />, label: 'Income' },
     { key: 'log-out', icon: <LogoutOutlined style={{ fontSize: '24px' }} />, label: 'log out' },
   ];
 
@@ -68,8 +68,8 @@ function MainPage() {
         return <Vehicle/>;
       case 'Profile':
         return <AdminPrfoile/>;
-      case 'Report':
-        return <Report/>;
+      case 'Income':
+        return <Income/>;
       case 'log-out':
         return <div>Logging Out...</div>;
       default:

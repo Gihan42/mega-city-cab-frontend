@@ -8,8 +8,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import Papa from 'papaparse';
 import { Alert, Button, Space } from 'antd';
-import PasswordChange from '../../passwordChange/passwordChange';
-
+import PasswordChange from '../../../passwordChange/passwordChange';
 
 function AdminPrfoile() {
 
