@@ -8,6 +8,14 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const resizeObserverLoopErr = () => {
+  const observer = window.ResizeObserver;
+  if (observer) {
+    observer.prototype.observe = function () {};
+  }
+};
+resizeObserverLoopErr();
+
 root.render(
   <React.StrictMode>
     <App />
