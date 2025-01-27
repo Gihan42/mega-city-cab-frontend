@@ -3,6 +3,7 @@ import Navbar from '../cpmponent/navbar/navbar'
 import Home from '../cpmponent/home/home';
 import AboutUs from '../cpmponent/aboutUs/aboutUs';
 import Booking from "../cpmponent/booking/booking";
+import Clients from "../cpmponent/comments/commentSection";
 import './userMain.css'
 
 function UserMain() {
@@ -12,6 +13,7 @@ function UserMain() {
         <Home/>
         <AboutUs/>
     <Booking/>
+    <Clients/>
     </div>
   )
 }

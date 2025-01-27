@@ -6,7 +6,7 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-
+import PhoneForwardedIcon from '@mui/icons-material/PhoneForwarded';
 
 function Booking() {
 
@@ -29,7 +29,6 @@ function Booking() {
         Shared: ['Model P', 'Model Q', 'Model R'],
         Outstation: ['Model S', 'Model T', 'Model U'],
     };
-
     return (
         <div className="container mx-auto px-4 py-8" id="booking">
             <div className="flex flex-col">
@@ -53,8 +52,8 @@ function Booking() {
                     </button>
                 ))}
             </div>
-            <h1 className="text-2xl mb-4 md:text-lg lg:text-xl font-normal text-black">Select Car Model</h1>
-            <div className="flex md:flex-row gap-4 p-2  flex-wrap">
+            <h1 className="text-2xl mb-4 md:text-lg lg:text-xl font-normal flex items-start justify-start text-black">Select Car Model</h1>
+            <div className="flex md:flex-row gap-4 p-2 items-center justify-center flex-wrap">
                 {carModels[selectedCategory].map((model, index) => (
                     <button
                         key={index}
@@ -94,63 +93,53 @@ function Booking() {
                 </div>
             </div>
             <div className="flex md:flex-row gap-4 justify-center items-center mt-4  p-6 flex-wrap mb-4 ">
-                <Card sx={{minWidth: 375}}
-                      className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
-                    <CardContent>
-                        <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 14}}>
-                            Word of the Day
+                <Card sx={{minWidth: 375}}  className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
+                    <CardContent className='justify-center items-center flex flex-col gap-2'>
+                        <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 35}}>
+                            Vehicle
                         </Typography>
-                        <Typography variant="h5" component="div"></Typography>
-                        <Typography sx={{color: 'text.secondary', mb: 1.5}}>adjective</Typography>
-                        <Typography variant="body2">
-                            well meaning and kindly.
-                            <br/>
-                            {'"a benevolent smile"'}
+                        <Typography variant="h5" component="div">
+                            wagonar
                         </Typography>
+                        <Typography variant="h5" component="div">
+                            SID-34567
+                        </Typography>
+
                     </CardContent>
-                    <CardActions>
-                        <Button size="small">Learn More</Button>
-                    </CardActions>
                 </Card>
                 <Card sx={{minWidth: 375}}
                       className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
-                    <CardContent>
-                        <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 14}}>
-                            Word of the Day
+                    <CardContent className='justify-center items-center flex flex-col gap-12'>
+                        <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 35}}>
+                            Price / Per KM
                         </Typography>
-                        <Typography variant="h5" component="div">
+                        <Typography variant="h5" component="div"  sx={{color: 'text.secondary', fontSize: 25}}>
+                            Rs 100.00
+                        </Typography>
 
-                        </Typography>
-                        <Typography sx={{color: 'text.secondary', mb: 1.5}}>adjective</Typography>
-                        <Typography variant="body2">
-                            well meaning and kindly.
-                            <br/>
-                            {'"a benevolent smile"'}
-                        </Typography>
                     </CardContent>
-                    <CardActions>
-                        <Button size="small">Learn More</Button>
-                    </CardActions>
+
                 </Card>
                 <Card sx={{minWidth: 375}}
                       className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
-                    <CardContent>
-                        <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 14}}>
-                            Word of the Day
+                    <CardContent className='justify-center items-center flex flex-col gap-2'>
+                        <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 35}}>
+                            Driver
                         </Typography>
                         <Typography variant="h5" component="div">
+                            Mr Piyal Soriyapperuma
+                        </Typography>
+                        <Typography variant="h5" component="div"
+                                    className='flex justify-center items-center w-full gap-4'>
+                            075-49494093
+                            <div
+                                className="rounded-full p-1 hover:bg-sky-900  hover:text-white transition-all duration-300">
+                                <PhoneForwardedIcon className="text-[#FCA000] hover:text-white" />
+                            </div>
+
 
                         </Typography>
-                        <Typography sx={{color: 'text.secondary', mb: 1.5}}>adjective</Typography>
-                        <Typography variant="body2">
-                            well meaning and kindly.
-                            <br/>
-                            {'"a benevolent smile"'}
-                        </Typography>
                     </CardContent>
-                    <CardActions>
-                        <Button size="small">Learn More</Button>
-                    </CardActions>
                 </Card>
             </div>
             <div className="flex md:flex-row gap-4 mt-4  p-4 flex-wrap mb-4 justify-center items-center  ">
@@ -166,6 +155,7 @@ function Booking() {
                         border: 'none',
                         cursor: 'pointer',
                         width: '50%',
+                        fontSize: '1.5rem'
                     }}
                 >
                     chose another cab
@@ -210,8 +200,8 @@ function Booking() {
 
                             <button
                                 type="submit"
-                                className="w-full mt-6 bg-[#FCA000] text-[#0D3B66] py-3 px-6 rounded-lg
-                     text-base md:text-lg font-semibold hover:bg-yellow-500
+                                className="w-full mt-8 bg-[#FCA000] text-[#0D3B66] py-3 px-6 rounded-lg
+                     text-base md:text-lg font-semibold
                      transition-colors duration-200 ease-in-out
                      focus:outline-none focus:ring-2 focus:ring-yellow-300"
                             >
@@ -230,8 +220,6 @@ function Booking() {
                     </Col>
                 </Row>
             </div>
-
-
         </div>
     );
 }
