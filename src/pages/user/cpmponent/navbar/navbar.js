@@ -47,7 +47,7 @@ function Navbar() {
   return (
       <div className="w-full h-auto fixed top-0 left-0 z-50">
         <nav
-            className={`navbar navbar-expand-lg ${isScrolled ? 'bg-white' : 'bg-transparent'} transition-all`}
+            className={`navbar navbar-expand-lg ${isScrolled ? 'bg-white' : 'bg-white'} transition-all`}
             style={{
               boxShadow: isScrolled ? '0 2px 2px -2px gray' : 'none', // Optional: Add shadow when scrolled
             }}
@@ -66,19 +66,19 @@ function Navbar() {
             {/* Left side links */}
             {!isMobile && (
                 <div className="flex gap-4 justify-center text-white w-full">
-                  <Link className="navbar-brand navbar-links cursor-pointer" to="home" smooth={true} duration={500}>
+                  <Link style={{ color: '#011c2f', transition: 'color 0.3s',   fontSize: '20px' }} className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer" to="home" smooth={true} duration={500}>
                     Home
                   </Link>
-                  <Link className="navbar-brand navbar-links cursor-pointer" to="aboutUs" smooth={true} duration={500}>
+                  <Link style={{ color: '#011c2f', transition: 'color 0.3s',  fontSize: '20px', }} className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer" to="aboutUs" smooth={true} duration={500}>
                     About Us
                   </Link>
-                  <Link className="navbar-brand navbar-links cursor-pointer" to="booking" smooth={true} duration={500}>
+                  <Link style={{ color: '#011c2f', transition: 'color 0.3s',  fontSize: '20px'}} className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer" to="booking" smooth={true} duration={500}>
                     Booking
                   </Link>
-                  <Link className="navbar-brand navbar-links cursor-pointer" to="clients" smooth={true} duration={500}>
+                  <Link style={{ color: '#011c2f', transition: 'color 0.3s',  fontSize: '20px' }} className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer" to="clients" smooth={true} duration={500}>
                     Clients
                   </Link>
-                  <Link className="navbar-brand navbar-links cursor-pointer" href="#">
+                  <Link style={{ color: '#011c2f', transition: 'color 0.3s',  fontSize: '20px' }} className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer" href="#">
                     Profile
                   </Link>
                 </div>
