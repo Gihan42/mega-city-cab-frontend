@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { Card, CardActions, CardContent, CardMedia, Button, Typography, TextField } from '@mui/material';
 import Logo from '../../../..//assets/Mega_City_Cab_Logo.jpg';
+import Footer from '../footer/footer'
 import 'animate.css';
 
 function Home() {

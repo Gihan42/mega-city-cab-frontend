@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-scroll';
 import Logo from '../../../../assets/Mega_City_Cab_Logo.jpg';
+import {useNavigate} from "react-router-dom";
 
 function Navbar() {
   const [isMobile, setIsMobile] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const navigate = useNavigate();
 
   // Handle screen resizing for mobile/desktop detection
   useEffect(() => {
@@ -38,6 +40,10 @@ function Navbar() {
     };
   }, []);
 
+  function logOut(){
+    navigate('/');
+  }
+
   return (
       <div className="w-full h-auto fixed top-0 left-0 z-50">
         <nav
@@ -57,6 +63,7 @@ function Navbar() {
               ></div>
             </a>
 
+            {/* Left side links */}
             {!isMobile && (
                 <div className="flex gap-4 justify-center text-white w-full">
                   <Link className="navbar-brand navbar-links cursor-pointer" to="home" smooth={true} duration={500}>
@@ -77,6 +84,7 @@ function Navbar() {
                 </div>
             )}
 
+            {/* Mobile menu */}
             {isMobile && (
                 <>
                   <button
@@ -119,6 +127,20 @@ function Navbar() {
                   </div>
                 </>
             )}
+
+            {/* Logout button aligned to the right */}
+            <div className="ml-auto">
+              <button className="btn btn-danger" style={{
+                backgroundColor: '#0D3B66',
+                color: '#fff',
+                padding: '10px 20px',
+                borderRadius: '10px',
+                border: 'none',
+                cursor: 'pointer',
+              }} onClick={logOut}>
+                Logout
+              </button>
+            </div>
           </div>
         </nav>
       </div>
