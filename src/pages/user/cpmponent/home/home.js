@@ -11,7 +11,7 @@ import 'animate.css';
 
 function Home() {
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative w-full h-screen" id='home'>
       <Navbar />
       <div
         id="carouselExampleControlsNoTouching"
@@ -25,7 +25,7 @@ function Home() {
               className="d-block w-full h-full object-cover"
               alt="Slide 1"
             />
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
             flex justify-start items-start sm:ml:12 md:ml-24 lg:ml-44 w-full px-4 sm:px-8 md:px-16 lg:px-24">
               <Card className="w-full max-w-md bg-white shadow-lg p-2 animate__animated animate__backInLeft rounded-xl  shadow-lg">
                 <CardMedia

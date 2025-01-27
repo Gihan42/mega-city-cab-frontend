@@ -44,7 +44,7 @@ function AboutUs() {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8" id='aboutUs'>
             <div className="flex flex-col lg:flex-row gap-6 items-center">
                 {/* About Section */}
                 <div className="w-full lg:w-1/2 space-y-6 animate__animated animate__backInLeft">
