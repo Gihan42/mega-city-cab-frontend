@@ -78,7 +78,7 @@ function AboutUs() {
                 {/* Container */}
                 <div className="w-full lg:w-1/2 min-h-[300px] md:min-h-[400px] lg:min-h-[500px] flex justify-center items-center p-4 animate__animated animate__backInRight">
                     {/* Card */}
-                    <Card className="w-full max-w-sm md:max-w-md bg-white p-3 md:p-4 rounded-xl shadow-xl animate__animated animate__backInLeft">
+                    <Card className="w-full max-w-sm md:max-w-md bg-white border-1 p-3 md:p-4 rounded-xl shadow-xl animate__animated animate__backInLeft">
                         {/* Card Image */}
                         <CardMedia
                             className="h-40 md:h-48 lg:h-52 rounded-lg transition-all duration-300 hover:opacity-90"

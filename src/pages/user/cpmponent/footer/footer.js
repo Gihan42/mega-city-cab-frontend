@@ -17,7 +17,7 @@ function Footer() {
                     <section>
                         <div className="row">
                             <div className="col-lg-4 col-md-6 mb-4 mb-md-0">
-                                <h5 className="text-uppercase">FOOTER CONTENT</h5>
+                                <h5 className="text-uppercase">MEGA CITY CAB</h5>
 
                                 <p>
                                     Lorem ipsum dolor sit amet consectetur adipisicing elit.

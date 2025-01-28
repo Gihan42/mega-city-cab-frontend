@@ -4,6 +4,7 @@ import Admin from './pages/admin/main/mainPage';
 import NotFound from './pages/pageNotFound/pagenotfound'
 import UserMain from './pages/user/main/userMain';
 import AboutUs  from './pages/user/cpmponent/aboutUs/aboutUs';
+import Profile from './pages/user/cpmponent/profile/profile'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -13,7 +14,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/User" element={<UserMain />} />
-        <Route path="/aboutUs" element={<AboutUs />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/*" element={<NotFound />} />
       </Routes>
     </Router>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-scroll';
+import { Link as ScrollLink } from 'react-scroll';
+import { Link as RouterLink, useNavigate } from 'react-router-dom'; // Import RouterLink
 import Logo from '../../../../assets/Mega_City_Cab_Logo.jpg';
-import {useNavigate} from "react-router-dom";
 
 function Navbar() {
   const [isMobile, setIsMobile] = useState(false);
@@ -40,7 +40,7 @@ function Navbar() {
     };
   }, []);
 
-  function logOut(){
+  function logOut() {
     navigate('/');
   }
 
@@ -66,21 +66,49 @@ function Navbar() {
             {/* Left side links */}
             {!isMobile && (
                 <div className="flex gap-4 justify-center text-white w-full">
-                  <Link style={{ color: '#011c2f', transition: 'color 0.3s',   fontSize: '20px' }} className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer" to="home" smooth={true} duration={500}>
+                  <ScrollLink
+                      style={{ color: '#011c2f', transition: 'color 0.3s', fontSize: '20px' }}
+                      className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer"
+                      to="home"
+                      smooth={true}
+                      duration={500}
+                  >
                     Home
-                  </Link>
-                  <Link style={{ color: '#011c2f', transition: 'color 0.3s',  fontSize: '20px', }} className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer" to="aboutUs" smooth={true} duration={500}>
+                  </ScrollLink>
+                  <ScrollLink
+                      style={{ color: '#011c2f', transition: 'color 0.3s', fontSize: '20px' }}
+                      className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer"
+                      to="aboutUs"
+                      smooth={true}
+                      duration={500}
+                  >
                     About Us
-                  </Link>
-                  <Link style={{ color: '#011c2f', transition: 'color 0.3s',  fontSize: '20px'}} className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer" to="booking" smooth={true} duration={500}>
+                  </ScrollLink>
+                  <ScrollLink
+                      style={{ color: '#011c2f', transition: 'color 0.3s', fontSize: '20px' }}
+                      className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer"
+                      to="booking"
+                      smooth={true}
+                      duration={500}
+                  >
                     Booking
-                  </Link>
-                  <Link style={{ color: '#011c2f', transition: 'color 0.3s',  fontSize: '20px' }} className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer" to="clients" smooth={true} duration={500}>
+                  </ScrollLink>
+                  <ScrollLink
+                      style={{ color: '#011c2f', transition: 'color 0.3s', fontSize: '20px' }}
+                      className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer"
+                      to="clients"
+                      smooth={true}
+                      duration={500}
+                  >
                     Clients
-                  </Link>
-                  <Link style={{ color: '#011c2f', transition: 'color 0.3s',  fontSize: '20px' }} className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer" href="#">
+                  </ScrollLink>
+                  <RouterLink
+                      style={{ color: '#011c2f', transition: 'color 0.3s', fontSize: '20px' }}
+                      className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer"
+                      to="/profile"
+                  >
                     Profile
-                  </Link>
+                  </RouterLink>
                 </div>
             )}
 
@@ -101,27 +129,29 @@ function Navbar() {
                   <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav">
                       <li className="nav-item">
-                        <Link className="nav-link" to="home" smooth={true} duration={500}>
+                        <ScrollLink className="nav-link" to="home" smooth={true} duration={500}>
                           Home
-                        </Link>
+                        </ScrollLink>
                       </li>
                       <li className="nav-item">
-                        <Link className="nav-link" to="aboutUs" smooth={true} duration={500}>
+                        <ScrollLink className="nav-link" to="aboutUs" smooth={true} duration={500}>
                           About Us
-                        </Link>
+                        </ScrollLink>
                       </li>
                       <li className="nav-item">
-                        <Link className="nav-link" to="booking" smooth={true} duration={500}>
+                        <ScrollLink className="nav-link" to="booking" smooth={true} duration={500}>
                           Booking
-                        </Link>
+                        </ScrollLink>
                       </li>
                       <li className="nav-item">
-                        <Link className="nav-link" to="clients" smooth={true} duration={500}>
+                        <ScrollLink className="nav-link" to="clients" smooth={true} duration={500}>
                           Clients
-                        </Link>
+                        </ScrollLink>
                       </li>
                       <li className="nav-item">
-                        <Link className="nav-link">Profile</Link>
+                        <RouterLink className="nav-link" to="/profile">
+                          Profile
+                        </RouterLink>
                       </li>
                     </ul>
                   </div>
@@ -130,14 +160,18 @@ function Navbar() {
 
             {/* Logout button aligned to the right */}
             <div className="ml-auto">
-              <button className="btn btn-danger" style={{
-                backgroundColor: '#0D3B66',
-                color: '#fff',
-                padding: '10px 20px',
-                borderRadius: '10px',
-                border: 'none',
-                cursor: 'pointer',
-              }} onClick={logOut}>
+              <button
+                  className="btn btn-danger"
+                  style={{
+                    backgroundColor: '#0D3B66',
+                    color: '#fff',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                  onClick={logOut}
+              >
                 Logout
               </button>
             </div>
