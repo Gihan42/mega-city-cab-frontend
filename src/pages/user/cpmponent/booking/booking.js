@@ -30,13 +30,13 @@ function Booking() {
         Outstation: ['Model S', 'Model T', 'Model U'],
     };
     return (
-        <div className="container mx-auto px-4 py-8" id="booking">
+        <div className="container mx-auto bg-slate-100 shadow-xl rounded-xl mt-32 px-4 py-8" id="booking">
             <div className="flex flex-col">
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-normal text-sky-900">Booking Now</h1>
                 <hr className="border-t-4 border-black w-1/3"/>
             </div>
             <h1 className="text-2xl md:text-lg lg:text-xl mb-4 font-normal text-black">Select Car Category</h1>
-            <div className="flex md:flex-row gap-4  p-4 flex-wrap mb-4 bg-slate-100 shadow-xl rounded-4  ">
+            <div className="flex md:flex-row gap-4  p-4 flex-wrap mb-4 bg-white shadow-xl rounded-4  ">
                 {carCategories.map((category, index) => (
                     <button
                         key={index}
@@ -79,7 +79,7 @@ function Booking() {
                     </button>
                 ))}
             </div>
-            <div className="flex flex-col  mt-4 p-4 justify-center items-center bg-slate-100 shadow-xl rounded-4">
+            <div className="flex flex-col  mt-4 p-4 justify-center items-center bg-white shadow-xl rounded-4">
                 <div
                     className="w-1/2 rounded-5 shadow-lg"
                     style={{
@@ -162,7 +162,7 @@ function Booking() {
                 </button>
             </div>
             <h1 className="text-2xl mb-4 md:text-2xl lg:text-2xl font-normal text-black">Confirm Your Booking</h1>
-            <div className="bg-slate-100 shadow-xl rounded-4  mt-4 p-4">
+            <div className="bg-white shadow-xl rounded-4  mt-4 p-4">
                 <Row className="mt-6 w-full flex flex-col lg:flex-row">
                     {/* Booking Form Column */}
                     <Col

@@ -5,6 +5,7 @@ import ContactImage from '../../../../assets/5124556.jpg';
 import 'animate.css';
 import { LocalPhone, MarkEmailUnread, LinkedIn, Instagram, Facebook } from '@mui/icons-material';
 import emailjs from 'emailjs-com';
+import { Card, CardActions, CardContent, CardMedia, Typography, TextField } from '@mui/material';
 
 function AboutUs() {
     const [success, setSuccess] = useState(false);
@@ -73,14 +74,68 @@ function AboutUs() {
                     </button>
                 </div>
 
-                {/* Logo Section */}
-                <div className="w-full lg:w-1/2 h-[300px] md:h-[400px] lg:h-[500px] animate__animated animate__backInRight">
-                    <div
-                        className="h-full w-full bg-cover bg-center rounded-2xl"
-                        style={{ backgroundImage: `url(${LogoImage})` }}
-                    />
-                </div>
+                {/* comment Section */}
+                {/* Container */}
+                <div className="w-full lg:w-1/2 min-h-[300px] md:min-h-[400px] lg:min-h-[500px] flex justify-center items-center p-4 animate__animated animate__backInRight">
+                    {/* Card */}
+                    <Card className="w-full max-w-sm md:max-w-md bg-white p-3 md:p-4 rounded-xl shadow-xl animate__animated animate__backInLeft">
+                        {/* Card Image */}
+                        <CardMedia
+                            className="h-40 md:h-48 lg:h-52 rounded-lg transition-all duration-300 hover:opacity-90"
+                            image={LogoImage}
+                            title="Mega City Cab"
+                            sx={{
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                            }}
+                        />
 
+                        {/* Card Content */}
+                        <CardContent className="py-4">
+                            <Typography
+                                gutterBottom
+                                variant="h5"
+                                component="div"
+                                className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-800"
+                            >
+                                Add a comment
+                            </Typography>
+                            <TextField
+                                id="outlined-multiline-static"
+                                label="Write your comment"
+                                multiline
+                                rows={3}
+                                fullWidth
+                                variant="outlined"
+                                className="mt-2"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '&:hover fieldset': {
+                                            borderColor: '#0D3B66',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: '#0D3B66',
+                                        },
+                                    },
+                                }}
+                            />
+                        </CardContent>
+
+                        {/* Card Actions */}
+                        <CardActions className="px-4 pb-4">
+                            <button
+                                type="button"
+                                className="w-full bg-[#0D3B66] text-white py-2.5 md:py-3 px-4 md:px-6
+                         rounded-lg text-sm md:text-base font-medium
+                         transition-all duration-200
+                         hover:bg-sky-800 focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50
+                         disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Add Comment
+                            </button>
+                        </CardActions>
+                    </Card>
+                </div>
                 {/* Modal */}
                 <div
                     className="modal fade"
