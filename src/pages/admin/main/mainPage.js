@@ -10,8 +10,10 @@ import {
   UserSwitchOutlined,
   ProfileOutlined,
   LineChartOutlined,
-  CarOutlined
+  CarOutlined,
+  CommentOutlined
 } from '@ant-design/icons';
+
 import { Button, Layout, Menu, theme } from 'antd';
 import Booking from '../component/booking/booking';
 import DashBoard from "../component/dashboard/dashboard";
@@ -20,7 +22,8 @@ import NotSupported from '../component/notspported/notsupported';
 import Drivers from '../component/drivers/drivers';
 import Vehicle from '../component/vehicles/vehicle';
 import AdminPrfoile from '../component/profile/adminPrfoile';
-import Income from '../component/report/income'
+import Income from '../component/report/income';
+import Comments from '../component/comments/comments';
 import { useNavigate } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
@@ -56,6 +59,7 @@ function MainPage() {
     { key: 'Vehicles', icon: <CarOutlined style={{ fontSize: '24px' }} />, label: 'Vehicles' },
     { key: 'Profile', icon: <ProfileOutlined style={{ fontSize: '24px' }} />, label: 'Profile' },
     { key: 'Income', icon: <LineChartOutlined style={{ fontSize: '24px' }} />, label: 'Income' },
+    { key: 'Comments', icon: <CommentOutlined  style={{ fontSize: '24px' }} />, label: 'Comments' },
     { key: 'log-out', icon: <LogoutOutlined style={{ fontSize: '24px' }} />, label: 'log out' },
   ];
 
@@ -75,6 +79,8 @@ function MainPage() {
         return <AdminPrfoile/>;
       case 'Income':
         return <Income/>;
+      case 'Comments':
+        return <Comments/>;
       case 'log-out':
         return handleLogout();
       default:
