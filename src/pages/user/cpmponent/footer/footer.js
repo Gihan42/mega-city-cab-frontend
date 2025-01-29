@@ -8,7 +8,7 @@ function Footer() {
     }
 
     return (
-        <div className="carousel slide w-full h-full" id="carouselExampleControlsNoTouching" data-bs-touch="false">
+        <div className="carousel slide mt-32 w-full h-full" id="carouselExampleControlsNoTouching" data-bs-touch="false">
             <footer
                 className="text-center text-lg-start text-white"
                 style={{ backgroundColor: '#0A2136', width: '100%' }}

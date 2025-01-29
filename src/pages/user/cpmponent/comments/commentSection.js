@@ -13,7 +13,7 @@ function CommentSection() {
     ];
     const images = [CardOne, CardTwo, CardThree, CardFour];
     return (
-        <div className="container mx-auto px-4 py-8" id="clients">
+        <div className="container pt-4 mx-auto mt-20 px-4 py-8" id="clients">
             {/* Header Section */}
             <div className="flex flex-col mb-8">
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-normal text-sky-900">
