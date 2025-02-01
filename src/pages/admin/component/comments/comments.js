@@ -12,7 +12,7 @@ import { Alert, Button, Space } from 'antd';
 function Comments() {
 
     const [pdfAndCsvAlertVisible, pdfCsvSetAlertVisible] = useState(false);
-    const[error,somethingError]=useState(false);
+    const [error, somethingError] = useState(false);
 
     const [searchFilters, setSearchFilters] = useState({
         commentId: '',
@@ -76,7 +76,7 @@ function Comments() {
             customerId: item.customerId,
             customerName: item.customerName,
             comment: item.comment,
-            commentDate:item.commentDate
+            commentDate: item.commentDate
 
         });
     };
@@ -113,7 +113,7 @@ function Comments() {
                 customerId: item.customerId,
                 customerName: item.customerName,
                 comment: item.comment,
-                commentDate:item.commentDate
+                commentDate: item.commentDate
             }))
         )
         const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
@@ -175,11 +175,11 @@ function Comments() {
                                 fullWidth
                                 value={searchFilters.commentId}
                                 onChange={handleInputChange}
-                                sx={{marginBottom: '1rem', '& .MuiOutlinedInput-root': {borderRadius: '8px'}}}
+                                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
-                                            <SearchIcon/>
+                                            <SearchIcon />
                                         </InputAdornment>
                                     ),
                                 }}
@@ -191,11 +191,11 @@ function Comments() {
                                 fullWidth
                                 value={searchFilters.customerId}
                                 onChange={handleInputChange}
-                                sx={{marginBottom: '1rem', '& .MuiOutlinedInput-root': {borderRadius: '8px'}}}
+                                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
-                                            <SearchIcon/>
+                                            <SearchIcon />
                                         </InputAdornment>
                                     ),
                                 }}
@@ -208,11 +208,11 @@ function Comments() {
                                 value={searchFilters.customerName}
                                 onChange={handleInputChange}
                                 type='number'
-                                sx={{marginBottom: '1rem', '& .MuiOutlinedInput-root': {borderRadius: '8px'}}}
+                                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
-                                            <SearchIcon/>
+                                            <SearchIcon />
                                         </InputAdornment>
                                     ),
                                 }}
@@ -224,31 +224,45 @@ function Comments() {
                                 fullWidth
                                 value={searchFilters.commentDate}
                                 onChange={handleInputChange}
-                                sx={{marginBottom: '1rem', '& .MuiOutlinedInput-root': {borderRadius: '8px'}}}
+                                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
-                                            <SearchIcon/>
+                                            <SearchIcon />
                                         </InputAdornment>
                                     ),
                                 }}
                             />
 
                             <button type="button" className="btn btn-primary dcButton"
-                                    style={{
-                                        id: 'dcButton',
-                                        backgroundColor: '#FCA000',
-                                        color: '#0D3B66',
-                                        padding: '10px 20px',
-                                        borderRadius: '10px',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        width: '80%',
-                                        marginBottom: '1rem',
-                                    }}
-                                    onClick={handleResetFilters}
+                                style={{
+                                    id: 'dcButton',
+                                    backgroundColor: '#FCA000',
+                                    color: '#0D3B66',
+                                    padding: '10px 20px',
+                                    borderRadius: '10px',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    width: '80%',
+                                    marginBottom: '1rem',
+                                }}
+                                onClick={handleResetFilters}
                             >
                                 clear
+                            </button>
+                            <button type="button" className="btn btn-primary dcButton"
+                                style={{
+                                    id: 'dcButton',
+                                    backgroundColor: '#C1121F',
+                                    color: '#fff',
+                                    padding: '10px 20px',
+                                    borderRadius: '10px',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    width: '80%',
+                                    marginBottom: '1rem',
+                                }} >
+                                delete
                             </button>
                         </div>
                     </form>
@@ -259,32 +273,32 @@ function Comments() {
             </div>
             <div className='justify-start items-center mb-4 flex gap-5 w-full animate__animated animate__backInRight'>
                 <button type="button" className="btn btn-primary dcButton"
-                        style={{
-                            id: 'dcButton',
-                            backgroundColor: '#0D3B66',
-                            color: '#fff',
-                            padding: '10px 20px',
-                            borderRadius: '10px',
-                            border: 'none',
-                            cursor: 'pointer',
-                            width: '10%',
-                        }}
-                        onClick={downloadPDF}
+                    style={{
+                        id: 'dcButton',
+                        backgroundColor: '#0D3B66',
+                        color: '#fff',
+                        padding: '10px 20px',
+                        borderRadius: '10px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        width: '10%',
+                    }}
+                    onClick={downloadPDF}
                 >
                     get pdf
                 </button>
                 <button type="button" className="btn btn-warning dcButton"
-                        style={{
-                            id: 'dcButton',
-                            backgroundColor: '#FCA000',
-                            color: '#0D3B66',
-                            padding: '10px 20px',
-                            borderRadius: '10px',
-                            border: 'none',
-                            cursor: 'pointer',
-                            width: '10%',
-                        }}
-                        onClick={downloadCSV}
+                    style={{
+                        id: 'dcButton',
+                        backgroundColor: '#FCA000',
+                        color: '#0D3B66',
+                        padding: '10px 20px',
+                        borderRadius: '10px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        width: '10%',
+                    }}
+                    onClick={downloadCSV}
                 >
                     get csv
                 </button>
@@ -301,36 +315,36 @@ function Comments() {
                     >
                         <table className="table-auto w-full text-lg text-left border-collapse">
                             <thead className="bg-gray-100 sticky top-0">
-                            <tr>
-                                <th className="border px-4 py-2">#</th>
-                                <th className="border px-4 py-2"> ID</th>
-                                <th className="border px-4 py-2">Customer Id</th>
-                                <th className="border px-4 py-2">Customer Name</th>
-                                <th className="border px-4 py-2">Comment</th>
-                                <th className="border px-4 py-2">Date</th>
-
-
-
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {filteredData.map((item, index) => (
-                                <tr
-                                    key={index}
-                                    className={`hover:bg-gray-50 cursor-pointer ${index % 2 === 0 ? 'bg-gray-50' : ''}`}
-                                    onClick={() => handleRowClick(item)}
-                                >
-                                    <td className="border px-4 py-2">{index + 1}</td>
-                                    <td className="border px-4 py-2">{item.commentId}</td>
-                                    <td className="border px-4 py-2">{item.customerId}</td>
-                                    <td className="border px-4 py-2">{item.customerName}</td>
-                                    <td className="border px-4 py-2">{item.comment}</td>
-                                    <td className="border px-4 py-2">{item.commentDate}</td>
+                                <tr>
+                                    <th className="border px-4 py-2">#</th>
+                                    <th className="border px-4 py-2"> ID</th>
+                                    <th className="border px-4 py-2">Customer Id</th>
+                                    <th className="border px-4 py-2">Customer Name</th>
+                                    <th className="border px-4 py-2">Comment</th>
+                                    <th className="border px-4 py-2">Date</th>
 
 
 
                                 </tr>
-                            ))}
+                            </thead>
+                            <tbody>
+                                {filteredData.map((item, index) => (
+                                    <tr
+                                        key={index}
+                                        className={`hover:bg-gray-50 cursor-pointer ${index % 2 === 0 ? 'bg-gray-50' : ''}`}
+                                        onClick={() => handleRowClick(item)}
+                                    >
+                                        <td className="border px-4 py-2">{index + 1}</td>
+                                        <td className="border px-4 py-2">{item.commentId}</td>
+                                        <td className="border px-4 py-2">{item.customerId}</td>
+                                        <td className="border px-4 py-2">{item.customerName}</td>
+                                        <td className="border px-4 py-2">{item.comment}</td>
+                                        <td className="border px-4 py-2">{item.commentDate}</td>
+
+
+
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
