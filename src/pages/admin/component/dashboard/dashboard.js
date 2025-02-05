@@ -83,11 +83,11 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen w-full p-4">
+    <div className=" w-full p-4 h-full">
       <Row className="flex flex-col lg:flex-row gap-4">
         <Col className="flex-1">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
             {[
               { title: 'Total Drivers', ref: countRef },
               { title: 'Total Vehicles', ref: countRefVehicle },
@@ -95,7 +95,7 @@ function Dashboard() {
             ].map((item, index) => (
               <div key={index} className="bg-white rounded-lg shadow-lg p-6 animate__animated animate__backInDown">
                 <div className="flex flex-col items-center justify-center h-32">
-                  <h2 className="text-xl text-sky-900 mb-4">{item.title}</h2>
+                  <h2 className="text-xl text-sky-900 ">{item.title}</h2>
                   <span ref={item.ref} className="text-2xl font-semibold">0</span>
                 </div>
               </div>
@@ -103,7 +103,7 @@ function Dashboard() {
           </div>
 
           {/* Title */}
-          <div className=" flex justify-center text-center mb-8">
+          <div className=" flex justify-center text-center pt-2 pb-2">
             <h1 className="text-4xl md:text-6xl text-sky-900 animate__animated animate__backInLeft">mega ci</h1> <h1 className='text-4xl md:text-6xl text-sky-900 animate__animated animate__backInRight'>ty cab</h1>
           </div>
 

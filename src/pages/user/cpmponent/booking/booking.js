@@ -30,6 +30,8 @@ function Booking() {
     const [hours, setHours] = useState(null);
     const [total, setTotal] = useState(null);
     const [error, setError] = useState(null);
+    const [minDateTime, setMinDateTime] = useState("");
+
 
     const fetchCoordinates = async (city) => {
         try {
@@ -105,9 +107,9 @@ function Booking() {
     const [today, setToday] = useState('');
 
     useEffect(() => {
-        const currentDate = new Date();
-        const formattedDate = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-        setToday(formattedDate);
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Adjust for local timezone
+        setMinDateTime(now.toISOString().slice(0, 16)); // Format: "YYYY-MM-DDTHH:MM"
     }, []);
 
     const carCategories = ['Economy', 'Standard', 'Luxury', 'Premium', 'Business', 'Shared', 'Outstation'];
@@ -123,14 +125,11 @@ function Booking() {
     };
 
 
-
-
-
     return (
         <div className="container mx-auto bg-slate-100 shadow-xl rounded-xl mt-32 px-4 py-8" id="booking">
             <div className="flex flex-col">
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-normal text-sky-900">Booking Now</h1>
-                <hr className="border-t-4 border-black w-1/3"/>
+                <hr className="border-t-4 border-black w-1/3" />
             </div>
             <h1 className="text-2xl md:text-lg lg:text-xl mb-4 font-normal text-black">Select Car Category</h1>
             <div className="flex md:flex-row gap-4  p-4 flex-wrap mb-4 bg-white shadow-xl rounded-4  ">
@@ -139,11 +138,10 @@ function Booking() {
                         key={index}
                         type="button"
                         onClick={() => setSelectedCategory(category)} // Set selected category on click
-                        className={`rounded-5 px-4 py-2 font-medium transition-all  ${
-                            selectedCategory === category
-                                ? 'bg-[#0D3B66] text-white'
-                                : 'bg-[#FCA000] text-[#0D3B66] hover:bg-[#0D3B66] hover:text-white'
-                        }`}
+                        className={`rounded-5 px-4 py-2 font-medium transition-all  ${selectedCategory === category
+                            ? 'bg-[#0D3B66] text-white'
+                            : 'bg-[#FCA000] text-[#0D3B66] hover:bg-[#0D3B66] hover:text-white'
+                            }`}
                     >
                         {category}
                     </button>
@@ -191,10 +189,10 @@ function Booking() {
                 </div>
             </div>
             <div className="flex md:flex-row gap-4 justify-center items-center mt-4  p-6 flex-wrap mb-4 ">
-                <Card sx={{minWidth: 375}}
-                      className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
-                    <CardContent className='justify-center items-center flex flex-col gap-2'>
-                        <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 35}}>
+                <Card sx={{ minWidth: 375 }}
+                    className=" cursor-pointer  border-1 text-white shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
+                    <CardContent className='justify-center text-white bg-sky-950 items-center flex flex-col gap-2'>
+                        <Typography gutterBottom sx={{ color: 'white', fontSize: 35 }}>
                             Vehicle
                         </Typography>
                         <Typography variant="h5" component="div">
@@ -206,34 +204,34 @@ function Booking() {
 
                     </CardContent>
                 </Card>
-                <Card sx={{minWidth: 375}}
-                      className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
-                    <CardContent className='justify-center items-center flex flex-col gap-12'>
-                        <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 35}}>
+                <Card sx={{ minWidth: 375 }}
+                    className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
+                    <CardContent className='justify-center text-white bg-sky-950 items-center flex flex-col gap-12'>
+                        <Typography gutterBottom sx={{ color: 'white', fontSize: 35 }}>
                             Price / Per KM
                         </Typography>
-                        <Typography variant="h5" component="div" sx={{color: 'text.secondary', fontSize: 25}}>
+                        <Typography variant="h5" component="div" sx={{ color: 'white', fontSize: 25 }}>
                             Rs 100.00
                         </Typography>
 
                     </CardContent>
 
                 </Card>
-                <Card sx={{minWidth: 375}}
-                      className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
-                    <CardContent className='justify-center items-center flex flex-col gap-2'>
-                        <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 35}}>
+                <Card sx={{ minWidth: 375 }}
+                    className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
+                    <CardContent className='justify-center items-center bg-sky-950 flex flex-col gap-2'>
+                        <Typography gutterBottom sx={{ color: 'white', fontSize: 35 }}>
                             Driver
                         </Typography>
-                        <Typography variant="h5" component="div">
+                        <Typography variant="h5" component="div" sx={{ color: 'white' }}>
                             Mr Piyal Soriyapperuma
                         </Typography>
-                        <Typography variant="h5" component="div"
-                                    className='flex justify-center items-center w-full gap-4'>
+                        <Typography variant="h5" component="div" sx={{ color: 'white' }}
+                            className='flex justify-center items-center w-full gap-4'>
                             075-49494093
                             <div
                                 className="rounded-full p-1 hover:bg-sky-900  hover:text-white transition-all duration-300">
-                                <PhoneForwardedIcon className="text-[#FCA000] hover:text-white"/>
+                                <PhoneForwardedIcon className="text-[#FCA000] hover:text-white" />
                             </div>
 
 
@@ -268,33 +266,30 @@ function Booking() {
                 <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                     <button
                         type="button"
-                        className={`rounded-5 px-4 py-2 font-medium text-sm sm:text-base transition-all whitespace-nowrap ${
-                            selectedCategory === 'Total'
-                                ? 'bg-[#FCA000] text-white'
-                                : 'bg-[#0D3B66] text-white hover:bg-[#0D3B66] hover:text-white'
-                        }`}
+                        className={`rounded-5 px-4 py-2 font-medium text-sm sm:text-base transition-all whitespace-nowrap ${selectedCategory === 'Total'
+                            ? 'bg-[#FCA000] text-white'
+                            : 'bg-[#0D3B66] text-white hover:bg-[#0D3B66] hover:text-white'
+                            }`}
                     >
                         Total: Rs {total || 0}
                     </button>
 
                     <button
                         type="button"
-                        className={`rounded-5 px-4 py-2 font-medium text-sm sm:text-base transition-all whitespace-nowrap ${
-                            selectedCategory === 'Distance'
-                                ? 'bg-[#FCA000] text-white'
-                                : 'bg-[#0D3B66] text-white hover:bg-[#0D3B66] hover:text-white'
-                        }`}
+                        className={`rounded-5 px-4 py-2 font-medium text-sm sm:text-base transition-all whitespace-nowrap ${selectedCategory === 'Distance'
+                            ? 'bg-[#FCA000] text-white'
+                            : 'bg-[#0D3B66] text-white hover:bg-[#0D3B66] hover:text-white'
+                            }`}
                     >
                         Total Distance: {distance ? distance.toFixed(2) : 0} km
                     </button>
 
                     <button
                         type="button"
-                        className={`rounded-5 px-4 py-2 font-medium text-sm sm:text-base transition-all whitespace-nowrap ${
-                            selectedCategory === 'Time'
-                                ? 'bg-[#FCA000] text-white'
-                                : 'bg-[#0D3B66] text-white hover:bg-[#0D3B66] hover:text-white'
-                        }`}
+                        className={`rounded-5 px-4 py-2 font-medium text-sm sm:text-base transition-all whitespace-nowrap ${selectedCategory === 'Time'
+                            ? 'bg-[#FCA000] text-white'
+                            : 'bg-[#0D3B66] text-white hover:bg-[#0D3B66] hover:text-white'
+                            }`}
                     >
                         Estimated Time: {hours ? hours : 0} hours
                     </button>
@@ -315,25 +310,24 @@ function Booking() {
                                         Fill in the details below to confirm your booking
                                     </div>
                                 </div>
-
                                 <form className="space-y-4">
                                     {[
-                                        {label: 'name', type: 'text'},
-                                        {label: 'contact', type: 'text'},
-                                        {label: 'email', type: 'email'},
-                                        {label: 'date', type: 'date'}
+                                        { label: "name", type: "text" },
+                                        { label: "contact", type: "text" },
+                                        { label: "email", type: "email" },
+                                        { label: "date & time", type: "datetime-local" }
                                     ].map((field) => (
                                         <div key={field.label} className="space-y-2">
-                                            <label
-                                                className="block text-sm md:text-base lg:text-lg text-white capitalize">
+                                            <label className="block text-sm md:text-base lg:text-lg text-white capitalize">
                                                 {field.label}*
                                             </label>
                                             <input
                                                 type={field.type}
                                                 className="w-full px-4 py-2 rounded-lg border border-gray-300
-                                                 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all"
-                                                min={field.type === 'date' ? today : undefined}
+                                focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all"
                                                 placeholder={`Enter your ${field.label}`}
+                                                min={field.type === "datetime-local" ? minDateTime : undefined} // Prevent past selection
+                                                required
                                             />
                                         </div>
                                     ))}
@@ -342,18 +336,21 @@ function Booking() {
                                         type="submit"
                                         className="btn btn-primary text-xl mt-6"
                                         style={{
-                                            marginTop: '1rem',
-                                            backgroundColor: '#FCA000',
-                                            color: '#0D3B66',
-                                            borderRadius: '10px',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            width: '100%',
-                                            fontSize: '1.5rem'
-                                        }}>
+                                            marginTop: "1rem",
+                                            backgroundColor: "#FCA000",
+                                            color: "#0D3B66",
+                                            borderRadius: "10px",
+                                            border: "none",
+                                            cursor: "pointer",
+                                            width: "100%",
+                                            fontSize: "1.5rem"
+                                        }}
+                                    >
                                         Confirm Booking
                                     </button>
                                 </form>
+
+
                             </div>
                         </div>
 
@@ -368,8 +365,8 @@ function Booking() {
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 />
-                                {startCoords && <Marker position={[startCoords.lat, startCoords.lng]}/>}
-                                {endCoords && <Marker position={[endCoords.lat, endCoords.lng]}/>}
+                                {startCoords && <Marker position={[startCoords.lat, startCoords.lng]} />}
+                                {endCoords && <Marker position={[endCoords.lat, endCoords.lng]} />}
                                 {routeCoords.length > 0 && (
                                     <Polyline
                                         positions={routeCoords.map((point) => [point.lat, point.lng])}
