@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { Col, Row } from 'antd';
 import anime from 'animejs';
 import 'animate.css';
@@ -13,32 +14,149 @@ function Dashboard() {
   const countRefVehicle = useRef(null);
   const countRefCustomer = useRef(null);
 
-  const totalDrivers = 20;
-  const totalVehicles = 50;
-  const totalCustomers = 109;
 
-  useEffect(() => {
-    [
-      { ref: countRef, total: totalDrivers },
-      { ref: countRefVehicle, total: totalVehicles },
-      { ref: countRefCustomer, total: totalCustomers }
-    ].forEach(({ ref, total }) => {
-      anime({
-        targets: ref.current,
-        innerHTML: [total] + "+",
-        easing: 'linear',
-        round: 1,
-        duration: 2000,
+
+  const [totalDrivers, setTotalDrivers] = useState(0);
+  const [totalVehicles, setTotalVehicle] = useState(0);
+  const [totalCustomers, setTotalCustomer] = useState(0);
+  const [drivers, setDrivers] = useState([]);
+
+
+  //get driver count
+  const getDriverCount = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver/count`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
       });
-    });
-  }, []);
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        setTotalDrivers(data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-  const data = {
-    labels,
+  //get vehicle count
+  const getVehicleCount = async () => {
+    try{
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle/count`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        setTotalVehicle(data.data);
+      }
+    }catch(error){
+      console.log(error);
+    }
+  }
+  //get customer count
+  const getCustomerCount = async () => {
+    try{
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user/count`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        setTotalCustomer(data.data);
+      }
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  //get all drivers
+  const getAllDrivers = async () => {
+    try{
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver/allDrivers`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        setDrivers(data.data);
+      }
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  const loadDataInColumnChart = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/payment/getPaymentByThisWeekDay`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+  
+        // Extract payment dates and total amounts from the response
+        const labels = data.data.map(item => item.paymentDate); // Extract the dates (paymentDate)
+        const amounts = data.data.map(item => item.totalAmount); // Extract the total amounts
+  
+        // Update the chart data dynamically
+        setColumnChartData({
+          labels: labels,
+          datasets: [{
+            label: 'Payments',
+            data: amounts,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(255, 159, 64, 0.2)',
+              'rgba(255, 205, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(153, 102, 255, 0.2)',
+              'rgba(201, 203, 207, 0.2)',
+            ],
+            borderColor: [
+              'rgb(255, 99, 132)',
+              'rgb(255, 159, 64)',
+              'rgb(255, 205, 86)',
+              'rgb(75, 192, 192)',
+              'rgb(54, 162, 235)',
+              'rgb(153, 102, 255)',
+              'rgb(201, 203, 207)',
+            ],
+            borderWidth: 1,
+          }],
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  
+  // bar chart state
+  const [columnChartData, setColumnChartData] = useState({
+    labels: [],
     datasets: [{
-      label: 'My First Dataset',
-      data: [65, 59, 80, 81, 56, 55, 40],
+      label: 'Payments',
+      data: [],
       backgroundColor: [
         'rgba(255, 99, 132, 0.2)',
         'rgba(255, 159, 64, 0.2)',
@@ -59,18 +177,86 @@ function Dashboard() {
       ],
       borderWidth: 1,
     }],
+  });
+  
+
+
+  const loadDataInLineChart = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/payment/totalPaymentinThisMonth`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log(data);
+
+        // Extract months and totalAmount from the response data
+        const months = data.data.map(item => item.monthName);
+        const amounts = data.data.map(item => item.totalAmount);
+
+        // Update the chart data with the correct variable name
+        setLineData({
+          labels: months,
+          datasets: [{
+            label: 'Sales',
+            data: amounts,
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1,
+          }],
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const linedata = {
-    labels,
+  // Line data chart state
+  const [lineData, setLineData] = useState({
+    labels: [],
     datasets: [{
       label: 'Sales',
-      data: [65, 59, 80, 81, 56, 55, 40],
+      data: [],
       fill: false,
       borderColor: 'rgb(75, 192, 192)',
       tension: 0.1,
     }],
-  };
+  });
+
+
+
+
+  useEffect(() => {
+    [
+      { ref: countRef, total: totalDrivers },
+      { ref: countRefVehicle, total: totalVehicles },
+      { ref: countRefCustomer, total: totalCustomers }
+    ].forEach(({ ref, total }) => {
+      anime({
+        targets: ref.current,
+        innerHTML: [total] + "+",
+        easing: 'linear',
+        round: 1,
+        duration: 2000,
+      });
+    });
+  }, [totalDrivers, totalVehicles, totalCustomers]);
+
+  useEffect(() => {
+    loadDataInLineChart();
+    loadDataInColumnChart();
+    getCustomerCount();
+    getDriverCount();
+    getVehicleCount();
+    getAllDrivers();
+  }, []);
+
+
 
   const chartOptions = {
     responsive: true,
@@ -110,18 +296,64 @@ function Dashboard() {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate__animated animate__backInUp">
             <div className="bg-white rounded-lg shadow-lg p-4 h-96">
-              <Bar data={data} options={chartOptions} />
+            <Bar data={columnChartData} options={chartOptions} />
             </div>
             <div className="bg-white rounded-lg shadow-lg p-4 h-96">
-              <Line data={linedata} options={chartOptions} />
+              <Line data={lineData} options={chartOptions} />
             </div>
+
           </div>
         </Col>
 
         {/* Sidebar */}
-        <Col className="w-full lg:w-72 bg-white shadow-lg rounded-xl p-4 animate__animated animate__backInRight">
-          <h4 className="text-sky-900 font-normal">all active drivers</h4>
-        </Col>
+<Col className="w-full lg:w-72 bg-white shadow-lg rounded-xl p-4 animate__animated animate__backInRight">
+  <h4 className="text-sky-900 font-normal text-center mb-4">All Active Drivers</h4>
+
+  {/* Scrollable Container with Inline Scrollbar Styles */}
+  <div
+    className="overflow-y-scroll h-96 justify-center mt-20 space-y-2"
+    style={{
+      scrollbarWidth: "thin", /* Firefox */
+      scrollbarColor: "#0D3B66 #f1f1f1", /* Scrollbar and track color (Firefox) */
+    }}
+  >
+    <style>
+      {`
+        /* For Webkit Browsers (Chrome, Safari, Edge) */
+        ::-webkit-scrollbar {
+          width: 6px; 
+        }
+        ::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #007bff;
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #0056b3;
+        }
+      `}
+    </style>
+
+    {drivers.map((driver) => (
+      <div
+        key={driver.driverId}
+        className="flex justify-between items-center bg-gray-100 shadow-md p-3 rounded-lg"
+      >
+        {/* Driver Name */}
+        <span className="text-sky-900 font-medium">{driver.name}</span>
+        {/* Online Icon */}
+        <span className="text-green-500">
+          <i className="fas fa-circle text-xs"></i>
+        </span>
+      </div>
+    ))}
+  </div>
+</Col>
+
+
       </Row>
     </div>
   );
