@@ -122,7 +122,7 @@ function Dashboard() {
         setColumnChartData({
           labels: labels,
           datasets: [{
-            label: 'Payments',
+            label: 'Daily Payments',
             data: amounts,
             backgroundColor: [
               'rgba(255, 99, 132, 0.2)',
@@ -155,7 +155,7 @@ function Dashboard() {
   const [columnChartData, setColumnChartData] = useState({
     labels: [],
     datasets: [{
-      label: 'Payments',
+      label: 'Daily Payments',
       data: [],
       backgroundColor: [
         'rgba(255, 99, 132, 0.2)',
@@ -203,7 +203,7 @@ function Dashboard() {
         setLineData({
           labels: months,
           datasets: [{
-            label: 'Sales',
+            label: 'Monthly Payments',
             data: amounts,
             fill: false,
             borderColor: 'rgb(75, 192, 192)',
@@ -220,7 +220,7 @@ function Dashboard() {
   const [lineData, setLineData] = useState({
     labels: [],
     datasets: [{
-      label: 'Sales',
+      label: 'Monthly Payments',
       data: [],
       fill: false,
       borderColor: 'rgb(75, 192, 192)',
@@ -263,7 +263,7 @@ function Dashboard() {
     maintainAspectRatio: false,
     plugins: {
       legend: { position: 'top' },
-      title: { display: true, text: 'Monthly Data' },
+      title: { display: true, },
     },
     scales: { y: { beginAtZero: true } },
   };
@@ -294,14 +294,13 @@ function Dashboard() {
           </div>
 
           {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate__animated animate__backInUp">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate_animated animate_backInUp">
             <div className="bg-white rounded-lg shadow-lg p-4 h-96">
-              <Bar data={columnChartData} options={chartOptions} />
+              <Bar data={columnChartData} options={chartOptions} width='100%' height='100%' />
             </div>
             <div className="bg-white rounded-lg shadow-lg p-4 h-96">
-              <Line data={lineData} options={chartOptions} />
+              <Line data={lineData} options={chartOptions} width='100%' height='100%' />
             </div>
-
           </div>
         </Col>
 
@@ -313,26 +312,20 @@ function Dashboard() {
           <div
             className="overflow-y-scroll h-96 justify-center mt-20 space-y-2"
             style={{
-              scrollbarWidth: "thin", /* Firefox */
-              scrollbarColor: "#0D3B66 #f1f1f1", /* Scrollbar and track color (Firefox) */
+              scrollbarWidth: "none", /* Firefox */
             }}
           >
             <style>
               {`
         /* For Webkit Browsers (Chrome, Safari, Edge) */
         ::-webkit-scrollbar {
-          width: 6px; 
+          display: none;
         }
         ::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
+          background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-          background: #007bff;
-          border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: #0056b3;
+          background: transparent;
         }
       `}
             </style>
@@ -352,6 +345,7 @@ function Dashboard() {
             ))}
           </div>
         </Col>
+
 
 
       </Row>

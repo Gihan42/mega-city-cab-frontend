@@ -55,6 +55,7 @@ function Booking() {
     status: ''
   });
 
+
   const filteredData = data.filter((item) => {
     return (
       (!searchFilters.bookingId || item.bookingId.toLowerCase().includes(searchFilters.bookingId.toLowerCase())) &&
@@ -63,11 +64,11 @@ function Booking() {
       (!searchFilters.vehicleId || item.vehicle.toLowerCase().includes(searchFilters.vehicleId.toLowerCase())) &&
       (!searchFilters.status || item.status.toLowerCase().includes(searchFilters.status.toLowerCase())) &&
       (!searchFilters.bookingDate || new Date(item.date).toISOString().slice(0, 10) === searchFilters.bookingDate)
-
     );
   });
 
   const handleInputChange = (e) => {
+    console.log(e.target.id, e.target.value);
     const { id, value } = e.target;
     setSearchFilters((prev) => ({
       ...prev,
@@ -413,7 +414,7 @@ function Booking() {
               scrollbarColor: '#0D3B66 #E4E4E7',
             }}
           >
-            <table className="table-auto w-full text-lg text-left border-collapse">
+            <table className="table-auto w-full text-md text-left border-collapse">
               <thead className="bg-gray-100 sticky top-0">
                 <tr>
                   <th className="border px-4 py-2">#</th>
