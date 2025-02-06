@@ -44,7 +44,7 @@ function Dashboard() {
 
   //get vehicle count
   const getVehicleCount = async () => {
-    try{
+    try {
       const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle/count`, {
         method: 'GET',
         headers: {
@@ -57,13 +57,13 @@ function Dashboard() {
         console.log(data);
         setTotalVehicle(data.data);
       }
-    }catch(error){
+    } catch (error) {
       console.log(error);
     }
   }
   //get customer count
   const getCustomerCount = async () => {
-    try{
+    try {
       const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user/count`, {
         method: 'GET',
         headers: {
@@ -76,14 +76,14 @@ function Dashboard() {
         console.log(data);
         setTotalCustomer(data.data);
       }
-    }catch(error){
+    } catch (error) {
       console.log(error);
     }
   }
 
   //get all drivers
   const getAllDrivers = async () => {
-    try{
+    try {
       const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver/allDrivers`, {
         method: 'GET',
         headers: {
@@ -96,7 +96,7 @@ function Dashboard() {
         console.log(data);
         setDrivers(data.data);
       }
-    }catch(error){
+    } catch (error) {
       console.log(error);
     }
   }
@@ -113,11 +113,11 @@ function Dashboard() {
       const data = await response.json();
       if (response.ok) {
         console.log(data);
-  
+
         // Extract payment dates and total amounts from the response
         const labels = data.data.map(item => item.paymentDate); // Extract the dates (paymentDate)
         const amounts = data.data.map(item => item.totalAmount); // Extract the total amounts
-  
+
         // Update the chart data dynamically
         setColumnChartData({
           labels: labels,
@@ -150,7 +150,7 @@ function Dashboard() {
       console.log(error);
     }
   };
-  
+
   // bar chart state
   const [columnChartData, setColumnChartData] = useState({
     labels: [],
@@ -178,7 +178,7 @@ function Dashboard() {
       borderWidth: 1,
     }],
   });
-  
+
 
 
   const loadDataInLineChart = async () => {
@@ -296,7 +296,7 @@ function Dashboard() {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate__animated animate__backInUp">
             <div className="bg-white rounded-lg shadow-lg p-4 h-96">
-            <Bar data={columnChartData} options={chartOptions} />
+              <Bar data={columnChartData} options={chartOptions} />
             </div>
             <div className="bg-white rounded-lg shadow-lg p-4 h-96">
               <Line data={lineData} options={chartOptions} />
@@ -306,19 +306,19 @@ function Dashboard() {
         </Col>
 
         {/* Sidebar */}
-<Col className="w-full lg:w-72 bg-white shadow-lg rounded-xl p-4 animate__animated animate__backInRight">
-  <h4 className="text-sky-900 font-normal text-center mb-4">All Active Drivers</h4>
+        <Col className="w-full lg:w-72 bg-white shadow-lg rounded-xl p-4 animate__animated animate__backInRight">
+          <h4 className="text-sky-900 font-normal text-center mb-4">All Active Drivers</h4>
 
-  {/* Scrollable Container with Inline Scrollbar Styles */}
-  <div
-    className="overflow-y-scroll h-96 justify-center mt-20 space-y-2"
-    style={{
-      scrollbarWidth: "thin", /* Firefox */
-      scrollbarColor: "#0D3B66 #f1f1f1", /* Scrollbar and track color (Firefox) */
-    }}
-  >
-    <style>
-      {`
+          {/* Scrollable Container with Inline Scrollbar Styles */}
+          <div
+            className="overflow-y-scroll h-96 justify-center mt-20 space-y-2"
+            style={{
+              scrollbarWidth: "thin", /* Firefox */
+              scrollbarColor: "#0D3B66 #f1f1f1", /* Scrollbar and track color (Firefox) */
+            }}
+          >
+            <style>
+              {`
         /* For Webkit Browsers (Chrome, Safari, Edge) */
         ::-webkit-scrollbar {
           width: 6px; 
@@ -335,23 +335,23 @@ function Dashboard() {
           background: #0056b3;
         }
       `}
-    </style>
+            </style>
 
-    {drivers.map((driver) => (
-      <div
-        key={driver.driverId}
-        className="flex justify-between items-center bg-gray-100 shadow-md p-3 rounded-lg"
-      >
-        {/* Driver Name */}
-        <span className="text-sky-900 font-medium">{driver.name}</span>
-        {/* Online Icon */}
-        <span className="text-green-500">
-          <i className="fas fa-circle text-xs"></i>
-        </span>
-      </div>
-    ))}
-  </div>
-</Col>
+            {drivers.map((driver) => (
+              <div
+                key={driver.driverId}
+                className="flex justify-between items-center bg-gray-100 shadow-md p-3 rounded-lg"
+              >
+                {/* Driver Name */}
+                <span className="text-sky-900 font-medium">{driver.name}</span>
+                {/* Online Icon */}
+                <span className="text-green-500">
+                  <i className="fas fa-circle text-xs"></i>
+                </span>
+              </div>
+            ))}
+          </div>
+        </Col>
 
 
       </Row>

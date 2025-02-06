@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -31,6 +31,7 @@ function Booking() {
       status: 'close'
     }))
   );
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
 
   const handleResetFilters = () => {
     setSearchFilters({
@@ -54,20 +55,6 @@ function Booking() {
     status: ''
   });
 
-  // const [data] = useState(
-  //   Array.from({ length: 20 }).map((_, index) => ({
-  //     bookingId: `BID-${index + 1}`,
-  //     customer: `Customer ${index + 1}`,
-  //     driver: `Driver ${index + 1}`,
-  //     vehicle: `Vehicle ${index + 1}`,
-  //     date: new Date().toISOString().slice(0, 10),
-  //     pickUpLocation: 'null',
-  //     destination: 'null',
-  //     totalAmount: 'null',
-  //     status: 'close'
-  //   }))
-  // );
-
   const filteredData = data.filter((item) => {
     return (
       (!searchFilters.bookingId || item.bookingId.toLowerCase().includes(searchFilters.bookingId.toLowerCase())) &&
@@ -75,7 +62,7 @@ function Booking() {
       (!searchFilters.driverId || item.driver.toLowerCase().includes(searchFilters.driverId.toLowerCase())) &&
       (!searchFilters.vehicleId || item.vehicle.toLowerCase().includes(searchFilters.vehicleId.toLowerCase())) &&
       (!searchFilters.status || item.status.toLowerCase().includes(searchFilters.status.toLowerCase())) &&
-      (!searchFilters.bookingDate || item.date === searchFilters.bookingDate)
+      (!searchFilters.bookingDate || new Date(item.date).toISOString().slice(0, 10) === searchFilters.bookingDate)
 
     );
   });
@@ -135,6 +122,7 @@ function Booking() {
       status: e.target.value,
     }));
   };
+
   const downloadCSV = () => {
     const csvData = Papa.unparse(
       filteredData.map((item, index) => ({
@@ -164,6 +152,74 @@ function Booking() {
       csvSetAlertVisible(false);
     }, 3000);
   };
+
+  //get all booking details
+  const getBookingDetails = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/booking/bookingDetails`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+  
+      const responseData = await response.json();
+  
+      if (response.ok) {
+        console.log(responseData);
+        
+        const mappedData = responseData.data.map((item) => ({
+          bookingId: `BID-${item.bookingId}`,
+          customer: `${item.customerName}-${item.customerId}` ,
+          driver: `${item.driverName}-${item.driverId}` ,
+          vehicle: `${item.vehicleModel} - ${item.vehiclePlateNumber}`,
+          date: item.bookingDate.split("T")[0],
+          pickUpLocation: item.pickupLocation ,
+          destination: item.dropLocation ,
+          totalAmount: item.amount,
+          status: item.status
+        }));
+  
+        setFilteredData(mappedData); // Update state with API response data
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  //update order status
+  const handleUpdateClick = (bookingId) => {
+    // Extract the booking number from the bookingId
+    const bookingNumber = bookingId.split('BID-')[1];
+    
+    // Update the booking status by sending the bookingNumber as a query parameter
+    const updateBookingStatus = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BACS_URL}/booking?bookingId=${bookingNumber}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+  
+        const responseData = await response.json();
+  
+        if (response.ok) {
+          console.log(responseData);
+          getBookingDetails();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
+    updateBookingStatus(); // Call the function
+  };
+  
+
+
+  useEffect(() => { getBookingDetails(); }, []);
 
   return (
     <div className="h-full w-full p-4 md:p-8 lg:p-12">
@@ -288,8 +344,8 @@ function Booking() {
               <MenuItem value="" disabled>
                 Select Status
               </MenuItem>
-              <MenuItem value={'pending'}>Pending</MenuItem>
-              <MenuItem value={'close'}>Close</MenuItem>
+              <MenuItem value={'Pending'}>Pending</MenuItem>
+              <MenuItem value={'Confirmed'}>Close</MenuItem>
             </Select>
 
           </form>
@@ -394,7 +450,9 @@ function Booking() {
                     <td className="border px-4 py-2">
                       <button type="button"
                         className="btn btn-success"
-                        disabled={item.status !== 'pending'}>update</button>
+                        disabled={item.status !== 'Pending'}
+                        onClick={() => handleUpdateClick(item.bookingId)}
+                        >update</button>
                     </td>
 
 
