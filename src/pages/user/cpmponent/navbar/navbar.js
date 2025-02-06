@@ -41,8 +41,14 @@ function Navbar() {
   }, []);
 
   function logOut() {
+    localStorage.setItem('token', '');
+    localStorage.setItem('email', '');
+    localStorage.setItem('role', '');
+    localStorage.setItem('id', '');
+    localStorage.setItem('name', '');
     navigate('/');
   }
+
 
   return (
       <div className="w-full h-auto fixed top-0 left-0 z-50">

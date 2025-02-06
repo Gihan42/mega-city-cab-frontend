@@ -10,10 +10,14 @@ import Visibility from '@mui/icons-material/Visibility';
 import mainPage  from '../../admin/main/mainPage';
 import { useNavigate } from 'react-router-dom';
 
+
 function LogingComponent() {
 
   const [showPassword, setShowPassword] = React.useState(false);
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -25,31 +29,83 @@ function LogingComponent() {
     event.preventDefault();
   };
 
-  const navigatePage = () => {
-      navigate('/admin')
+  const navigatePage = (role) => {
+    console.log(role)
+    if (role === 'User'){ navigate('/User')}
+    else if (role === 'Admin'){navigate('/admin')} 
+    else{ navigate('/')}
   }
 
+  // loging function
+  const loging = async (event) => {
+    event.preventDefault();
+    const loginRequest = {
+      email: email,
+      password: password,
+    }
+    console.log(loginRequest)
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginRequest),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('token', data.jwt);
+        localStorage.setItem('email', data.email);
+        localStorage.setItem('role', data.role);
+        localStorage.setItem('id', data.userId);
+        localStorage.setItem('name', data.userName);
+        console.log(data);
+        navigatePage(data.role);
+
+
+      } else {
+        alert(data.message);
+      }
+    }catch (error) {
+      console.log(error)
+      alert('error')
+    }
+   
+  };
+//validate email 
+const handleEmailChange = (e) => {
+  const value = e.target.value;
+  setEmail(value);
+  // Regular expression for email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  setEmailError(!emailRegex.test(value));
+};
   return (
     <div className='flex items-center justify-center flex-col w-full mb-12'>
       <form className='flex items-start justify-center flex-col w-full max-w-md px-4 py-8'>
         {/* Username Input Field */}
         <label for="outlined-basic" className="form-label">email*</label>
         <TextField
-          id="outlined-basic"
-          label="eamil"
-          variant="outlined"
-          fullWidth
-          sx={{
-            marginBottom: '1rem',
-            '& .MuiInputLabel-root': {
-              
-            },
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '8px',
-             
-            },
-          }}
-        />
+      id="outlined-basic"
+      label="Email"
+      variant="outlined"
+      value={email}
+      onChange={handleEmailChange}
+      fullWidth
+      sx={{
+        marginBottom: '1rem',
+        '& .MuiInputLabel-root': {
+          // Add any styling for label here
+        },
+        '& .MuiOutlinedInput-root': {
+          borderRadius: '8px',
+        },
+      }}
+      error={emailError}
+      helperText={emailError ? 'Please enter a valid email address' : ''}
+    />
+    
 
         {/* Password Input Field */}
         <label for="outlined-adornment-password" className="form-label"> password*</label>
@@ -58,6 +114,8 @@ function LogingComponent() {
           <OutlinedInput
             id="outlined-adornment-password"
             type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -81,8 +139,8 @@ function LogingComponent() {
 
         {/* Submit Button */}
         <button
-          onClick={navigatePage}
-          type="submit"
+          onClick={loging}
+          type="button"
           className="btn btn-primary"
           style={{
             marginTop: '1rem',

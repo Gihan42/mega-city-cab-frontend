@@ -97,6 +97,11 @@ function MainPage() {
   }
 
   const handleLogout = () => {
+    localStorage.setItem('token', '');
+    localStorage.setItem('email', '');
+    localStorage.setItem('role', '');
+    localStorage.setItem('id', '');
+    localStorage.setItem('name', '');
     navigate('/');
   }
   return (

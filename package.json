@@ -21,6 +21,7 @@
     "emailjs-com": "^3.2.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
+    "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.474.0",
     "papaparse": "^5.5.1",
