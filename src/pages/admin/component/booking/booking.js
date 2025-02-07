@@ -182,7 +182,7 @@ function Booking() {
           status: item.status
         }));
   
-        setFilteredData(mappedData); // Update state with API response data
+        setFilteredData(mappedData);
       }
     } catch (error) {
       console.log(error);

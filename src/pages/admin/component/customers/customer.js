@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import Papa from 'papaparse';
 import { Alert, Button, Space } from 'antd';
+
 
 function Customer() {
   const [pdfAlertVisible, pdfSetAlertVisible] = useState(false);
@@ -22,6 +23,8 @@ function Customer() {
       customerAddress: `Customer ${index + 1}`,
     }))
   );
+
+
   
   const handleResetFilters = () => {
     setSearchFilters({
@@ -43,17 +46,7 @@ function Customer() {
     customerContact: '',
   });
 
-  // const [data] = useState(
-  //   Array.from({ length: 20 }).map((_, index) => ({
-  //     customerId: `CID-${index + 1}`,
-  //     customerEmail: `Customer ${index + 1}`,
-  //     customerName: `Customer ${index + 1}`,
-  //     customerNic: `Customer ${index + 1}`,
-  //     customerContact: `Customer ${index + 1}`,
-  //     customerAddress: `Customer ${index + 1}`,
-  //   }))
-  // );
-
+  
   const filteredData = data.filter((item) => {
     return (
       (!searchFilters.customerId || item.customerId.toLowerCase().includes(searchFilters.customerId.toLowerCase())) &&
@@ -138,6 +131,69 @@ function Customer() {
         }, 3000);
   };
 
+  //get all customer 
+  const getAllCustomer = async () => {
+    try{
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user/allUsers`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const responseData = await response.json();
+        if (response.ok) {
+          console.log("all users"+responseData.data);
+
+         const mappedData = responseData.data.map((item) => ({
+          customerId:`CUS-${item.id}`,
+          customerEmail:item.email,
+          customerName:item.username,
+          customerNic:item.nic,
+          customerContact:item.contactNumber,
+          customerAddress:item.address
+
+
+         })); 
+
+          setFilteredData(mappedData);
+        }
+
+    }catch(error){
+      console.log(error);
+  }
+};
+
+// delete user
+const deleteUser = async () => {
+
+  const customerId = searchFilters.customerId.split('CUS-')[1];
+
+  try{
+    const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user?userId=${customerId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    const responseData = await response.json();
+      if (response.ok) {
+        console.log("delete user"+responseData.data);
+        alert("User Deleted Successfully");
+        getAllCustomer();
+      }
+
+  }catch(error){
+    alert("User Not Deleted ");
+    console.log(error);
+  }
+
+};
+
+useEffect(() => {
+  getAllCustomer();
+}, []);
   
   return (
     <div className='h-full w-full p-4 md:p-8 lg:p-12'>
@@ -193,8 +249,8 @@ function Customer() {
                 ),
               }}
             />
-                        <TextField
-              id="customerEamail"
+            <TextField
+              id="customerEmail"
               label="Search by Eamil"
               variant="outlined"
               fullWidth
@@ -226,7 +282,7 @@ function Customer() {
               }}
             />
             <TextField
-              id="CustomerNic"
+              id="customerNic"
               label="Search by  Nic"
               variant="outlined"
               fullWidth
@@ -242,7 +298,7 @@ function Customer() {
               }}
             />
             <TextField
-              id="contact"
+              id="customerContact"
               label="Search by  Contact"
               variant="outlined"
               fullWidth
@@ -268,7 +324,10 @@ function Customer() {
                 cursor: 'pointer',
                 width: '100%',
                 marginBottom: '1%',
-              }} >
+                type: 'nutton'
+              }} 
+              
+              onClick={deleteUser}>
               delete
             </button>
 
