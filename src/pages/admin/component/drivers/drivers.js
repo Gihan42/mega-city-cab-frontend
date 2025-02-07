@@ -15,9 +15,12 @@ import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 
 function Drivers() {
-    const [pdfAndCsvAlertVisible, pdfCsvSetAlertVisible] = useState(false);
-    const[error,somethingError]=useState(false);
-  
+  const [pdfAndCsvAlertVisible, pdfCsvSetAlertVisible] = useState(false);
+  const [error, somethingError] = useState(false);
+  const [saveDriverAlertVisible, saveDriverSetAlertVisible] = useState(false);
+  const [updateDriverAlertVisible, updateDriverSetAlertVisible] = useState(false);
+  const [deleteDriverAlertVisible, deleteDriverSetAlertVisible] = useState(false);
+
   const [searchFilters, setSearchFilters] = useState({
     driverId: '',
     driverName: '',
@@ -70,7 +73,7 @@ function Drivers() {
     return (
       (!searchFilters.driverId || item.driverId.toLowerCase().includes(searchFilters.driverId.toLowerCase())) &&
       (!searchFilters.driverName || item.driverName.toLowerCase().includes(searchFilters.driverName.toLowerCase())) &&
-      (!searchFilters.driverAge || item.driverAge.toString().includes(searchFilters.driverAge.toString()))&&
+      (!searchFilters.driverAge || item.driverAge.toString().includes(searchFilters.driverAge.toString())) &&
       (!searchFilters.driverEmail || item.driverEmail.toLowerCase().includes(searchFilters.driverEmail.toLowerCase())) &&
       (!searchFilters.driverLicenseNumber || item.driverLicenseNumber.toLowerCase().includes(searchFilters.driverLicenseNumber.toLowerCase())) &&
       (!searchFilters.driverNicNumber || item.driverNicNumber.toLowerCase().includes(searchFilters.driverNicNumber.toLowerCase())) &&
@@ -101,10 +104,10 @@ function Drivers() {
   };
   const downloadPDF = () => {
     const doc = new jsPDF();
-    doc.text('driver Table', 14, 10); 
+    doc.text('driver Table', 14, 10);
     doc.autoTable({
       startY: 20,
-      head: [['#', ' ID', 'Name', 'Age', 'Email', 'Licenece Number	','Nic Number	','Contact	','Address']],
+      head: [['#', ' ID', 'Name', 'Age', 'Email', 'Licenece Number	', 'Nic Number	', 'Contact	', 'Address']],
       body: filteredData.map((item, index) => [
         index + 1,
         item.driverId,
@@ -118,82 +121,221 @@ function Drivers() {
       ]),
     });
     doc.save('driver_table.pdf');
-      
-        pdfCsvSetAlertVisible(true);
 
-   
-        setTimeout(() => {
-          pdfCsvSetAlertVisible(false);
-        }, 3000);
+    pdfCsvSetAlertVisible(true);
+
+
+    setTimeout(() => {
+      pdfCsvSetAlertVisible(false);
+    }, 3000);
   };
-  
-    const downloadCSV = () => {
-      const csvData = Papa.unparse(
-        filteredData.map((item, index) => ({
-          '#': index + 1,
-          ' ID': item.driverId,
-          driverName: item.driverName,
-          driverAge: item.driverAge,
-          driverEmail: item.driverEmail,
-          driverLicenseNumber: item.driverLicenseNumber,
-          driverNicNumber: item.driverNicNumber,
-          driverContact: item.driverContact,
-          driverAddress: item.driverAddress
+
+  const downloadCSV = () => {
+    const csvData = Papa.unparse(
+      filteredData.map((item, index) => ({
+        '#': index + 1,
+        ' ID': item.driverId,
+        driverName: item.driverName,
+        driverAge: item.driverAge,
+        driverEmail: item.driverEmail,
+        driverLicenseNumber: item.driverLicenseNumber,
+        driverNicNumber: item.driverNicNumber,
+        driverContact: item.driverContact,
+        driverAddress: item.driverAddress
+      }))
+    )
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'driver.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    pdfCsvSetAlertVisible(true);
+    setTimeout(() => {
+      pdfCsvSetAlertVisible(false);
+    }, 3000);
+  };
+
+  //get all drivers
+  const getAllDrivers = async () => {
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver/allDrivers`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+      const responseData = await response.json();
+      if (response.ok) {
+        console.log(responseData.data)
+        const mappedData = responseData.data.map((item) => ({
+          driverId: `D-${item.driverId}`,
+          driverName: item.name,
+          driverAge: item.age,
+          driverEmail: item.email,
+          driverLicenseNumber: item.licenseNumber,
+          driverNicNumber: item.nic,
+          driverContact: item.contactNumber,
+          driverAddress: item.address,
+          driverStatus: item.status
         }))
-      )
-      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', 'driver.csv');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-  
-      pdfCsvSetAlertVisible(true);
-          setTimeout(() => {
-            pdfCsvSetAlertVisible(false);
-          }, 3000);
-    };
-
-    //get all drivers
-    const getAllDrivers = async () => {
-
-      try{
-        const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver/allDrivers`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-        })
-        const responseData = await response.json();
-        if(response.ok){
-            console.log(responseData.data)
-            const mappedData = responseData.data.map((item) => ({
-              driverId:`D-${item.driverId}`,
-              driverName:item.name,
-              driverAge:item.age,
-              driverEmail:item.email,
-              driverLicenseNumber:item.licenseNumber,
-              driverNicNumber:item.nic,
-              driverContact:item.contactNumber,
-              driverAddress:item.address,
-              driverStatus:item.status
-            }))
-            setFilteredData(mappedData);
-        }
-
-      }catch(error){
-        console.log(error)
+        setFilteredData(mappedData);
       }
-    }
 
-    useEffect (() => { getAllDrivers(); }, []);
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  // save driver
+  const saveDriver = async (event) => {
+    event.preventDefault();
+    const driverRequest = {
+      name: searchFilters.driverName,
+      age: searchFilters.driverAge,
+      email: searchFilters.driverEmail,
+      licenseNumber: searchFilters.driverLicenseNumber,
+      contactNumber: searchFilters.driverContact,
+      nic: searchFilters.driverNicNumber,
+      address: searchFilters.driverAddress,
+      status: "Available",
+    }
+    try{
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(driverRequest),
+    })
+    if(response.ok){
+      saveDriverSetAlertVisible(true);
+      setTimeout(() => {
+        saveDriverSetAlertVisible(false);
+        handleResetFilters();
+        getAllDrivers();
+      }, 3000);
+    }
+    }catch(error){console.log(error)}
+    
+  };
+
+  // update driver
+  const updateDriver = async (event) => {
+    event.preventDefault();
+    const dId=searchFilters.driverId.split('D-')[1];
+    const driverRequest = {
+      driverId:dId ,
+      name: searchFilters.driverName,
+      age: searchFilters.driverAge,
+      email: searchFilters.driverEmail,
+      licenseNumber: searchFilters.driverLicenseNumber,
+      contactNumber: searchFilters.driverContact,
+      nic: searchFilters.driverNicNumber,
+      address: searchFilters.driverAddress,
+      status: "Available",
+    }
+    try{
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(driverRequest),
+    })
+    if(response.ok){
+      updateDriverSetAlertVisible(true);
+      setTimeout(() => {
+        updateDriverSetAlertVisible(false);
+        handleResetFilters();
+        getAllDrivers();
+      }, 3000);
+    }
+    }catch(error){console.log(error)}
+  };
+
+  //delete driver
+  const deleteDriver = async () => {
+    const dId=searchFilters.driverId.split('D-')[1];
+    try{
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver?driverId=${dId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+    })
+    if(response.ok){
+      deleteDriverSetAlertVisible(true);
+      setTimeout(() => {
+        deleteDriverSetAlertVisible(false);
+        handleResetFilters();
+        getAllDrivers();
+      }, 3000);
+    }
+    }catch(error){console.log(error)}
+  }
+
+  useEffect(() => { getAllDrivers(); }, []);
 
 
   return (
     <div className='h-full w-full p-4 md:p-8 lg:p-12'>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+              {saveDriverAlertVisible && (
+                <Alert
+                  className='w-96 mb-5'
+                  message="Driver Saved"
+                  type="success"
+                  showIcon
+                  action={
+                    <Button size="small" type="text">
+                      UNDO
+                    </Button>
+                  }
+                  closable
+                />
+              )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+              {updateDriverAlertVisible && (
+                <Alert
+                  className='w-96 mb-5'
+                  message="Driver Updated"
+                  type="success"
+                  showIcon
+                  action={
+                    <Button size="small" type="text">
+                      UNDO
+                    </Button>
+                  }
+                  closable
+                />
+              )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+              {deleteDriverAlertVisible && (
+                <Alert
+                  className='w-96 mb-5'
+                  message="Driver Deleted"
+                  type="success"
+                  showIcon
+                  action={
+                    <Button size="small" type="text">
+                      UNDO
+                    </Button>
+                  }
+                  closable
+                />
+              )}
+            </div>
       <div className='flex justify-center items-center animate__animated animate__backInDown'>
         {pdfAndCsvAlertVisible && (
           <Alert
@@ -365,7 +507,7 @@ function Drivers() {
                   cursor: 'pointer',
                   width: '80%',
                 }}
-                onClick={''}
+                onClick={saveDriver}
               >
                 save
               </button>
@@ -380,7 +522,7 @@ function Drivers() {
                   cursor: 'pointer',
                   width: '80%',
                 }}
-                onClick={''}
+                onClick={updateDriver}
               >
                 update
               </button>
@@ -395,7 +537,7 @@ function Drivers() {
                   cursor: 'pointer',
                   width: '80%',
                 }}
-                onClick={''}
+                onClick={deleteDriver}
               >
                 delete
               </button>
