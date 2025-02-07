@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -10,19 +10,25 @@ import 'jspdf-autotable';
 import Papa from 'papaparse';
 import { Alert, Button, Space } from 'antd';
 
-
 function Vehicle() {
     const [pdfAndCsvAlertVisible, pdfCsvSetAlertVisible] = useState(false);
     const [error, somethingError] = useState(false);
     const [image, setImage] = useState(null);
+    const fileInputRef = useRef(null);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            console.log("Selected File:", file); // Debugging
             const imageUrl = URL.createObjectURL(file);
             setImage(imageUrl);
+            setSearchFilters((prev) => ({
+                ...prev,
+                image: file, // Store the file object
+            }));
         }
     };
+
     const [searchFilters, setSearchFilters] = useState({
         vehicleId: '',
         model: '',
@@ -32,16 +38,17 @@ function Vehicle() {
         category: '',
         image: '',
     });
+
     const defaultImage = 'https://via.placeholder.com/150';
     const [data, setFilteredData] = useState(
         Array.from({ length: 20 }).map((_, index) => ({
-            vehicleId: `VID-${index + 1}`,
-            model: `model- ${index + 1}`,
-            plateNumber: `SP-${index + 1}`,
-            pricePerKm: `KM ${index + 1}`,
-            passengersCount: `Count- ${index + 1}`,
-            category: `C- ${index + 1}`,
-            image: defaultImage,
+            vehicleId: "loading",
+            model: "loading",
+            plateNumber: "loading",
+            pricePerKm: "loading",
+            passengersCount: "loading",
+            category: "loading",
+            image: "loading",
         }))
     );
 
@@ -58,6 +65,7 @@ function Vehicle() {
 
         setFilteredData(data);
     };
+
     const filteredData = data.filter((item) => {
         return (
             (!searchFilters.vehicleId || item.vehicleId.toLowerCase().includes(searchFilters.vehicleId.toLowerCase())) &&
@@ -69,6 +77,7 @@ function Vehicle() {
             (!searchFilters.image || item.image.toLowerCase().includes(searchFilters.image.toLowerCase()))
         );
     });
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         setSearchFilters((prev) => ({
@@ -76,6 +85,7 @@ function Vehicle() {
             [id]: value,
         }));
     };
+
     const handleRowClick = (item) => {
         setSearchFilters({
             vehicleId: item.vehicleId,
@@ -87,12 +97,13 @@ function Vehicle() {
             image: item.image,
         });
     };
+
     const downloadPDF = () => {
         const doc = new jsPDF();
         doc.text('vehicle Table', 14, 10);
         doc.autoTable({
             startY: 20,
-            head: [['#', ' ID', 'Model', 'Plate Number', 'Ctegory', 'Price Per Km	', 'Passengers Count	', 'Image']],
+            head: [['#', ' ID', 'Model', 'Plate Number', 'Category', 'Price Per Km', 'Passengers Count', 'Image']],
             body: filteredData.map((item, index) => [
                 index + 1,
                 item.vehicleId,
@@ -107,12 +118,11 @@ function Vehicle() {
         doc.save('vehicle_table.pdf');
 
         pdfCsvSetAlertVisible(true);
-
-
         setTimeout(() => {
             pdfCsvSetAlertVisible(false);
         }, 3000);
     };
+
     const downloadCSV = () => {
         const csvData = Papa.unparse(
             filteredData.map((item, index) => ({
@@ -125,7 +135,7 @@ function Vehicle() {
                 category: item.category,
                 image: item.image,
             }))
-        )
+        );
         const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -140,6 +150,84 @@ function Vehicle() {
             pdfCsvSetAlertVisible(false);
         }, 3000);
     };
+
+    const getAllVehicles = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle/allVehicales/with/category`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+
+            const responseData = await response.json();
+            console.log("API Response:", responseData); // Debugging
+
+            if (response.ok) {
+                const mappedData = responseData.data.map((item) => ({
+                    vehicleId: item.vehicleId,
+                    model: item.model,
+                    plateNumber: item.plateNumber,
+                    category: item.category,
+                    pricePerKm: item.pricePerKm,
+                    passengersCount: item.passengerCount,
+                    image: item.image,
+                }));
+
+                console.log("Mapped Data:", mappedData); // Debugging
+                setFilteredData(mappedData);
+            }
+        } catch (error) {
+            console.log("Fetch Error:", error);
+        }
+    };
+
+    const saveVehicle = async (event) => {
+        event.preventDefault();
+
+        console.log("Search Filters:", searchFilters);
+
+        const formData = new FormData();
+        formData.append("plateNumber", searchFilters.plateNumber);
+        formData.append("passengerCount", searchFilters.passengersCount);
+        formData.append("pricePerKm", searchFilters.pricePerKm);
+        formData.append("vehicleModel", searchFilters.model);
+        formData.append("status", searchFilters.status || "Available");
+        formData.append("imageFile", searchFilters.image);
+        formData.append("category", searchFilters.category);
+
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle/save`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: formData,
+            });
+
+            if (response.ok) {
+                alert("Vehicle Saved Successfully");
+                getAllVehicles(); // Refresh the list after saving
+            } else {
+                const errorData = await response.json();
+                console.log("Error Response:", errorData);
+                alert("Error Saving Vehicle: " + (errorData.message || "Unknown error"));
+            }
+        } catch (error) {
+            console.log("Error:", error);
+            alert("An error occurred while saving the vehicle.");
+        }
+    };
+
+    useEffect(() => {
+        getAllVehicles();
+    }, []);
+
     return (
         <div className='h-full w-full p-4 md:p-8 lg:p-12'>
             <div className='flex justify-center items-center animate__animated animate__backInDown'>
@@ -162,19 +250,19 @@ function Vehicle() {
                 {error && (
                     <Alert
                         message="Error"
-                        description="somthing went wrong try again"
+                        description="Something went wrong, try again"
                         type="error"
                         showIcon
                     />
                 )}
             </div>
             <Row>
-                <Col className=' h-auto w-full bg-white rounded-xl mb-4 shadow-lg flex flex-col p-2 animate__animated animate__backInDown'>
-                    <form className="flex flex-col  justify-center items-center  h-auto w-full">
-                        <div className='flex flex-col md:flex-row justify-center items-center p-2 h-auto gap-4 md:gap-20 w-full '>
+                <Col className='h-auto w-full bg-white rounded-xl mb-4 shadow-lg flex flex-col p-2 animate__animated animate__backInDown'>
+                    <form className="flex flex-col justify-center items-center h-auto w-full">
+                        <div className='flex flex-col md:flex-row justify-center items-center p-2 h-auto gap-4 md:gap-20 w-full'>
                             <TextField
                                 id="vehicleId"
-                                label=" ID"
+                                label="ID"
                                 variant="outlined"
                                 fullWidth
                                 value={searchFilters.vehicleId}
@@ -190,7 +278,7 @@ function Vehicle() {
                             />
                             <TextField
                                 id="model"
-                                label=" Model"
+                                label="Model"
                                 variant="outlined"
                                 fullWidth
                                 value={searchFilters.model}
@@ -206,7 +294,7 @@ function Vehicle() {
                             />
                             <TextField
                                 id="plateNumber"
-                                label=" Plate Number"
+                                label="Plate Number"
                                 variant="outlined"
                                 fullWidth
                                 value={searchFilters.plateNumber}
@@ -222,7 +310,7 @@ function Vehicle() {
                             />
                             <TextField
                                 id="pricePerKm"
-                                label=" Price Per Km"
+                                label="Price Per Km"
                                 variant="outlined"
                                 fullWidth
                                 value={searchFilters.pricePerKm}
@@ -238,7 +326,7 @@ function Vehicle() {
                             />
                             <TextField
                                 id="passengersCount"
-                                label=" Passengers Count "
+                                label="Passengers Count"
                                 variant="outlined"
                                 fullWidth
                                 value={searchFilters.passengersCount}
@@ -254,7 +342,7 @@ function Vehicle() {
                             />
                             <TextField
                                 id="category"
-                                label=" Category "
+                                label="Category"
                                 variant="outlined"
                                 fullWidth
                                 value={searchFilters.category}
@@ -276,6 +364,7 @@ function Vehicle() {
                                 className='w-2/5'
                                 onChange={handleImageChange}
                                 type='file'
+                                inputRef={fileInputRef}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
@@ -292,10 +381,10 @@ function Vehicle() {
                                     backgroundPosition: 'center',
                                 }}
                             />
-
-                            <button type="button" className="btn btn-primary dcButton"
+                            <button
+                                type="button"
+                                className="btn btn-primary dcButton"
                                 style={{
-                                    id: 'dcButton',
                                     backgroundColor: '#0D3B66',
                                     color: '#fff',
                                     padding: '10px 20px',
@@ -304,13 +393,14 @@ function Vehicle() {
                                     cursor: 'pointer',
                                     width: '20%',
                                 }}
-                                onClick={''}
+                                onClick={saveVehicle}
                             >
-                                save
+                                Save
                             </button>
-                            <button type="button" className="btn btn-primary dcButton"
+                            <button
+                                type="button"
+                                className="btn btn-primary dcButton"
                                 style={{
-                                    id: 'dcButton',
                                     backgroundColor: '#008000',
                                     color: '#fff',
                                     padding: '10px 20px',
@@ -319,13 +409,14 @@ function Vehicle() {
                                     cursor: 'pointer',
                                     width: '20%',
                                 }}
-                                onClick={''}
+                                onClick={() => {}}
                             >
-                                update
+                                Update
                             </button>
-                            <button type="button" className="btn btn-primary dcButton"
+                            <button
+                                type="button"
+                                className="btn btn-primary dcButton"
                                 style={{
-                                    id: 'dcButton',
                                     backgroundColor: '#C1121F',
                                     color: '#fff',
                                     padding: '10px 20px',
@@ -334,24 +425,22 @@ function Vehicle() {
                                     cursor: 'pointer',
                                     width: '20%',
                                 }}
-                                onClick={''}
+                                onClick={() => {}}
                             >
-                                delete
+                                Delete
                             </button>
                         </div>
                     </form>
                 </Col>
             </Row>
             <div className="justify-start items-start mb-4">
-                <h3 className="text-lg font-normal text-sky-900">All Vehicales</h3>
+                <h3 className="text-lg font-normal text-sky-900">All Vehicles</h3>
             </div>
             <div className='justify-end flex items-center mb-4 flex gap-5 w-full animate__animated animate__backInRight'>
-
                 <button
                     type="button"
                     className="btn btn-primary dcButton"
                     style={{
-                        id: 'dcButton',
                         backgroundColor: '#0D3B66',
                         color: '#fff',
                         padding: '10px 20px',
@@ -362,13 +451,12 @@ function Vehicle() {
                     }}
                     onClick={downloadPDF}
                 >
-                    get pdf
+                    Get PDF
                 </button>
                 <button
                     type="button"
                     className="btn btn-warning dcButton"
                     style={{
-                        id: 'dcButton',
                         backgroundColor: '#FCA000',
                         color: '#0D3B66',
                         padding: '10px 20px',
@@ -379,11 +467,12 @@ function Vehicle() {
                     }}
                     onClick={downloadCSV}
                 >
-                    get csv
+                    Get CSV
                 </button>
-                <button type="button" className="btn btn-primary dcButton"
+                <button
+                    type="button"
+                    className="btn btn-primary dcButton"
                     style={{
-                        id: 'dcButton',
                         backgroundColor: '#008000',
                         color: '#fff',
                         padding: '10px 20px',
@@ -394,10 +483,9 @@ function Vehicle() {
                     }}
                     onClick={handleResetFilters}
                 >
-                    clear
+                    Clear
                 </button>
             </div>
-
             <Row>
                 <Col xs={24} sm={24} md={24} lg={24} className="flex justify-center items-center p-2 h-full animate__animated animate__backInUp">
                     <div
@@ -411,13 +499,13 @@ function Vehicle() {
                             <thead className="bg-gray-100 sticky top-0">
                                 <tr>
                                     <th className="border px-4 py-2">#</th>
-                                    <th className="border px-4 py-2" >ID</th>
-                                    <th className="border px-4 py-2" >Model</th>
-                                    <th className="border px-4 py-2" >Plate Number</th>
-                                    <th className="border px-4 py-2" >Category</th>
-                                    <th className="border px-4 py-2" >Price Per Km</th>
-                                    <th className="border px-4 py-2" >Passengers Count</th>
-                                    <th className="border px-4 py-2" >Image</th>
+                                    <th className="border px-4 py-2">ID</th>
+                                    <th className="border px-4 py-2">Model</th>
+                                    <th className="border px-4 py-2">Plate Number</th>
+                                    <th className="border px-4 py-2">Category</th>
+                                    <th className="border px-4 py-2">Price Per Km</th>
+                                    <th className="border px-4 py-2">Passengers Count</th>
+                                    <th className="border px-4 py-2">Image</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -435,22 +523,29 @@ function Vehicle() {
                                         <td className="border px-4 py-2">{item.pricePerKm}</td>
                                         <td className="border px-4 py-2">{item.passengersCount}</td>
                                         <td className="border px-4 py-2">
-                                            <img
-                                                src={item.image}
-                                                alt="Vehicle"
-                                                style={{ width: '50px', height: '50px', borderRadius: '50%' }}
-                                            />
+                                            {item.image ? (
+                                                <img
+                                                    src={item.image.startsWith("data:image") ? item.image : `data:image/jpeg;base64,${item.image.trim()}`}
+                                                    alt="Vehicle"
+                                                    style={{ width: '50px', height: '50px', borderRadius: '50%' }}
+                                                />
+                                            ) : (
+                                                <img
+                                                    src="https://via.placeholder.com/50"
+                                                    alt="Placeholder"
+                                                    style={{ width: '50px', height: '50px', borderRadius: '50%' }}
+                                                />
+                                            )}
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-
                     </div>
                 </Col>
             </Row>
         </div>
-    )
+    );
 }
 
-export default Vehicle
+export default Vehicle;

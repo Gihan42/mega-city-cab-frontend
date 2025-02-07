@@ -639,8 +639,6 @@ function Drivers() {
                     <td className="border px-4 py-2">{item.driverContact}</td>
                     <td className="border px-4 py-2">{item.driverAddress}</td>
                     <td className="border px-4 py-2">available</td>
-
-
                   </tr>
                 ))}
               </tbody>
