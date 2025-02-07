@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -70,7 +70,7 @@ function Drivers() {
     return (
       (!searchFilters.driverId || item.driverId.toLowerCase().includes(searchFilters.driverId.toLowerCase())) &&
       (!searchFilters.driverName || item.driverName.toLowerCase().includes(searchFilters.driverName.toLowerCase())) &&
-      (!searchFilters.driverAge || item.driverAge.toLowerCase().includes(searchFilters.driverAge.toLowerCase())) &&
+      (!searchFilters.driverAge || item.driverAge.toString().includes(searchFilters.driverAge.toString()))&&
       (!searchFilters.driverEmail || item.driverEmail.toLowerCase().includes(searchFilters.driverEmail.toLowerCase())) &&
       (!searchFilters.driverLicenseNumber || item.driverLicenseNumber.toLowerCase().includes(searchFilters.driverLicenseNumber.toLowerCase())) &&
       (!searchFilters.driverNicNumber || item.driverNicNumber.toLowerCase().includes(searchFilters.driverNicNumber.toLowerCase())) &&
@@ -155,6 +155,43 @@ function Drivers() {
             pdfCsvSetAlertVisible(false);
           }, 3000);
     };
+
+    //get all drivers
+    const getAllDrivers = async () => {
+
+      try{
+        const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver/allDrivers`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        })
+        const responseData = await response.json();
+        if(response.ok){
+            console.log(responseData.data)
+            const mappedData = responseData.data.map((item) => ({
+              driverId:`D-${item.driverId}`,
+              driverName:item.name,
+              driverAge:item.age,
+              driverEmail:item.email,
+              driverLicenseNumber:item.licenseNumber,
+              driverNicNumber:item.nic,
+              driverContact:item.contactNumber,
+              driverAddress:item.address,
+              driverStatus:item.status
+            }))
+            setFilteredData(mappedData);
+        }
+
+      }catch(error){
+        console.log(error)
+      }
+    }
+
+    useEffect (() => { getAllDrivers(); }, []);
+
+
   return (
     <div className='h-full w-full p-4 md:p-8 lg:p-12'>
       <div className='flex justify-center items-center animate__animated animate__backInDown'>
@@ -226,7 +263,6 @@ function Drivers() {
                 fullWidth
                 value={searchFilters.driverAge}
                 onChange={handleInputChange}
-                type='number'
                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                 InputProps={{
                   endAdornment: (

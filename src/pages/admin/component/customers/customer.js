@@ -8,11 +8,13 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import Papa from 'papaparse';
 import { Alert, Button, Space } from 'antd';
+import { ToastContainer, toast } from 'react-toastify';
 
 
 function Customer() {
   const [pdfAlertVisible, pdfSetAlertVisible] = useState(false);
   const [csvAlertVisible, csvSetAlertVisible] = useState(false);
+  const [deleteAlerttVisible, deleteSetAlertVisible] = useState(false);
   const [data, setFilteredData] = useState(
     Array.from({ length: 20 }).map((_, index) => ({
       customerId: `CID-${index + 1}`,
@@ -166,9 +168,7 @@ function Customer() {
 
 // delete user
 const deleteUser = async () => {
-
   const customerId = searchFilters.customerId.split('CUS-')[1];
-
   try{
     const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user?userId=${customerId}`, {
       method: 'DELETE',
@@ -180,12 +180,15 @@ const deleteUser = async () => {
     const responseData = await response.json();
       if (response.ok) {
         console.log("delete user"+responseData.data);
-        alert("User Deleted Successfully");
-        getAllCustomer();
+        deleteSetAlertVisible(true);
+        setTimeout(() => {
+          deleteSetAlertVisible(false);
+          getAllCustomer();
+          handleResetFilters();
+        }, 3000);
       }
 
   }catch(error){
-    alert("User Not Deleted ");
     console.log(error);
   }
 
@@ -218,6 +221,22 @@ useEffect(() => {
           <Alert
             className='w-96 mb-5'
             message="CSV File Saved"
+            type="success"
+            showIcon
+            action={
+              <Button size="small" type="text">
+                UNDO
+              </Button>
+            }
+            closable
+          />
+        )}
+      </div>
+      <div className='flex justify-center items-center animate__animated animate__backInDown'>
+        {deleteAlerttVisible && (
+          <Alert
+            className='w-96 mb-5'
+            message="user deleted"
             type="success"
             showIcon
             action={
