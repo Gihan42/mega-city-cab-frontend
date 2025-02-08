@@ -222,7 +222,14 @@ function Drivers() {
         getAllDrivers();
       }, 3000);
     }
-    }catch(error){console.log(error)}
+    }catch(error){console.log(error)
+      somethingError(true);
+      setTimeout(() => {
+        somethingError(false);
+        handleResetFilters();
+        getAllDrivers();
+      }, 3000);
+    }
     
   };
 
@@ -258,7 +265,14 @@ function Drivers() {
         getAllDrivers();
       }, 3000);
     }
-    }catch(error){console.log(error)}
+    }catch(error){console.log(error)
+      somethingError(true);
+      setTimeout(() => {
+        somethingError(false);
+        handleResetFilters();
+        getAllDrivers();
+      }, 3000);
+    }
   };
 
   //delete driver
@@ -280,7 +294,14 @@ function Drivers() {
         getAllDrivers();
       }, 3000);
     }
-    }catch(error){console.log(error)}
+    }catch(error){console.log(error)
+      somethingError(true);
+      setTimeout(() => {
+        somethingError(false);
+        handleResetFilters();
+        getAllDrivers();
+      }, 3000);
+    }
   }
 
   useEffect(() => { getAllDrivers(); }, []);

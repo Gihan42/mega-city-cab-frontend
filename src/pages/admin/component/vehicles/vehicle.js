@@ -13,21 +13,25 @@ import { Alert, Button, Space } from 'antd';
 function Vehicle() {
     const [pdfAndCsvAlertVisible, pdfCsvSetAlertVisible] = useState(false);
     const [error, somethingError] = useState(false);
+    const [saveVehicleAlertVisible, saveVehicleSetAlertVisible] = useState(false);
+    const [updateVehicleAlertVisible, updateVehicleSetAlertVisible] = useState(false);
+    const [deleteVehicleAlertVisible, deleteVehicleSetAlertVisible] = useState(false);
     const [image, setImage] = useState(null);
     const fileInputRef = useRef(null);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            console.log("Selected File:", file); // Debugging
             const imageUrl = URL.createObjectURL(file);
             setImage(imageUrl);
+            setSelectedImage(imageUrl);
             setSearchFilters((prev) => ({
                 ...prev,
-                image: file, // Store the file object
+                image: file,
             }));
         }
-    };
+    }
 
     const [searchFilters, setSearchFilters] = useState({
         vehicleId: '',
@@ -62,19 +66,24 @@ function Vehicle() {
             category: '',
             image: '',
         });
-
+        setSelectedImage(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+        setImage(null);
         setFilteredData(data);
     };
 
     const filteredData = data.filter((item) => {
         return (
-            (!searchFilters.vehicleId || item.vehicleId.toLowerCase().includes(searchFilters.vehicleId.toLowerCase())) &&
+            (!searchFilters.vehicleId || item.vehicleId.toString().includes(searchFilters.vehicleId.toString())) &&
             (!searchFilters.model || item.model.toLowerCase().includes(searchFilters.model.toLowerCase())) &&
             (!searchFilters.plateNumber || item.plateNumber.toLowerCase().includes(searchFilters.plateNumber.toLowerCase())) &&
-            (!searchFilters.pricePerKm || item.pricePerKm.toLowerCase().includes(searchFilters.pricePerKm.toLowerCase())) &&
-            (!searchFilters.passengersCount || item.passengersCount.toLowerCase().includes(searchFilters.passengersCount.toLowerCase())) &&
+            (!searchFilters.pricePerKm || item.pricePerKm.toString().includes(searchFilters.pricePerKm.toString())) &&
+            (!searchFilters.passengersCount || item.passengersCount.toString().includes(searchFilters.passengersCount.toString())) &&
             (!searchFilters.category || item.category.toLowerCase().includes(searchFilters.category.toLowerCase())) &&
-            (!searchFilters.image || item.image.toLowerCase().includes(searchFilters.image.toLowerCase()))
+            (!searchFilters.image || item.image.toString().includes(searchFilters.image.toString()))
+
         );
     });
 
@@ -96,6 +105,18 @@ function Vehicle() {
             category: item.category,
             image: item.image,
         });
+
+
+        if (item.image) {
+            if (item.image.startsWith("data:image")) {
+                setSelectedImage(item.image);
+            } 
+            else if (typeof item.image === 'string') {
+                setSelectedImage(`data:image/jpeg;base64,${item.image.trim()}`);
+            }
+        } else {
+            setSelectedImage(defaultImage);
+        }
     };
 
     const downloadPDF = () => {
@@ -151,6 +172,7 @@ function Vehicle() {
         }, 3000);
     };
 
+    //get all vehicle
     const getAllVehicles = async () => {
         try {
             const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle/allVehicales/with/category`, {
@@ -183,6 +205,7 @@ function Vehicle() {
         }
     };
 
+    //save vehicle
     const saveVehicle = async (event) => {
         event.preventDefault();
 
@@ -211,8 +234,12 @@ function Vehicle() {
             });
 
             if (response.ok) {
-                alert("Vehicle Saved Successfully");
-                getAllVehicles(); // Refresh the list after saving
+                setTimeout(() => {
+                    saveVehicleSetAlertVisible(false);
+                    handleResetFilters();
+                    getAllVehicles();
+                }, 3000);
+
             } else {
                 const errorData = await response.json();
                 console.log("Error Response:", errorData);
@@ -220,9 +247,94 @@ function Vehicle() {
             }
         } catch (error) {
             console.log("Error:", error);
-            alert("An error occurred while saving the vehicle.");
+            somethingError(true);
+            setTimeout(() => {
+                somethingError(false);
+                handleResetFilters();
+                getAllVehicles();
+            }, 3000);
+
         }
     };
+
+    //update vehicle
+    const updateVehicle = async (event) => {
+        event.preventDefault();
+        const formData = new FormData();
+        formData.append("vehicleId", searchFilters.vehicleId);
+        formData.append("plateNumber", searchFilters.plateNumber);
+        formData.append("passengerCount", searchFilters.passengersCount);
+        formData.append("pricePerKm", searchFilters.pricePerKm);
+        formData.append("vehicleModel", searchFilters.model);
+        formData.append("status", searchFilters.status || "Available");
+        formData.append("imageFile", searchFilters.image);
+        formData.append("category", searchFilters.category);
+
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+        try {
+
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle/update`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: formData,
+            });
+
+            if (response.ok) {
+                setTimeout(() => {
+                    updateVehicleSetAlertVisible(false);
+                    handleResetFilters();
+                    getAllVehicles();
+                }, 3000);
+
+            } else {
+                const errorData = await response.json();
+                console.log("Error Response:", errorData);
+                alert("Error Saving Vehicle: " + (errorData.message || "Unknown error"));
+            }
+
+        } catch (error) {
+            console.log("Error:", error);
+            somethingError(true);
+            setTimeout(() => {
+                somethingError(false);
+                handleResetFilters();
+                getAllVehicles();
+            }, 3000);
+        }
+    };
+
+    //delete vehicle
+    const deleteVehicle = async () => {
+        const id = searchFilters.vehicleId;
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle?vehicleId=${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            })
+            if (response.ok) {
+                setTimeout(() => {
+                    deleteVehicleSetAlertVisible(false);
+                    handleResetFilters();
+                    getAllVehicles();
+                }, 3000);
+            }
+        } catch (error) {
+            console.log("Error:", error);
+            somethingError(true);
+            setTimeout(() => {
+                somethingError(false);
+                handleResetFilters();
+                getAllVehicles();
+            }, 3000);
+        }
+    }
 
     useEffect(() => {
         getAllVehicles();
@@ -246,6 +358,7 @@ function Vehicle() {
                     />
                 )}
             </div>
+
             <div className='flex justify-center items-center animate__animated animate__backInDown'>
                 {error && (
                     <Alert
@@ -256,6 +369,55 @@ function Vehicle() {
                     />
                 )}
             </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {saveVehicleAlertVisible && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="Vehicle Saved"
+                        type="success"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
+                    />
+                )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {updateVehicleAlertVisible && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="Vehicle Updated"
+                        type="success"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
+                    />
+                )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {deleteVehicleAlertVisible && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="Vehicle Deleted"
+                        type="success"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
+                    />
+                )}
+            </div>
+
             <Row>
                 <Col className='h-auto w-full bg-white rounded-xl mb-4 shadow-lg flex flex-col p-2 animate__animated animate__backInDown'>
                     <form className="flex flex-col justify-center items-center h-auto w-full">
@@ -376,7 +538,7 @@ function Vehicle() {
                             <div
                                 className='h-16 w-20 rounded-full border-2 border-black'
                                 style={{
-                                    backgroundImage: image ? `url(${image})` : 'none',
+                                    backgroundImage: selectedImage ? `url(${selectedImage})` : 'none',
                                     backgroundSize: 'cover',
                                     backgroundPosition: 'center',
                                 }}
@@ -409,7 +571,7 @@ function Vehicle() {
                                     cursor: 'pointer',
                                     width: '20%',
                                 }}
-                                onClick={() => {}}
+                                onClick={updateVehicle}
                             >
                                 Update
                             </button>
@@ -425,7 +587,7 @@ function Vehicle() {
                                     cursor: 'pointer',
                                     width: '20%',
                                 }}
-                                onClick={() => {}}
+                                onClick={deleteVehicle}
                             >
                                 Delete
                             </button>
