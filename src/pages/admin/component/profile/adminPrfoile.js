@@ -202,7 +202,7 @@ function AdminPrfoile() {
                 console.log(responseData);
                 const mappedData = responseData.data.map((item) => ({
                     adminId: item.id,
-                    adminName: item.userName,
+                    adminName: item.username,
                     adminEmail: item.email,
                     adminNicNumber: item.nic,
                     adminContact: item.contactNumber,
@@ -267,10 +267,85 @@ function AdminPrfoile() {
     };
 
     //update user
-    const updateUser = async () => {
-        
+    const updateUser = async (event) => {
+        event.preventDefault();
+        const userRequest = {
+            id: searchFilters.adminId,
+            username: searchFilters.adminName,
+            password:"123",
+            contactNumber: searchFilters.adminContact,
+            email: searchFilters.adminEmail,
+            address: searchFilters.adminAddress,
+            nic: searchFilters.adminNicNumber,
+            status: '1',
+            role: "Admin",
+        }
+
+        console.log(userRequest);
+        try{
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify(userRequest)
+            })
+            const responseData = await response.json();
+            if (response.ok) {
+                console.log(responseData);
+                updatUserSetAlertVisible(true);
+                setTimeout(() => {
+                    updatUserSetAlertVisible(false);
+                    handleResetFilters();
+                    getAllUsers();
+                }, 3000);
+            }
+        }
+        catch (error) {
+            console.log(error);
+            somethingError(true);
+            setTimeout(() => {
+                somethingError(false);
+                handleResetFilters();
+                getAllUsers();
+
+            }, 3000);
+        }
+
     }
 
+    //delete user
+    const deleteUser = async () => {
+        const id = searchFilters.adminId;
+        try{
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user?userId=${id}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+                })
+                if(response.ok){
+                    deleteUserSetAlertVisible(true);
+                    setTimeout(() => {
+                        deleteUserSetAlertVisible(false);
+                        handleResetFilters();
+                        getAllUsers();
+                    }, 3000);
+                }
+
+        }catch(error){
+            console.log(error);
+            somethingError(true);
+            setTimeout(() => {
+                somethingError(false);
+                handleResetFilters();
+                getAllUsers();
+
+            }, 3000);
+        }
+    }
 
 
     useEffect(() => {
@@ -510,7 +585,7 @@ function AdminPrfoile() {
                                     cursor: 'pointer',
                                     width: '40%',
                                 }}
-                                onClick={''}
+                                onClick={updateUser}
                             >
                                 update
                             </button>
@@ -525,7 +600,7 @@ function AdminPrfoile() {
                                     cursor: 'pointer',
                                     width: '40%',
                                 }}
-                                onClick={''}
+                                onClick={deleteUser}
                             >
                                 delete
                             </button>
