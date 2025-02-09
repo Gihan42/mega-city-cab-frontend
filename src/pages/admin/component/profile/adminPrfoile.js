@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -9,22 +9,34 @@ import 'jspdf-autotable';
 import Papa from 'papaparse';
 import { Alert, Button, Space } from 'antd';
 import PasswordChange from '../../../passwordChange/passwordChange';
+import IconButton from '@mui/material/IconButton';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 function AdminPrfoile() {
 
     const [pdfAndCsvAlertVisible, pdfCsvSetAlertVisible] = useState(false);
     const [error, somethingError] = useState(false);
-      const [currentPassword, setCurrentPassword] = useState('');
-      const [newPassword, setNewPassword] = useState('');
-      const [confirmPassword, setConfirmPassword] = useState('');
+    const [saveUserAlertVisible, saveUserSetAlertVisible] = useState(false);
+    const [updateUserAlertVisible, updatUserSetAlertVisible] = useState(false);
+    const [deleteUserAlertVisible, deleteUserSetAlertVisible] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const[password,setPassword]=useState('');
 
-      const resetInputs = () => {
+
+    const resetInputs = () => {
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-      };
-  
-    
+    };
+
+
     const [searchFilters, setSearchFilters] = useState({
         adminId: '',
         adminName: '',
@@ -32,6 +44,7 @@ function AdminPrfoile() {
         adminNicNumber: '',
         adminContact: '',
         adminAddress: '',
+        adminPassword: ''
     });
     const [data, setFilteredData] = useState(
         Array.from({ length: 20 }).map((_, index) => ({
@@ -63,19 +76,19 @@ function AdminPrfoile() {
             adminNicNumber: '',
             adminContact: '',
             adminAddress: '',
+            password: ''
         });
 
         setFilteredData(data);
     };
     const filteredData = data.filter((item) => {
         return (
-            (!searchFilters.adminId || item.adminId.toLowerCase().includes(searchFilters.adminId.toLowerCase())) &&
-            (!searchFilters.adminName || item.adminName.toLowerCase().includes(searchFilters.adminName.toLowerCase())) &&
+            (!searchFilters.adminId || item.adminId.toString().includes(searchFilters.adminId.toString())) &&
+            (!searchFilters.adminName || (item.adminName?.toLowerCase() || "").includes(searchFilters.adminName.toLowerCase())) &&
             (!searchFilters.adminEmail || item.adminEmail.toLowerCase().includes(searchFilters.adminEmail.toLowerCase())) &&
             (!searchFilters.adminNicNumber || item.adminNicNumber.toLowerCase().includes(searchFilters.adminNicNumber.toLowerCase())) &&
             (!searchFilters.adminContact || item.adminContact.toLowerCase().includes(searchFilters.adminContact.toLowerCase())) &&
             (!searchFilters.adminAddress || item.adminAddress.toLowerCase().includes(searchFilters.adminAddress.toLowerCase()))
-
         );
     });
     const handleInputChange = (e) => {
@@ -85,6 +98,11 @@ function AdminPrfoile() {
             [id]: value,
         }));
     };
+
+    const handleInputPasswordChange = (event) => {
+        setPassword(event.target.value);
+    };
+    
     const handleRowClick = (item) => {
         setSearchFilters({
             adminId: item.adminId,
@@ -148,7 +166,116 @@ function AdminPrfoile() {
         }, 3000);
     };
 
+
+    const [showPassword, setShowPassword] = React.useState(false);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
+
+    const handleMouseUpPassword = (event) => {
+        event.preventDefault();
+    };
+
+
+
+
+
+
+
+
+    //get all users
+    const getAllUsers = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user/allAdmins`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+
+            })
+            const responseData = await response.json();
+            if (response.ok) {
+                console.log(responseData);
+                const mappedData = responseData.data.map((item) => ({
+                    adminId: item.id,
+                    adminName: item.userName,
+                    adminEmail: item.email,
+                    adminNicNumber: item.nic,
+                    adminContact: item.contactNumber,
+                    adminAddress: item.address
+                }))
+                setFilteredData(mappedData);
+            }
+
+
+        } catch (error) {
+            somethingError(true);
+        }
+
+    };
+
   
+    
+
+
+    //save user
+    const saveUser = async () => {
+
+        const userRequest = {
+            username: searchFilters.adminName,
+            password: password,
+            contactNumber: searchFilters.adminContact,
+            email: searchFilters.adminEmail,
+            address: searchFilters.adminAddress,
+            nic: searchFilters.adminNicNumber,
+            status: '1',
+            role: "Admin",
+        }
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                       },
+                body: JSON.stringify(userRequest)
+            })
+            const responseData = await response.json();
+            if (response.ok) {
+                console.log(responseData);
+                saveUserSetAlertVisible(true);
+                setTimeout(() => {
+                    saveUserSetAlertVisible(false);
+                    handleResetFilters();
+                    getAllUsers();
+                }, 3000);
+            }
+
+        } catch (error) {
+            console.log(error);
+            somethingError(true);
+            setTimeout(() => {
+                somethingError(false);
+                handleResetFilters();
+                getAllUsers();
+
+            }, 3000);
+        }
+    };
+
+    //update user
+    const updateUser = async () => {
+        
+    }
+
+
+
+    useEffect(() => {
+        getAllUsers();
+    }, []);
 
     return (
         <div className='h-full w-full p-4 md:p-8 lg:p-12'>
@@ -175,6 +302,54 @@ function AdminPrfoile() {
                         description="somthing went wrong try again"
                         type="error"
                         showIcon
+                    />
+                )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {saveUserAlertVisible && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="Driver Saved"
+                        type="success"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
+                    />
+                )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {updateUserAlertVisible && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="Driver Updated"
+                        type="success"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
+                    />
+                )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {deleteUserAlertVisible && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="Driver Deleted"
+                        type="success"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
                     />
                 )}
             </div>
@@ -281,6 +456,34 @@ function AdminPrfoile() {
                                     ),
                                 }}
                             />
+
+                            <FormControl  sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }} variant="outlined" fullWidth>
+                                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={password}
+                                    onChange={handleInputPasswordChange}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label={
+                                                    showPassword ? 'hide the password' : 'display the password'
+                                                }
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                                onMouseUp={handleMouseUpPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Password"
+                                />
+                            </FormControl>
+
+
                             <button type="button" className="btn btn-primary dcButton"
                                 style={{
                                     id: 'dcButton',
@@ -292,7 +495,7 @@ function AdminPrfoile() {
                                     cursor: 'pointer',
                                     width: '40%',
                                 }}
-                                onClick={''}
+                                onClick={saveUser}
                             >
                                 save
                             </button>
@@ -350,21 +553,21 @@ function AdminPrfoile() {
             <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
-                        <div className="modal-header"> 
+                        <div className="modal-header">
                             <h1 className="modal-title fs-5" id="exampleModalLabel" >Change Your Password</h1>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" 
-                            aria-label="Close" onClick={resetInputs}></button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close" onClick={resetInputs}></button>
                         </div>
                         <div className="modal-body">
                             <PasswordChange
-                            
-                            currentPassword={currentPassword}
-                            setCurrentPassword={setCurrentPassword}
-                            newPassword={newPassword}
-                            setNewPassword={setNewPassword}
-                            confirmPassword={confirmPassword}
-                            setConfirmPassword={setConfirmPassword}
-                            resetInputs={resetInputs}
+
+                                currentPassword={currentPassword}
+                                setCurrentPassword={setCurrentPassword}
+                                newPassword={newPassword}
+                                setNewPassword={setNewPassword}
+                                confirmPassword={confirmPassword}
+                                setConfirmPassword={setConfirmPassword}
+                                resetInputs={resetInputs}
                             />
                         </div>
 
@@ -465,15 +668,9 @@ function AdminPrfoile() {
                             </tbody>
                         </table>
 
-
-
                     </div>
                 </Col>
             </Row>
-
-
-
-
 
         </div>
     )
