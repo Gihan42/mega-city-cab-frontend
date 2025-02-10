@@ -11,7 +11,8 @@ import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import './booking.css'
+import './booking.css';
+import { Alert } from 'antd';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -31,6 +32,7 @@ function Booking() {
     const [total, setTotal] = useState(null);
     const [error, setError] = useState(null);
     const [minDateTime, setMinDateTime] = useState("");
+    const [confirmBooking, confirmBookingSetAlertVisible] = useState(false);
 
 
     const fetchCoordinates = async (city) => {
@@ -112,18 +114,243 @@ function Booking() {
         setMinDateTime(now.toISOString().slice(0, 16)); // Format: "YYYY-MM-DDTHH:MM"
     }, []);
 
-    const carCategories = ['Economy', 'Standard', 'Luxury', 'Premium', 'Business', 'Shared', 'Outstation'];
-    const [selectedCategory, setSelectedCategory] = useState(carCategories[0]);
-    const carModels = {
-        Economy: ['Model A', 'Model B', 'Model C'],
-        Standard: ['Model D', 'Model E', 'Model F'],
-        Luxury: ['Model G', 'Model H', 'Model I'],
-        Premium: ['Model J', 'Model K', 'Model L'],
-        Business: ['Model M', 'Model N', 'Model O'],
-        Shared: ['Model P', 'Model Q', 'Model R'],
-        Outstation: ['Model S', 'Model T', 'Model U'],
+    const [carCategories, setCarCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [carModels, setCarModels] = useState({});
+    const [selectedModel, setSelectedModel] = useState(null);
+    const [cabImage, setCabImage] = useState(null);
+    const [plateNumber, setPlateNumber] = useState(null);
+    const [pricePerKm, setPricerPerKm] = useState(null);
+    const [dName, setDname] = useState(null);
+    const [dContact, setDContact] = useState(null);
+    const [vehicleId, setVehicleId] = useState(null);
+    const [dId, setDId] = useState(null)
+    const [currentDate, setCurrentDate] = useState("");
+
+    useEffect(() => {
+        const updateDate = () => {
+            setCurrentDate(new Date().toISOString().split('T')[0]);
+        };
+
+        updateDate();
+        const interval = setInterval(updateDate, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+
+    // Fetch all car categories
+    const getAllVehicleCategories = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/category/allCategories`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+                console.log("Response Data (Categories):", responseData.data);
+                setCarCategories(responseData.data);
+
+                // Set default selected category if categories exist
+                if (responseData.data.length > 0) {
+                    const defaultCategory = responseData.data[0];
+                    setSelectedCategory(defaultCategory);
+                    getAllCarModels(defaultCategory); // Fetch models for the first category
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching vehicle categories:", error);
+        }
     };
 
+    // Fetch car models for a selected category
+    const getAllCarModels = async (category) => {
+        console.log("Fetching models for category:", category);
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle?categoryName=${category}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+                console.log("Response Data (Car Models):", responseData.data);
+                setCarModels(prevModels => ({
+                    ...prevModels,
+                    [category]: responseData.data
+                }));
+                if (responseData.data.length > 0) {
+                    setSelectedModel(responseData.data[0]);
+                    getRandomlyVehicle(responseData.data[0])
+
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching car models:", error);
+        }
+    };
+
+    //get randomly vehicle
+    const getRandomlyVehicle = async (model) => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle?model=${model}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+
+            const responseData = await response.json();
+
+
+            if (response.ok) {
+                console.log("Response Data cars:", responseData.data, vehicleId);
+                setVehicleId(responseData.data.vehicleId)
+                const base64Image = `data:image/jpeg;base64,${responseData.data.image}`;
+                setCabImage(base64Image);
+                setPlateNumber(responseData.data.plateNumber);
+                setPricerPerKm(responseData.data.pricePerKm);
+
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    //get randomly driver
+    const getRandomlyDriver = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver/getDriver`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+
+            const responseData = await response.json();
+            if (response.ok) {
+                console.log(responseData.data)
+                setDname(responseData.data.name);
+                setDContact(responseData.data.contactNumber);
+                setDId(responseData.data.driverId)
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        getAllVehicleCategories();
+        getRandomlyDriver();
+    }, []);
+
+    // Check if the selected category is valid before accessing car models
+    const modelsForSelectedCategory = selectedCategory && carModels[selectedCategory] ? carModels[selectedCategory] : [];
+
+
+
+
+
+    const [formData, setFormData] = useState({
+        name: localStorage.getItem('name'),
+        contact: "",
+        email: localStorage.getItem('email'),
+        dateTime: "",
+    });
+
+    const [isValid, setIsValid] = useState(false);
+
+    // Handle input changes
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    // Check if all fields are filled
+    useEffect(() => {
+        const { name, contact, email, dateTime } = formData;
+        setIsValid(name.trim() !== "" && contact.trim() !== "" && email.trim() !== "" && dateTime.trim() !== "");
+    }, [formData]);
+
+    // Confirm booking
+    const placeBooking = async (event) => {
+        if (!isValid) return;
+        event.preventDefault();
+        console.log("Booking Details:", formData);
+
+        const bookingRequest = {
+            customerId: localStorage.getItem('id'),
+            vehicleId: vehicleId,
+            driverId: dId,
+            pickUpLocation: startCity,
+            dropLocation: endCity,
+            hours: hours,
+            totalKm: distance,
+            bookingDateTime: currentDate,
+            amount: pricePerKm * distance,
+            status: 'Confirmed',
+        }
+        console.log(bookingRequest)
+        try{
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/booking/save`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              },
+              body: JSON.stringify(bookingRequest),
+          })
+          if(response.ok){
+
+            confirmBookingSetAlertVisible(true);
+            setFormData({
+                name: "",
+                contact: "",
+                email: "",
+                dateTime: "",
+    
+            });
+            setStartCity("");
+            setEndCity("");
+            setDistance("");
+            setTotal("");
+            setHours("");
+            setTimeout(() => {
+                confirmBookingSetAlertVisible(false);
+            }, 3000);
+          }
+        }catch(error){
+            console.log(error)
+            setError(true);
+            setTimeout(() => {
+                setError(false);
+              setStartCity("");
+              setEndCity("");
+              setDistance("");
+              setTotal("");
+              setHours("");
+              setFormData({
+                name: "",
+                contact: "",
+                email: "",
+                dateTime: "",
+    
+            });
+            }, 3000);
+        }
+    };
 
     return (
         <div className="container mx-auto bg-slate-100 shadow-xl rounded-xl mt-32 px-4 py-8" id="booking">
@@ -137,7 +364,10 @@ function Booking() {
                     <button
                         key={index}
                         type="button"
-                        onClick={() => setSelectedCategory(category)} // Set selected category on click
+                        onClick={() => {
+                            setSelectedCategory(category);
+                            getAllCarModels(category);
+                        }}
                         className={`rounded-5 px-4 py-2 font-medium transition-all  ${selectedCategory === category
                             ? 'bg-[#0D3B66] text-white'
                             : 'bg-[#FCA000] text-[#0D3B66] hover:bg-[#0D3B66] hover:text-white'
@@ -150,36 +380,30 @@ function Booking() {
             <h1 className="text-2xl mb-4 md:text-lg lg:text-xl font-normal flex items-start justify-start text-black">Select
                 Car Model</h1>
             <div className="flex md:flex-row gap-4 p-2 items-center justify-center flex-wrap">
-                {carModels[selectedCategory].map((model, index) => (
-                    <button
-                        key={index}
-                        type="button"
-                        className="rounded px-4 py-2 transition-all"
-                        style={{
-                            backgroundColor: '#fff', // Set background color
-                            color: '#0D3B66', // Text color
-                            border: '2px solid #0D3B66', // Outline color
-                            borderRadius: '8px', // Rounded edges
-                            cursor: 'pointer',
-                        }}
-                        onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = '#0D3B66'; // Hover background color
-                            e.target.style.color = '#FFFFFF'; // Hover text color
-                        }}
-                        onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = '#fff'; // Reset background color
-                            e.target.style.color = '#0D3B66'; // Reset text color
-                        }}
-                    >
-                        {model}
-                    </button>
-                ))}
+                {modelsForSelectedCategory.length > 0 ? (
+                    modelsForSelectedCategory.map((model, index) => (
+                        <button
+                            key={index}
+                            type="button"
+                            onClick={() => { setSelectedModel(model); getRandomlyVehicle(model) }} // Set selected model on click
+                            className={`px-4 py-2 font-medium transition-all border-2 border-[#0D3B66] rounded-md
+                                    ${selectedModel === model
+                                    ? 'bg-[#0D3B66] text-white'  // Selected button color
+                                    : 'bg-white text-[#0D3B66] hover:bg-[#FCA000] hover:text-[#0D3B66]'}`
+                            }
+                        >
+                            {model}
+                        </button>
+                    ))
+                ) : (
+                    <p>Please select a category to see the models.</p>
+                )}
             </div>
             <div className="flex flex-col  mt-4 p-4 justify-center items-center bg-white shadow-xl rounded-4">
                 <div
                     className="w-1/2 rounded-5 shadow-lg"
                     style={{
-                        backgroundImage: `url(${CabImage})`,
+                        backgroundImage: cabImage ? `url(${cabImage})` : 'none',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         height: '400px',
@@ -196,10 +420,10 @@ function Booking() {
                             Vehicle
                         </Typography>
                         <Typography variant="h5" component="div">
-                            wagonar
+                            {selectedModel}
                         </Typography>
                         <Typography variant="h5" component="div">
-                            SID-34567
+                            {plateNumber}
                         </Typography>
 
                     </CardContent>
@@ -211,7 +435,7 @@ function Booking() {
                             Price / Per KM
                         </Typography>
                         <Typography variant="h5" component="div" sx={{ color: 'white', fontSize: 25 }}>
-                            Rs 100.00
+                            RS {pricePerKm}.00
                         </Typography>
 
                     </CardContent>
@@ -224,11 +448,11 @@ function Booking() {
                             Driver
                         </Typography>
                         <Typography variant="h5" component="div" sx={{ color: 'white' }}>
-                            Mr Piyal Soriyapperuma
+                            Mr {dName}
                         </Typography>
                         <Typography variant="h5" component="div" sx={{ color: 'white' }}
                             className='flex justify-center items-center w-full gap-4'>
-                            075-49494093
+                            {dContact}
                             <div
                                 className="rounded-full p-1 hover:bg-sky-900  hover:text-white transition-all duration-300">
                                 <PhoneForwardedIcon className="text-[#FCA000] hover:text-white" />
@@ -241,22 +465,38 @@ function Booking() {
             </div>
             <div className="flex md:flex-row gap-4 mt-4  p-4 flex-wrap mb-4 justify-center items-center  ">
                 <button
-                    type="submit"
-                    className="btn btn-primary text-2xl"
-                    style={{
-                        marginTop: '1rem',
-                        backgroundColor: '#FCA000',
-                        color: '#0D3B66',
-                        padding: '10px 20px',
-                        borderRadius: '10px',
-                        border: 'none',
-                        cursor: 'pointer',
-                        width: '50%',
-                        fontSize: '1.5rem'
-                    }}
+                    type="button"
+                    className="custom-button"
+                    onClick={() => getRandomlyVehicle(selectedModel)}
                 >
-                    chose another cab
+                    Choose Another Cab
                 </button>
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {confirmBooking && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="Confirm Your Booking"
+                        type="success"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
+                    />
+                )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {error && (
+                    <Alert
+                        message="Error"
+                        description="somthing went wrong try again"
+                        type="error"
+                        showIcon
+                    />
+                )}
             </div>
             <div className="flex flex-col sm:flex-row justify-between gap-3 w-full mb-4 p-4">
                 <h2 className="text-lg sm:text-xl lg:text-2xl font-normal text-black">
@@ -271,7 +511,7 @@ function Booking() {
                             : 'bg-[#0D3B66] text-white hover:bg-[#0D3B66] hover:text-white'
                             }`}
                     >
-                        Total: Rs {total || 0}
+                        Total: Rs {pricePerKm * distance || 0}
                     </button>
 
                     <button
@@ -312,10 +552,10 @@ function Booking() {
                                 </div>
                                 <form className="space-y-4">
                                     {[
-                                        { label: "name", type: "text" },
-                                        { label: "contact", type: "text" },
-                                        { label: "email", type: "email" },
-                                        { label: "date & time", type: "datetime-local" }
+                                        { label: "name", type: "text", name: "name" },
+                                        { label: "contact", type: "text", name: "contact" },
+                                        { label: "email", type: "email", name: "email" },
+                                        { label: "date & time", type: "datetime-local", name: "dateTime" },
                                     ].map((field) => (
                                         <div key={field.label} className="space-y-2">
                                             <label className="block text-sm md:text-base lg:text-lg text-white capitalize">
@@ -323,28 +563,32 @@ function Booking() {
                                             </label>
                                             <input
                                                 type={field.type}
-                                                className="w-full px-4 py-2 rounded-lg border border-gray-300
-                                focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all"
+                                                name={field.name}
+                                                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all"
                                                 placeholder={`Enter your ${field.label}`}
                                                 min={field.type === "datetime-local" ? minDateTime : undefined} // Prevent past selection
+                                                value={formData[field.name]}
+                                                onChange={handleChange}
                                                 required
                                             />
                                         </div>
                                     ))}
 
                                     <button
-                                        type="submit"
-                                        className="btn btn-primary text-xl mt-6"
+                                        type="button"
+                                        className={`btn btn-primary text-xl mt-6 ${isValid ? "" : "opacity-50 cursor-not-allowed"}`}
                                         style={{
                                             marginTop: "1rem",
-                                            backgroundColor: "#FCA000",
-                                            color: "#0D3B66",
+                                            backgroundColor: isValid ? "#FCA000" : "#ddd",
+                                            color: isValid ? "#0D3B66" : "#999",
                                             borderRadius: "10px",
                                             border: "none",
-                                            cursor: "pointer",
+                                            cursor: isValid ? "pointer" : "not-allowed",
                                             width: "100%",
-                                            fontSize: "1.5rem"
+                                            fontSize: "1.5rem",
                                         }}
+                                        onClick={placeBooking}
+                                        disabled={!isValid}
                                     >
                                         Confirm Booking
                                     </button>

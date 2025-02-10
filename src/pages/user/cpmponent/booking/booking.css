@@ -6,3 +6,23 @@
     position: relative !important;
     z-index: 0 !important;
 }
+
+.custom-button {
+    margin-top: 1rem;
+    background-color: #FCA000;
+    color: #0D3B66;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    width: 50%;
+    font-size: 1.5rem;
+    transition: background-color 0.3s, color 0.3s; 
+}
+
+.custom-button:hover {
+    border: 1px solid #0D3B66;
+    background-color: #fff;
+    color: #0D3B66;
+
+}

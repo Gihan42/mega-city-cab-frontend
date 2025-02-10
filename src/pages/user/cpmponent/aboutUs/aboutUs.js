@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Alert, Button, Col, Row } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Alert, Button, Col, Row, Space } from 'antd';
 import LogoImage from '../../../../assets/Mega_City_Cab_Logo.jpg';
 import ContactImage from '../../../../assets/5124556.jpg';
 import 'animate.css';
@@ -7,8 +7,25 @@ import { LocalPhone, MarkEmailUnread, LinkedIn, Instagram, Facebook } from '@mui
 import emailjs from 'emailjs-com';
 import { Card, CardActions, CardContent, CardMedia, Typography, TextField } from '@mui/material';
 
+
 function AboutUs() {
     const [success, setSuccess] = useState(false);
+    const [saveCommentAlert, saveCommentSetAlert] = useState(false);
+    const [error, somethingError] = useState(false);
+    const [comment, setComment] = useState('');
+    const [currentDate, setCurrentDate] = useState("");
+
+  useEffect(() => {
+    const updateDate = () => {
+      setCurrentDate(new Date().toISOString().split('T')[0]);
+    };
+
+    updateDate(); 
+    const interval = setInterval(updateDate, 1000); 
+
+    return () => clearInterval(interval); 
+  }, []);
+
 
     const clearContactFormTextFields = () => {
         ['name', 'phone', 'email', 'subject', 'message'].forEach(id => {
@@ -43,9 +60,87 @@ function AboutUs() {
                 (err) => console.log('Failed to send message', err)
             );
     };
+    const handleInputComment = (event) => {
+        setComment(event.target.value);
+    };
+
+    // to day date
+
+
+
+    //save comment
+    const saveComment = async (event) => {
+        event.preventDefault();
+        const commentRequest = {
+            comment: comment,
+            userId: localStorage.getItem('id'),
+            date: currentDate,
+            status: '1'
+        }
+        console.log(commentRequest)
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/comment/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify(commentRequest)
+            })
+            const responseData = await response.json();
+            if (response.ok) {
+                console.log(responseData);
+                saveCommentSetAlert(true)
+                setTimeout(() => {
+                    saveCommentSetAlert(false)
+                    setComment('')
+                }, 3000);
+            }
+        } catch (error) {
+            somethingError(true)
+            setTimeout(() => {
+                somethingError(false)
+                setComment('')
+            }, 3000);
+        }
+
+
+
+
+
+    }
+
+
+
 
     return (
         <div className="container mx-auto px-4 py-8" id='aboutUs'>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {saveCommentAlert && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="Commented"
+                        type="success"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
+                    />
+                )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {error && (
+                    <Alert
+                        message="Error"
+                        description="somthing went wrong try again"
+                        type="error"
+                        showIcon
+                    />
+                )}
+            </div>
             <div className="flex flex-col lg:flex-row gap-6 items-center">
                 {/* About Section */}
                 <div className="w-full lg:w-1/2 space-y-6 animate__animated animate__backInLeft">
@@ -118,6 +213,8 @@ function AboutUs() {
                                         },
                                     },
                                 }}
+                                value={comment}
+                                onChange={handleInputComment}
                             />
                         </CardContent>
 
@@ -130,6 +227,7 @@ function AboutUs() {
                          transition-all duration-200
                          hover:bg-sky-800 focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50
                          disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={saveComment}
                             >
                                 Add Comment
                             </button>
@@ -144,10 +242,10 @@ function AboutUs() {
                     aria-hidden="true"
                 >
                     <div className="modal-dialog max-w-4xl w-full"
-                         style={{
-                             maxWidth: '800px',
-                             width: '90%',
-                         }}>
+                        style={{
+                            maxWidth: '800px',
+                            width: '90%',
+                        }}>
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h1 className="modal-title text-xl font-semibold">Contact Us</h1>

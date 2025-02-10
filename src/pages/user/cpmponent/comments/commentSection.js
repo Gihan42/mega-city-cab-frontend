@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import CardOne from '../../../../assets/ceoMarkaerting.png';
 import CardTwo from '../../../../assets/piterSmith.jpg';
 import CardThree from '../../../../assets/Oliver Twist.jpg';
 import CardFour from '../../../../assets/JamesAndrew.jpg';
+import { Alert, Button, Space } from 'antd';
 
 function CommentSection() {
+
     const comments = [
         { id: 1, customerName: "John Doe", comment: "Great service! Really loved it." },
         { id: 2, customerName: "Jane Smith", comment: "The product quality was excellent!" },
@@ -12,6 +14,10 @@ function CommentSection() {
         { id: 4, customerName: "Michael Brown", comment: "Had an issue, but customer support was very helpful." },
     ];
     const images = [CardOne, CardTwo, CardThree, CardFour];
+
+
+
+
     return (
         <div className="container pt-4 mx-auto mt-20 px-4 py-8" id="clients">
             {/* Header Section */}
