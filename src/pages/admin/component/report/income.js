@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useState,useEffect } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -56,8 +56,8 @@ function Income() {
 
   const filteredData = data.filter((item) => {
     return (
-      (!searchFilters.paymentId || item.paymentId.toLowerCase().includes(searchFilters.paymentId.toLowerCase())) &&
-      (!searchFilters.bookingId || item.bookingId.toLowerCase().includes(searchFilters.bookingId.toLowerCase())) &&
+      (!searchFilters.paymentId || item.paymentId.toString().includes(searchFilters.paymentId.toString())) &&
+      (!searchFilters.bookingId || item.bookingId.toString().includes(searchFilters.bookingId.toString())) &&
       (!searchFilters.amount || item.amount.toLowerCase().includes(searchFilters.amount.toLowerCase())) &&
       (!searchFilters.date || item.date === searchFilters.date) &&
       (!searchFilters.method || item.method.toLowerCase().includes(searchFilters.method.toLowerCase())) &&
@@ -151,6 +151,37 @@ function Income() {
       csvSetAlertVisible(false);
     }, 3000);
   };
+  //get all payment details
+  const getPaymentDetails = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/payment/allPayments`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+      const responseData = await response.json()
+      if (response.ok) {
+        const mappedData = responseData.data.map((item) => ({
+          paymentId:item.paymentId,
+          bookingId:item.bookingId,
+          amount:item.amount,
+          date:item.date,
+          method:item.paymentMethod,
+          cutomer:`${item.customerId}-${item.customerName}`,
+          vehicle:`${item.vehicleId}-${item.vehicleModel}`,
+          driver:`${item.driverId}-${item.driverName}`,
+        }))
+        setFilteredData(mappedData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    getPaymentDetails();
+  }, []);
 
   return (
     <div className="h-full w-full p-4 md:p-8 lg:p-12">

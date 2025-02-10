@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -13,6 +13,8 @@ function Comments() {
 
     const [pdfAndCsvAlertVisible, pdfCsvSetAlertVisible] = useState(false);
     const [error, somethingError] = useState(false);
+    const [deleteCommentAlertVisible, deleteCommentSetAlertVisible] = useState(false);
+
 
     const [searchFilters, setSearchFilters] = useState({
         commentId: '',
@@ -27,7 +29,7 @@ function Comments() {
             customerId: `CUS ${index + 1}`,
             customerName: `CUSTOMER${index + 1}`,
             comment: `ABC ${index + 1}`,
-            commentDate: `DATE ${index + 1}`,
+            commentDate: new Date().toISOString().slice(0, 10),
         }))
     );
     // const [data] = useState(
@@ -55,14 +57,16 @@ function Comments() {
     };
     const filteredData = data.filter((item) => {
         return (
-            (!searchFilters.commentId || item.commentId.toLowerCase().includes(searchFilters.commentId.toLowerCase())) &&
-            (!searchFilters.customerId || item.customerId.toLowerCase().includes(searchFilters.customerId.toLowerCase())) &&
+            (!searchFilters.commentId || item.commentId.toString().includes(searchFilters.commentId.toString())) &&
+            (!searchFilters.customerId || item.customerId.toString().includes(searchFilters.customerId.toString())) &&
             (!searchFilters.customerName || item.customerName.toLowerCase().includes(searchFilters.customerName.toLowerCase())) &&
             (!searchFilters.comment || item.comment.toLowerCase().includes(searchFilters.comment.toLowerCase())) &&
-            (!searchFilters.commentDate || item.commentDate.toLowerCase().includes(searchFilters.commentDate.toLowerCase()))
-
+            (!searchFilters.commentDate ||
+                (item.commentDate && !isNaN(new Date(item.commentDate)) &&
+                    new Date(item.commentDate).toISOString().slice(0, 10) === searchFilters.commentDate))
         );
     });
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         setSearchFilters((prev) => ({
@@ -113,7 +117,7 @@ function Comments() {
                 customerId: item.customerId,
                 customerName: item.customerName,
                 comment: item.comment,
-                commentDate: item.commentDate
+                commentDate: item.commentDate.split("T")[0]
             }))
         )
         const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
@@ -131,7 +135,78 @@ function Comments() {
         }, 3000);
     };
 
+    // get all comments
+    const getComments = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/comment/allComments`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            })
+            const responseData = await response.json();
+            if (response.ok) {
+                console.log(data);
+                const mappedData = responseData.data.map((item) => {
+                    const dateValue = item.date;
+                    const parsedDate = dateValue ? new Date(dateValue) : null;
 
+                    return {
+                        commentId: item.commentId,
+                        customerId: item.userId,
+                        customerName: item.userName,
+                        comment: item.comment,
+                        commentDate: parsedDate instanceof Date && !isNaN(parsedDate)
+                            ? parsedDate.toISOString().split("T")[0]
+                            : "Invalid Date",
+
+                    };
+                });
+
+                console.log("Mapped Data:", mappedData);
+                setFilteredData(mappedData);
+
+
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    //delete comment
+    const deleteComment = async () => {
+        const id = searchFilters.commentId
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/comment?commentId=${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            })
+            if(response.ok){
+                deleteCommentSetAlertVisible(true)
+                setTimeout(() => {
+                    deleteCommentSetAlertVisible(false);
+                    handleResetFilters();
+                    getComments();
+                  }, 3000);
+            }
+
+        } catch (error) {
+            console.log(error)
+            somethingError(true);
+            setTimeout(() => {
+              somethingError(false);
+              handleResetFilters();
+              getComments();
+            }, 3000);
+        }
+    }
+    useEffect(() => {
+        getComments();
+    }, []);
 
 
     return (
@@ -159,6 +234,22 @@ function Comments() {
                         description="somthing went wrong try again"
                         type="error"
                         showIcon
+                    />
+                )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {deleteCommentAlertVisible && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="Comment Deleted"
+                        type="success"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
                     />
                 )}
             </div>
@@ -207,7 +298,6 @@ function Comments() {
                                 fullWidth
                                 value={searchFilters.customerName}
                                 onChange={handleInputChange}
-                                type='number'
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
@@ -261,7 +351,8 @@ function Comments() {
                                     cursor: 'pointer',
                                     width: '80%',
                                     marginBottom: '1rem',
-                                }} >
+                                }}  onClick={deleteComment}
+                                   >
                                 delete
                             </button>
                         </div>
