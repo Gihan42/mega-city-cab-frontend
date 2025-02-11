@@ -13,6 +13,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import './booking.css';
 import { Alert } from 'antd';
+import Stripe from "react-stripe-checkout";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -277,13 +278,21 @@ function Booking() {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
-
-    // Check if all fields are filled
+    
     useEffect(() => {
         const { name, contact, email, dateTime } = formData;
-        setIsValid(name.trim() !== "" && contact.trim() !== "" && email.trim() !== "" && dateTime.trim() !== "");
-    }, [formData]);
-
+    
+        setIsValid(
+            name.trim() !== "" &&
+            contact.trim() !== "" &&
+            email.trim() !== "" &&
+            dateTime.trim() !== "" &&
+            Number(distance) > 0 &&  
+            Number(hours) > 0 &&     
+            Number(total) > 0       
+        );
+    }, [formData, distance, hours, total]); 
+    
     // Confirm booking
     const placeBooking = async (event) => {
         if (!isValid) return;
@@ -312,8 +321,9 @@ function Booking() {
               },
               body: JSON.stringify(bookingRequest),
           })
+          const responseData = await response.json();
           if(response.ok){
-
+            payment(responseData.data.bookingId);
             confirmBookingSetAlertVisible(true);
             setFormData({
                 name: "",
@@ -352,6 +362,46 @@ function Booking() {
         }
     };
 
+// Payment function
+const payment = async (bookingId) => {
+    const paymentRequest = {
+        bookingId: bookingId,
+        amount: pricePerKm * distance,
+        date: currentDate,
+        paymentMethod: 'visa',
+        currency: 'lkr',
+        customerId: localStorage.getItem('id'),
+        vehicleId: vehicleId,
+        status: 'paid',
+    };
+
+    try {
+        const response = await fetch(`${process.env.REACT_APP_BACS_URL}/payment/save`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+            body: JSON.stringify(paymentRequest),
+        });
+
+        const responseData = await response.json();
+        if (response.ok) {
+            console.log(responseData);
+
+            // Save paymentId to localStorage
+            localStorage.setItem('paymentId', responseData.data.payment.paymentId);
+
+            // Open Stripe Payment Page in a New Tab
+            window.location.href = responseData.data.sessionUrl;
+
+        } else {
+            throw new Error('Failed to save payment');
+        }
+    } catch (error) {
+        console.error("Error processing payment:", error);
+    }
+};
     return (
         <div className="container mx-auto bg-slate-100 shadow-xl rounded-xl mt-32 px-4 py-8" id="booking">
             <div className="flex flex-col">
@@ -385,10 +435,10 @@ function Booking() {
                         <button
                             key={index}
                             type="button"
-                            onClick={() => { setSelectedModel(model); getRandomlyVehicle(model) }} // Set selected model on click
+                            onClick={() => { setSelectedModel(model); getRandomlyVehicle(model) }} 
                             className={`px-4 py-2 font-medium transition-all border-2 border-[#0D3B66] rounded-md
                                     ${selectedModel === model
-                                    ? 'bg-[#0D3B66] text-white'  // Selected button color
+                                    ? 'bg-[#0D3B66] text-white'  
                                     : 'bg-white text-[#0D3B66] hover:bg-[#FCA000] hover:text-[#0D3B66]'}`
                             }
                         >

@@ -34,6 +34,7 @@
     "react-scripts": "^5.0.1",
     "react-scroll": "^1.9.0",
     "react-slick": "^0.30.3",
+    "react-stripe-checkout": "^2.6.3",
     "react-toastify": "^11.0.3",
     "react-typed": "^2.0.12",
     "slick-carousel": "^1.8.1",
