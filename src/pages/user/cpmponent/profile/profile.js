@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState,useEffect } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -13,6 +13,9 @@ import PasswordChange from'../../../passwordChange/passwordChange';
 import {useNavigate} from "react-router-dom";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { Contact } from 'lucide-react';
+
+
 
 
 function Profile() {
@@ -20,6 +23,14 @@ function Profile() {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [userId,setUserId]=useState('');
+    const [userName,setUserName]=useState('');
+    const [email,setEmail]=useState('');
+    const [nic,setNic]=useState('');
+    const [contact,setContact]=useState('');
+    const [address,setAddress]=useState('');
+    const [userUpdateAlert, userUpdateSetAlertVisible] = useState(false);
+    const [error, somethingError] = useState(false);
 
     const resetInputs = () => {
         setCurrentPassword("");
@@ -44,7 +55,6 @@ function Profile() {
             pickUpLocation: 'null',
             destination: 'null',
             totalAmount: 'null',
-            status: 'close'
         }))
     );
 
@@ -82,8 +92,8 @@ function Profile() {
     );
     const filteredData = data.filter((item) => {
         return (
-            (!searchFilters.bookingId || item.bookingId.toLowerCase().includes(searchFilters.bookingId.toLowerCase())) &&
-            (!searchFilters.customerId || item.customer.toLowerCase().includes(searchFilters.customerId.toLowerCase())) &&
+            (!searchFilters.bookingId || item.bookingId.toString().includes(searchFilters.bookingId.toString())) &&
+            (!searchFilters.customerId || item.customer.toString().includes(searchFilters.customerId.toString())) &&
             (!searchFilters.driverId || item.driver.toLowerCase().includes(searchFilters.driverId.toLowerCase())) &&
             (!searchFilters.vehicleId || item.vehicle.toLowerCase().includes(searchFilters.vehicleId.toLowerCase())) &&
             (!searchFilters.status || item.status.toLowerCase().includes(searchFilters.status.toLowerCase())) &&
@@ -110,8 +120,141 @@ function Profile() {
         });
     };
 
+
+    //load user details
+    const loadUserDetails = async () => {
+        const userId = localStorage.getItem('id');
+        try{
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user?uId=${userId}`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            })
+            const jsonData = await response.json();
+            if(response.ok){
+                setUserId(jsonData.data.userId);
+                setUserName(jsonData.data.username);
+                setEmail(jsonData.data.email);
+                setNic(jsonData.data.nic);
+                setContact(jsonData.data.contactNumber);
+                setAddress(jsonData.data.address);
+            }
+        }catch(error){
+            console.log(error)
+        }
+
+    };
+
+    //get booking details by id
+    const loadBookingDetails = async () =>{
+        const userId = localStorage.getItem('id');
+        try{
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/booking?userId=${userId}`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            })
+            const responseData = await response.json();
+            if(response.ok){
+                const mappedData = responseData.data.map((item) => ({
+
+                    bookingId:item.bookingId,
+                    customer:item.userId,
+                    driver:`${item.driverId}-${item.driverName}`,
+                    vehicle:`${item.vehiclePlateNumber}-${item.vehicleModel}`,
+                    date:item.bookingDate.split("T")[0],
+                    pickUpLocation:item.startLocation,
+                    destination:item.dropLocation,
+                    totalAmount:item.amount,
+
+                }))
+                setFilteredData(mappedData);
+            }
+        }catch(error){
+            console.log(error);
+        }
+    } ;
+
+    //update user
+    
+    const updateUser = async (event) => {
+        event.preventDefault();
+        const userRequest = {
+            id:userId ,
+            username: userName,
+            password:"123",
+            contactNumber: contact,
+            email:email,
+            address: address,
+            nic: nic,
+            status: '1',
+            role: "Admin",
+        }
+
+        console.log(userRequest);
+        try{
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify(userRequest)
+            })
+            const responseData = await response.json();
+            if (response.ok) {
+                console.log(responseData);
+                userUpdateSetAlertVisible(true);
+                setTimeout(() => {
+                userUpdateSetAlertVisible(false);
+                }, 3000);
+            }
+        }
+        catch (error) {
+            console.log(error);
+            somethingError(true);
+            setTimeout(() => {
+                somethingError(false);
+            }, 3000);
+        }
+
+    }
+
+  useEffect(() => { loadUserDetails(); loadBookingDetails()}, []);
+
+
     return (
         <div className="container mx-auto  mb-4 px-4 py-8" id="profile">
+                        <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                            {error && (
+                                <Alert
+                                    message="Error"
+                                    description="somthing went wrong try again"
+                                    type="error"
+                                    showIcon
+                                />
+                            )}
+                        </div>
+                                    <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                                        {userUpdateAlert && (
+                                            <Alert
+                                                className='w-96 mb-5'
+                                                message="Updated"
+                                                type="success"
+                                                showIcon
+                                                action={
+                                                    <Button size="small" type="text">
+                                                        UNDO
+                                                    </Button>
+                                                }
+                                                closable
+                                            />
+                                        )}
+                                    </div>
             <div className="flex flex-col">
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-normal text-sky-900">Profile</h1>
                 <hr className="border-t-4 border-black w-1/3"/>
@@ -171,8 +314,7 @@ function Profile() {
                                 label=" User ID"
                                 variant="outlined"
                                 fullWidth
-                                value={''}
-                                onChange={''}
+                                value={userId}
                                 disabled={true}
                                 sx={{marginBottom: '1rem', '& .MuiOutlinedInput-root': {borderRadius: '8px'}}}
                             />
@@ -181,8 +323,8 @@ function Profile() {
                                 label=" User Name"
                                 variant="outlined"
                                 fullWidth
-                                value={''}
-                                onChange={''}
+                                value={userName}
+                                onChange={(e) => setUserName(e.target.value)}
                                 sx={{marginBottom: '1rem', '& .MuiOutlinedInput-root': {borderRadius: '8px'}}}
                             />
                             <TextField
@@ -191,8 +333,7 @@ function Profile() {
                                 variant="outlined"
                                 fullWidth
                                 disabled={true}
-                                value={''}
-                                onChange={''}
+                                value={email}
                                 sx={{marginBottom: '1rem', '& .MuiOutlinedInput-root': {borderRadius: '8px'}}}
                             />
                             <TextField
@@ -200,8 +341,8 @@ function Profile() {
                                 label=" User Nic"
                                 variant="outlined"
                                 fullWidth
-                                value={''}
-                                onChange={''}
+                                value={nic}
+                                onChange={(e) => setNic(e.target.value)}
                                 sx={{marginBottom: '1rem', '& .MuiOutlinedInput-root': {borderRadius: '8px'}}}
                             />
                             <TextField
@@ -209,8 +350,8 @@ function Profile() {
                                 label=" User Contact"
                                 variant="outlined"
                                 fullWidth
-                                value={''}
-                                onChange={''}
+                                value={contact}
+                                onChange={(e) => setContact(e.target.value)}
                                 sx={{marginBottom: '1rem', '& .MuiOutlinedInput-root': {borderRadius: '8px'}}}
                             />
 
@@ -222,8 +363,8 @@ function Profile() {
                                 label=" User Address"
                                 variant="outlined"
                                 fullWidth
-                                value={''}
-                                onChange={''}
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
                                 sx={{marginBottom: '1rem', '& .MuiOutlinedInput-root': {borderRadius: '8px'}}}
                             />
                             <button type="button" className="btn btn-primary dcButton"
@@ -237,7 +378,7 @@ function Profile() {
                                         cursor: 'pointer',
                                         width: '40%',
                                     }}
-                                    onClick={''}
+                                    onClick={updateUser}
                             >
                                 update
                             </button>

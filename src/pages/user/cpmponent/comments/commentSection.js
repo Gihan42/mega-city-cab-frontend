@@ -6,17 +6,36 @@ import CardFour from '../../../../assets/JamesAndrew.jpg';
 import { Alert, Button, Space } from 'antd';
 
 function CommentSection() {
-
-    const comments = [
-        { id: 1, customerName: "John Doe", comment: "Great service! Really loved it." },
-        { id: 2, customerName: "Jane Smith", comment: "The product quality was excellent!" },
-        { id: 3, customerName: "Emily Johnson", comment: "Delivery was quick and smooth." },
-        { id: 4, customerName: "Michael Brown", comment: "Had an issue, but customer support was very helpful." },
-    ];
+    const [comments, setComments] = useState([]); // State to store fetched comments
     const images = [CardOne, CardTwo, CardThree, CardFour];
 
+    // Fetch random comments from the API
+    const getRandomComments = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/comment/randomComment`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            const responseData = await response.json();
+            if (response.ok) {
+                // Update the state with the fetched comments
+                setComments(responseData.data.map(comment => ({
+                    id: comment._id, // Assuming the API returns an `_id` field
+                    customerName: comment.customerName, // Map `username` to `customerName`
+                    comment: comment.comment, // Map `comment` to `comment`
+                })));
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-
+    useEffect(() => {
+        getRandomComments();
+    }, []);
 
     return (
         <div className="container pt-4 mx-auto mt-20 px-4 py-8" id="clients">
