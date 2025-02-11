@@ -13,7 +13,8 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import './booking.css';
 import { Alert } from 'antd';
-import Stripe from "react-stripe-checkout";
+import emailjs from 'emailjs-com';
+import {useNavigate} from "react-router-dom";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -34,6 +35,8 @@ function Booking() {
     const [error, setError] = useState(null);
     const [minDateTime, setMinDateTime] = useState("");
     const [confirmBooking, confirmBookingSetAlertVisible] = useState(false);
+    const [ifValidUser,ifValidUserSetAlert]=useState(false);
+    const navigate = useNavigate();
 
 
     const fetchCoordinates = async (city) => {
@@ -293,6 +296,81 @@ function Booking() {
         );
     }, [formData, distance, hours, total]); 
     
+
+    //send mail
+   const  sendMail = (startLocation,
+        endLocation,bookingId) =>{
+        const templateParams = {
+            driver_name: dName,
+            contact_email: formData.email,
+            contact_phone: formData.contact,
+            customer_name: formData.name,
+            pickup_location: startLocation,
+            drop_location:endLocation,
+            booking_id:bookingId,
+            booking_date:formData.dateTime,
+            plate_number:plateNumber,
+            model:selectedModel
+        };
+        emailjs
+        .send(
+            'service_bulp1em',
+            'template_sm6k6ag',
+            templateParams,
+            'xvlC_Tt8GhRFq5k5R'
+        )
+        .then(
+            () => {
+                console.log('send mail')
+            },
+            (err) => console.log('Failed to send message', err)
+        );
+    };
+
+    //check a valid user
+    const checkValidUser = async () => {
+        if (!isValid) return;
+        const userId= localStorage.getItem('id');
+        try{
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user?userId=${userId}`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            })
+            const jsonData = await response.json();
+            if(response.ok){
+                if(jsonData.data){
+                    placeBooking(new Event("click"));
+                }
+                else{
+                    ifValidUserSetAlert(true);
+                    setFormData({
+                        name: "",
+                        contact: "",
+                        email: "",
+                        dateTime: "",
+            
+                    });
+                    setStartCity("");
+                    setEndCity("");
+                    setDistance("");
+                    setTotal("");
+                    setHours("");
+                    setTimeout(() => {
+                        ifValidUserSetAlert(false);
+                        navigate('/profile')
+                    }, 6000);
+
+                }
+            }
+
+        }catch(error){
+            console.log(error)
+        }
+    }
+
     // Confirm booking
     const placeBooking = async (event) => {
         if (!isValid) return;
@@ -307,7 +385,7 @@ function Booking() {
             dropLocation: endCity,
             hours: hours,
             totalKm: distance,
-            bookingDateTime: currentDate,
+            bookingDateTime: formData.dateTime,
             amount: pricePerKm * distance,
             status: 'Confirmed',
         }
@@ -337,6 +415,7 @@ function Booking() {
             setDistance("");
             setTotal("");
             setHours("");
+            sendMail(startCity,endCity,responseData.data.bookingId)
             setTimeout(() => {
                 confirmBookingSetAlertVisible(false);
             }, 3000);
@@ -585,6 +664,22 @@ const payment = async (bookingId) => {
                     </button>
                 </div>
             </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {ifValidUser && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="Please Update Your Details"
+                        type="warning"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
+                    />
+                )}
+            </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="bg-white shadow-xl rounded-lg mt-4">
@@ -637,7 +732,7 @@ const payment = async (bookingId) => {
                                             width: "100%",
                                             fontSize: "1.5rem",
                                         }}
-                                        onClick={placeBooking}
+                                        onClick={checkValidUser}
                                         disabled={!isValid}
                                     >
                                         Confirm Booking

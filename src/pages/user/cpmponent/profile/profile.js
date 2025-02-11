@@ -38,9 +38,6 @@ function Profile() {
         setConfirmPassword("");
     };
 
-    function logOut() {
-        navigate('/');
-    }
     function backtoHome() {
         navigate('/User');
     }
@@ -180,7 +177,6 @@ function Profile() {
     } ;
 
     //update user
-    
     const updateUser = async (event) => {
         event.preventDefault();
         const userRequest = {
@@ -262,8 +258,8 @@ function Profile() {
                     <button
                         className="btn btn-danger "
                         style={{
-                            backgroundColor: '#FCA000',
-                            color: '#0D3B66',
+                            backgroundColor: '#0D3B66',
+                            color: '#fff',
                             padding: '10px 20px',
                             borderRadius: '10px',
                             border: 'none',
@@ -286,20 +282,6 @@ function Profile() {
 
                     >
                         Change Password
-                    </button>
-                    <button
-                        className="btn btn-primary dcButton"
-                        style={{
-                            backgroundColor: '#0D3B66',
-                            color: '#fff',
-                            padding: '10px 20px',
-                            borderRadius: '10px',
-                            border: 'none',
-                            cursor: 'pointer',
-                        }}
-                        onClick={logOut}
-                    >
-                        Logout
                     </button>
                 </div>
             </div>
