@@ -167,7 +167,7 @@ function Income() {
           paymentId:item.paymentId,
           bookingId:item.bookingId,
           amount:item.amount,
-          date:item.date,
+          date:item.date.split("T")[0],
           method:item.paymentMethod,
           cutomer:`${item.customerId}-${item.customerName}`,
           vehicle:`${item.vehicleId}-${item.vehicleModel}`,

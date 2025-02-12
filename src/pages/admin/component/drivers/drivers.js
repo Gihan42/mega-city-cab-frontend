@@ -20,6 +20,7 @@ function Drivers() {
   const [saveDriverAlertVisible, saveDriverSetAlertVisible] = useState(false);
   const [updateDriverAlertVisible, updateDriverSetAlertVisible] = useState(false);
   const [deleteDriverAlertVisible, deleteDriverSetAlertVisible] = useState(false);
+  const [isRowSelected, setIsRowSelected] = useState(false);
 
   const [searchFilters, setSearchFilters] = useState({
     driverId: '',
@@ -66,7 +67,7 @@ function Drivers() {
       driverContact: '',
       driverAddress: ''
     });
-
+    setIsRowSelected(false);
     setFilteredData(data);
   };
   const filteredData = data.filter((item) => {
@@ -101,6 +102,7 @@ function Drivers() {
       driverAddress: item.driverAddress
 
     });
+    setIsRowSelected(true);
   };
   const downloadPDF = () => {
     const doc = new jsPDF();
@@ -529,6 +531,7 @@ function Drivers() {
                   width: '80%',
                 }}
                 onClick={saveDriver}
+                disabled={isRowSelected}
               >
                 save
               </button>

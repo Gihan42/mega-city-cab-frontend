@@ -19,6 +19,7 @@ function Vehicle() {
     const [image, setImage] = useState(null);
     const fileInputRef = useRef(null);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [isRowSelected, setIsRowSelected] = useState(false);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -70,6 +71,7 @@ function Vehicle() {
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
+        setIsRowSelected(false);
         setImage(null);
         setFilteredData(data);
     };
@@ -106,7 +108,7 @@ function Vehicle() {
             image: item.image,
         });
 
-
+        setIsRowSelected(true);
         if (item.image) {
             if (item.image.startsWith("data:image")) {
                 setSelectedImage(item.image);
@@ -556,6 +558,7 @@ function Vehicle() {
                                     width: '20%',
                                 }}
                                 onClick={saveVehicle}
+                                disabled={isRowSelected}
                             >
                                 Save
                             </button>

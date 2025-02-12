@@ -28,7 +28,7 @@ function AdminPrfoile() {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const[password,setPassword]=useState('');
-
+    const [isRowSelected, setIsRowSelected] = useState(false);
 
     const resetInputs = () => {
         setCurrentPassword("");
@@ -78,7 +78,7 @@ function AdminPrfoile() {
             adminAddress: '',
             password: ''
         });
-
+        setIsRowSelected(false);
         setFilteredData(data);
     };
     const filteredData = data.filter((item) => {
@@ -112,6 +112,7 @@ function AdminPrfoile() {
             adminContact: item.adminContact,
             adminAddress: item.adminAddress
         });
+        setIsRowSelected(true);
     };
     const downloadPDF = () => {
         const doc = new jsPDF();
@@ -571,6 +572,7 @@ function AdminPrfoile() {
                                     width: '40%',
                                 }}
                                 onClick={saveUser}
+                                disabled={isRowSelected}
                             >
                                 save
                             </button>

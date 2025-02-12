@@ -26,6 +26,9 @@ import Income from '../component/report/income';
 import Comments from '../component/comments/comments';
 import { useNavigate } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Badge, Avatar, Space } from "antd";
+
+
 
 
 const { Header, Sider, Content } = Layout;
@@ -35,12 +38,14 @@ function MainPage() {
   const [selectedMenu, setSelectedMenu] = useState('Dashboard');
   const [isScreenSupported, setIsScreenSupported] = useState(true);
   const navigate = useNavigate();
+  const [bookingsCount,setBookingCount] = useState('');;
 
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
   useEffect(() => {
+    getPendingBookingCount();
     const checkScreenSize = () => {
       setIsScreenSupported(window.innerWidth > 1030);
     };
@@ -50,10 +55,44 @@ function MainPage() {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
+  const getPendingBookingCount = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACS_URL}/booking/pending/count`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+  
+      if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+      
+        const text = await response.text();
+      if (!text) return setBookingCount(0);
+  
+      const responseData = JSON.parse(text);
+      setBookingCount(responseData.data || 0);
+    } catch (error) {
+      console.error("Error fetching pending booking count:", error);
+      setBookingCount(0);
+    }
+  };
+  
+
 
   const menuItems = [
     { key: 'Dashboard', icon: <HomeOutlined style={{ fontSize: '24px' }} />, label: 'Dashboard' },
-    { key: 'Bookings', icon: <CarryOutOutlined style={{ fontSize: '24px' }} />, label: 'Bookings' },
+    {
+      key: "Bookings",
+      icon: <CarryOutOutlined style={{ fontSize: "24px"}} />,
+      label: (
+        <span>
+          <Badge count={bookingsCount} offset={[10, 0]} style={{ backgroundColor: "#f5222d",marginTop:"5px"}}>
+          <span style={{ color: "white",fontSize: "24px" }}>Bookings</span>
+          </Badge>
+        </span>
+      ),
+    },
     { key: 'Customers', icon: <UserOutlined style={{ fontSize: '24px' }} />, label: 'Customers' },
     { key: 'Drivers', icon: <UserSwitchOutlined style={{ fontSize: '24px' }} />, label: 'Drivers' },
     { key: 'Vehicles', icon: <CarOutlined style={{ fontSize: '24px' }} />, label: 'Vehicles' },
@@ -81,8 +120,9 @@ function MainPage() {
         return <Income/>;
       case 'Comments':
         return <Comments/>;
-      case 'log-out':
-        return handleLogout();
+        case 'log-out':
+          handleLogout();
+          return null; 
       default:
         return <div>Welcome</div>;
     }
