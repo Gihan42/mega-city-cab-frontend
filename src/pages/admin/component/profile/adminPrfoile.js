@@ -181,12 +181,6 @@ function AdminPrfoile() {
     };
 
 
-
-
-
-
-
-
     //get all users
     const getAllUsers = async () => {
         try {
@@ -219,13 +213,10 @@ function AdminPrfoile() {
 
     };
 
-  
-    
-
 
     //save user
     const saveUser = async () => {
-
+        if (!validateForm()) return;
         const userRequest = {
             username: searchFilters.adminName,
             password: password,
@@ -270,6 +261,7 @@ function AdminPrfoile() {
     //update user
     const updateUser = async (event) => {
         event.preventDefault();
+        if (!validateForm()) return;
         const userRequest = {
             id: searchFilters.adminId,
             username: searchFilters.adminName,
@@ -352,6 +344,79 @@ function AdminPrfoile() {
     useEffect(() => {
         getAllUsers();
     }, []);
+
+
+      const [validationErrors, setValidationErrors] = useState({
+        adminName: '',
+        adminEmail: '',
+        adminNicNumber: '',
+        adminContact: '',
+        adminAddress: '',
+        adminPassword: ''
+      });
+    
+      const validateForm = () => {
+        const errors = {};
+        let isValid = true;
+      
+        
+        if (!searchFilters.adminName) {
+          errors.adminName = 'Admin Name is required';
+          isValid = false;
+        } else if (!/^[A-Za-z\s]+$/.test(searchFilters.adminName)) {
+          errors.adminName = 'Admin Name cannot contain numbers';
+          isValid = false;
+        } else if (searchFilters.adminName.length > 20) {
+          errors.adminName = 'Admin Name must be at most 20 characters';
+          isValid = false;
+        }
+      
+        
+        if (!searchFilters.adminEmail) {
+          errors.adminEmail = 'Admin Email is required';
+          isValid = false;
+        } else if (!/\S+@\S+\.\S+/.test(searchFilters.adminEmail)) {
+          errors.adminEmail = 'Admin Email is invalid';
+          isValid = false;
+        }
+      
+      
+        // Validate NIC (11 numbers or 11 numbers + "V")
+        if (!searchFilters.adminNicNumber) {
+          errors.adminNicNumber = 'NIC Number is required';
+          isValid = false;
+        } 
+      
+        // Validate Contact Number (Exactly 10 digits & must start with specific prefixes)
+        if (!searchFilters.adminContact) {
+          errors.adminContact = 'Contact Number is required';
+          isValid = false;
+        } else if (!/^(077|076|078|072|075|074|071)\d{7}$/.test(searchFilters.adminContact)) {
+          errors.adminContact = 'Contact Number must be 10 digits and start with 077, 076, 078, 072, 075, 074, or 071';
+          isValid = false;
+        }
+      
+        
+        if (!searchFilters.adminAddress) {
+          errors.adminAddress = 'Address is required';
+          isValid = false;
+        }
+
+        if (!searchFilters.adminPassword) {
+            errors.adminPassword = 'Password is required';
+            isValid = false;
+          }else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(searchFilters.adminPassword)){
+            errors.adminContact = 'Password must be 10 latters';
+            isValid = false;
+          }else if (searchFilters.adminPassword.length > 10) {
+            errors.adminPassword = 'Password must be at most 10 characters';
+            isValid = false;
+          }
+        
+      
+        setValidationErrors(errors);
+        return isValid;
+      };
 
     return (
         <div className='h-full w-full p-4 md:p-8 lg:p-12'>
@@ -456,6 +521,8 @@ function AdminPrfoile() {
                                 fullWidth
                                 value={searchFilters.adminName}
                                 onChange={handleInputChange}
+                                error={!!validationErrors.adminName}
+                                helperText={validationErrors.adminName}
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
@@ -472,6 +539,8 @@ function AdminPrfoile() {
                                 fullWidth
                                 value={searchFilters.adminEmail}
                                 onChange={handleInputChange}
+                                error={!!validationErrors.adminEmail}
+                                helperText={validationErrors.adminEmail}
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
@@ -488,6 +557,8 @@ function AdminPrfoile() {
                                 fullWidth
                                 value={searchFilters.adminNicNumber}
                                 onChange={handleInputChange}
+                                error={!!validationErrors.adminNicNumber}
+                                helperText={validationErrors.adminNicNumber}
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
@@ -504,6 +575,8 @@ function AdminPrfoile() {
                                 fullWidth
                                 value={searchFilters.adminContact}
                                 onChange={handleInputChange}
+                                error={!!validationErrors.adminContact}
+                                helperText={validationErrors.adminContact}
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
@@ -523,6 +596,8 @@ function AdminPrfoile() {
                                 fullWidth
                                 value={searchFilters.adminAddress}
                                 onChange={handleInputChange}
+                                error={!!validationErrors.adminAddress}
+                                helperText={validationErrors.adminAddress}
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
@@ -540,6 +615,8 @@ function AdminPrfoile() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={handleInputPasswordChange}
+                                    error={!!validationErrors.adminPassword}
+                                    helperText={validationErrors.adminPassword}
                                     endAdornment={
                                         <InputAdornment position="end">
                                             <IconButton

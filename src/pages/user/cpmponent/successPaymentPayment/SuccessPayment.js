@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 function SuccessPayment() {
   const navigate = useNavigate();
   useEffect(() => {
-    console.log("weda")
     const paymentId=localStorage.getItem('paymentId')
     exportBill(paymentId)
     

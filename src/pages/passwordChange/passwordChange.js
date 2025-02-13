@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
@@ -25,7 +23,13 @@ function PasswordChange({
 
   const [updatePasswordVisible, updatePasswordSetAlertVisible] = useState(false);
   const [error, setError] = useState(false);
-  const [passwordMismatch, setPasswordMismatch] = useState(false); // New state for mismatch validation
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
   const navigate = useNavigate();
 
   const handleClickShowPassword = (field) => {
@@ -39,7 +43,6 @@ function PasswordChange({
     event.preventDefault();
   };
 
-  // Logout Function
   const handleLogout = (userId) => {
     const currentUserId = localStorage.getItem('id');
     if (userId === currentUserId) {
@@ -48,34 +51,65 @@ function PasswordChange({
     }
   };
 
-  // Change Password Function
+  const validatePassword = (password, fieldName) => {
+    if (!password) {
+      return 'Password is required';
+    } else if (password.length < 10) {
+      return 'Password must be at least 10 characters';
+    } else if (password.length > 20) {
+      return 'Password must be at most 20 characters';
+    }
+    return '';
+  };
+
   const changePassword = async (event) => {
     event.preventDefault();
 
-    // Validate if newPassword and confirmPassword are the same
+    // Validate all fields
+    const currentPasswordError = validatePassword(currentPassword, 'currentPassword');
+    const newPasswordError = validatePassword(newPassword, 'newPassword');
+    const confirmPasswordError = validatePassword(confirmPassword, 'confirmPassword');
+
+    // Check if newPassword and confirmPassword match
     if (newPassword !== confirmPassword) {
       setPasswordMismatch(true);
+      setValidationErrors({
+        currentPassword: currentPasswordError,
+        newPassword: newPasswordError,
+        confirmPassword: 'New Password and Confirm Password must match',
+      });
       return;
     }
 
-    setPasswordMismatch(false); // Reset mismatch error if fixed
+    // Set validation errors
+    setValidationErrors({
+      currentPassword: currentPasswordError,
+      newPassword: newPasswordError,
+      confirmPassword: confirmPasswordError,
+    });
+
+    // If there are any validation errors, stop here
+    if (currentPasswordError || newPasswordError || confirmPasswordError) {
+      return;
+    }
+
+    // Reset mismatch error if fixed
+    setPasswordMismatch(false);
 
     const passwordRequest = {
       userId: localStorage.getItem('id'),
       currentPassword: currentPassword,
-      newPassword: confirmPassword
+      newPassword: confirmPassword,
     };
-
-    console.log(passwordRequest);
 
     try {
       const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user/updateUserPassword`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify(passwordRequest)
+        body: JSON.stringify(passwordRequest),
       });
 
       if (response.ok) {
@@ -99,11 +133,10 @@ function PasswordChange({
       {/* Success Alert */}
       {updatePasswordVisible && (
         <Alert
-          className='w-96 mb-5'
+          className="w-96 mb-5"
           message="Password Updated Successfully"
           type="success"
           showIcon
-          width='full'
           closable
         />
       )}
@@ -114,7 +147,6 @@ function PasswordChange({
           message="Error"
           description="Something went wrong, try again"
           type="error"
-           width='full'
           showIcon
         />
       )}
@@ -125,7 +157,6 @@ function PasswordChange({
           message="Password Mismatch"
           description="New Password and Confirm Password must be the same"
           type="warning"
-          width='full'
           showIcon
         />
       )}
@@ -135,7 +166,9 @@ function PasswordChange({
       </div>
 
       {/* Current Password */}
-      <label htmlFor="current-password" className="form-label">Current Password*</label>
+      <label htmlFor="current-password" className="form-label">
+        Current Password*
+      </label>
       <FormControl sx={{ m: 0, width: '100%' }} variant="outlined" className="mb-4">
         <InputLabel htmlFor="current-password">Password</InputLabel>
         <OutlinedInput
@@ -156,10 +189,15 @@ function PasswordChange({
           label="Password"
           sx={{ borderRadius: '8px' }}
         />
+        {validationErrors.currentPassword && (
+          <span className="text-red-500 text-sm">{validationErrors.currentPassword}</span>
+        )}
       </FormControl>
 
       {/* New Password */}
-      <label htmlFor="new-password" className="form-label">New Password*</label>
+      <label htmlFor="new-password" className="form-label">
+        New Password*
+      </label>
       <FormControl sx={{ m: 0, width: '100%' }} variant="outlined" className="mb-4">
         <InputLabel htmlFor="new-password">Password</InputLabel>
         <OutlinedInput
@@ -180,10 +218,15 @@ function PasswordChange({
           label="Password"
           sx={{ borderRadius: '8px' }}
         />
+        {validationErrors.newPassword && (
+          <span className="text-red-500 text-sm">{validationErrors.newPassword}</span>
+        )}
       </FormControl>
 
       {/* Confirm Password */}
-      <label htmlFor="confirm-password" className="form-label">Confirm Password*</label>
+      <label htmlFor="confirm-password" className="form-label">
+        Confirm Password*
+      </label>
       <FormControl sx={{ m: 0, width: '100%' }} variant="outlined" className="mb-4">
         <InputLabel htmlFor="confirm-password">Password</InputLabel>
         <OutlinedInput
@@ -204,6 +247,9 @@ function PasswordChange({
           label="Password"
           sx={{ borderRadius: '8px' }}
         />
+        {validationErrors.confirmPassword && (
+          <span className="text-red-500 text-sm">{validationErrors.confirmPassword}</span>
+        )}
       </FormControl>
 
       {/* Submit Button */}

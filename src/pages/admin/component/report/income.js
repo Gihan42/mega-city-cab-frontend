@@ -1,4 +1,4 @@
-import React, { use, useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -12,11 +12,21 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
-import FormControl from '@mui/material/FormControl';
+import { FormControl } from '@mui/material';
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 function Income() {
   const [pdfAlertVisible, pdfSetAlertVisible] = useState(false);
   const [csvAlertVisible, csvSetAlertVisible] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [year, setYear] = useState('');
+  const [monthTotal, setMonthTotal] = useState(0);
+  const [yearTotal, setYearTotal] = useState(0);
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => 1900 + i);
+
   const [data, setFilteredData] = useState(
     Array.from({ length: 20 }).map((_, index) => ({
       paymentId: `PID-${index + 1}`,
@@ -29,6 +39,7 @@ function Income() {
       driver: `DID-${index + 1}- Veh${index + 1}`
     }))
   );
+
   const handleResetFilters = () => {
     setSearchFilters({
       paymentId: '',
@@ -38,9 +49,15 @@ function Income() {
       method: '',
       cutomer: '',
       vehicle: '',
-      driver: ''
+      driver: '',
     });
     setFilteredData(data);
+    setMonthTotal(0);
+    setYearTotal(0);
+
+    // Clear selected month and year
+    setSelectedMonth(null);
+    setYear('');
   };
 
   const [searchFilters, setSearchFilters] = useState({
@@ -64,7 +81,6 @@ function Income() {
       (!searchFilters.cutomer || item.cutomer.toLowerCase().includes(searchFilters.cutomer.toLowerCase())) &&
       (!searchFilters.vehicle || item.vehicle.toLowerCase().includes(searchFilters.vehicle.toLowerCase())) &&
       (!searchFilters.driver || item.driver.toLowerCase().includes(searchFilters.driver.toLowerCase()))
-
     );
   });
 
@@ -88,6 +104,7 @@ function Income() {
       driver: item.driver,
     });
   };
+
   const handleStatusChange = (e) => {
     setSearchFilters((prev) => ({
       ...prev,
@@ -118,11 +135,11 @@ function Income() {
 
     pdfSetAlertVisible(true);
 
-
     setTimeout(() => {
       pdfSetAlertVisible(false);
     }, 3000);
   };
+
   const downloadCSV = () => {
     const csvData = Papa.unparse(
       filteredData.map((item, index) => ({
@@ -136,7 +153,7 @@ function Income() {
         vehicle: item.vehicle,
         driver: item.driver,
       }))
-    )
+    );
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -151,7 +168,7 @@ function Income() {
       csvSetAlertVisible(false);
     }, 3000);
   };
-  //get all payment details
+
   const getPaymentDetails = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_BACS_URL}/payment/allPayments`, {
@@ -160,28 +177,57 @@ function Income() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-      })
-      const responseData = await response.json()
+      });
+      const responseData = await response.json();
       if (response.ok) {
         const mappedData = responseData.data.map((item) => ({
-          paymentId:item.paymentId,
-          bookingId:item.bookingId,
-          amount:item.amount,
-          date:item.date.split("T")[0],
-          method:item.paymentMethod,
-          cutomer:`${item.customerId}-${item.customerName}`,
-          vehicle:`${item.vehicleId}-${item.vehicleModel}`,
-          driver:`${item.driverId}-${item.driverName}`,
-        }))
+          paymentId: item.paymentId,
+          bookingId: item.bookingId,
+          amount: item.amount,
+          date: item.date.split("T")[0],
+          method: item.paymentMethod,
+          cutomer: `${item.customerId}-${item.customerName}`,
+          vehicle: `${item.vehicleId}-${item.vehicleModel}`,
+          driver: `${item.driverId}-${item.driverName}`,
+        }));
         setFilteredData(mappedData);
       }
     } catch (error) {
       console.log(error);
     }
-  }
+  };
+
   useEffect(() => {
     getPaymentDetails();
   }, []);
+
+  const handleMonthChange = (e) => {
+    const selectedMonth = e.target.value;
+    setSelectedMonth(selectedMonth);
+
+    const total = filteredData
+      .filter((item) => {
+        const date = new Date(item.date);
+        return date.getMonth() + 1 === parseInt(selectedMonth.split('-')[1]);
+      })
+      .reduce((sum, item) => sum + parseFloat(item.amount), 0);
+
+    setMonthTotal(total);
+  };
+
+  const handleYearChange = (e) => {
+    const selectedYear = e.target.value;
+    setYear(selectedYear);
+
+    const total = filteredData
+      .filter((item) => {
+        const date = new Date(item.date);
+        return date.getFullYear() === parseInt(selectedYear);
+      })
+      .reduce((sum, item) => sum + parseFloat(item.amount), 0);
+
+    setYearTotal(total);
+  };
 
   return (
     <div className="h-full w-full p-4 md:p-8 lg:p-12">
@@ -204,98 +250,149 @@ function Income() {
 
       <Row>
         <Col xs={24} sm={24} md={24} lg={24} className="bg-white rounded-xl mb-4 shadow-lg flex flex-col md:flex-row justify-center items-center p-2 h-auto animate__animated animate__backInDown">
-          <form className="flex flex-col md:flex-row justify-center items-center p-2 h-auto gap-4 md:gap-20 w-full">
-            <TextField
-              id="paymentId"
-              label="Search by Payment ID"
-              variant="outlined"
-              fullWidth
-              value={searchFilters.paymentId}
-              onChange={handleInputChange}
-              sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              id="bookingId"
-              label="Search by Booking ID"
-              variant="outlined"
-              fullWidth
-              value={searchFilters.bookingId}
-              onChange={handleInputChange}
-              sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              id="date"
-              variant="outlined"
-              fullWidth
-              type="date"
-              value={searchFilters.date}
-              onChange={handleInputChange}
-              sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-            />
+          <form className="flex flex-col  justify-center items-center  h-auto w-full">
+            <div className='flex flex-col md:flex-row justify-center items-center p-2 h-auto gap-4 md:gap-20 w-full '>
+              <TextField
+                id="paymentId"
+                label="Search by Payment ID"
+                variant="outlined"
+                fullWidth
+                value={searchFilters.paymentId}
+                onChange={handleInputChange}
+                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                id="bookingId"
+                label="Search by Booking ID"
+                variant="outlined"
+                fullWidth
+                value={searchFilters.bookingId}
+                onChange={handleInputChange}
+                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                id="date"
+                variant="outlined"
+                fullWidth
+                type="date"
+                value={searchFilters.date}
+                onChange={handleInputChange}
+                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+              />
 
-            <TextField
-              id="cutomer"
-              label="Search by Customer"
-              variant="outlined"
-              fullWidth
-              value={searchFilters.cutomer}
-              onChange={handleInputChange}
-              sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
+              <TextField
+                id="cutomer"
+                label="Search by Customer"
+                variant="outlined"
+                fullWidth
+                value={searchFilters.cutomer}
+                onChange={handleInputChange}
+                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
 
-            <TextField
-              id="vehicle"
-              label="Search by Vehicle"
-              variant="outlined"
-              fullWidth
-              value={searchFilters.vehicle}
-              onChange={handleInputChange}
-              sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              id="driver"
-              label="Search by Driver"
-              variant="outlined"
-              fullWidth
-              value={searchFilters.driver}
-              onChange={handleInputChange}
-              sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
+              <TextField
+                id="vehicle"
+                label="Search by Vehicle"
+                variant="outlined"
+                fullWidth
+                value={searchFilters.vehicle}
+                onChange={handleInputChange}
+                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                id="driver"
+                label="Search by Driver"
+                variant="outlined"
+                fullWidth
+                value={searchFilters.driver}
+                onChange={handleInputChange}
+                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </div>
+
+            <div className='flex flex-col md:flex-row justify-center items-center p-2 h-auto gap-4 md:gap-20 w-full'>
+              <TextField
+                id="month"
+                variant="outlined"
+                fullWidth
+                type="month"
+                value={selectedMonth || ''} 
+                onChange={handleMonthChange}
+                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+              />
+              <TextField
+                variant="outlined"
+                fullWidth
+                type="text"
+                value={`Rs: ${monthTotal}`}
+                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <FormControl fullWidth sx={{ marginBottom: '1rem' }}>
+                <InputLabel id="year-select-label">Year</InputLabel>
+                <Select
+                  labelId="year-select-label"
+                  id="year-select"
+                  value={year}
+                  label="Year"
+                  onChange={handleYearChange}
+                  sx={{ borderRadius: '8px' }}
+                >
+                  {years.map((year) => (
+                    <MenuItem key={year} value={year} sx={{ height: "20px", minWidth: "120px", fontSize: "16px" }}>
+                      {year}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <TextField
+                variant="outlined"
+                fullWidth
+                type="text"
+                value={`Rs: ${yearTotal}`}
+                sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </div>
           </form>
         </Col>
       </Row>
@@ -351,8 +448,6 @@ function Income() {
         </button>
       </div>
 
-
-
       <Row>
         <Col xs={24} sm={24} md={24} lg={24} className="flex justify-center items-center p-2 h-full animate__animated animate__backInUp">
           <div
@@ -396,12 +491,11 @@ function Income() {
                 ))}
               </tbody>
             </table>
-
           </div>
         </Col>
       </Row>
     </div>
-  )
+  );
 }
 
-export default Income
+export default Income;

@@ -14,7 +14,9 @@ import L from 'leaflet';
 import './booking.css';
 import { Alert } from 'antd';
 import emailjs from 'emailjs-com';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -35,8 +37,10 @@ function Booking() {
     const [error, setError] = useState(null);
     const [minDateTime, setMinDateTime] = useState("");
     const [confirmBooking, confirmBookingSetAlertVisible] = useState(false);
-    const [ifValidUser,ifValidUserSetAlert]=useState(false);
+    const [ifValidUser, ifValidUserSetAlert] = useState(false);
     const navigate = useNavigate();
+    const [checked, setChecked] = useState(false);
+
 
 
     const fetchCoordinates = async (city) => {
@@ -130,6 +134,12 @@ function Booking() {
     const [vehicleId, setVehicleId] = useState(null);
     const [dId, setDId] = useState(null)
     const [currentDate, setCurrentDate] = useState("");
+
+
+
+    const handleChecked = () => {
+        setChecked(!checked); // Toggle the checked state
+    };
 
     useEffect(() => {
         const updateDate = () => {
@@ -264,10 +274,6 @@ function Booking() {
     // Check if the selected category is valid before accessing car models
     const modelsForSelectedCategory = selectedCategory && carModels[selectedCategory] ? carModels[selectedCategory] : [];
 
-
-
-
-
     const [formData, setFormData] = useState({
         name: localStorage.getItem('name'),
         contact: "",
@@ -281,77 +287,78 @@ function Booking() {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
-    
+
     useEffect(() => {
         const { name, contact, email, dateTime } = formData;
-    
+
         setIsValid(
             name.trim() !== "" &&
             contact.trim() !== "" &&
             email.trim() !== "" &&
             dateTime.trim() !== "" &&
-            Number(distance) > 0 &&  
-            Number(hours) > 0 &&     
-            Number(total) > 0       
+            Number(distance) > 0 &&
+            Number(hours) > 0 &&
+            Number(total) > 0 &&
+            checked
         );
-    }, [formData, distance, hours, total]); 
-    
+    }, [formData, distance, hours, total, checked]);
+
 
     //send mail
-   const  sendMail = (startLocation,
-        endLocation,bookingId) =>{
+    const sendMail = (startLocation,
+        endLocation, bookingId) => {
         const templateParams = {
             driver_name: dName,
             contact_email: formData.email,
             contact_phone: formData.contact,
             customer_name: formData.name,
             pickup_location: startLocation,
-            drop_location:endLocation,
-            booking_id:bookingId,
-            booking_date:formData.dateTime,
-            plate_number:plateNumber,
-            model:selectedModel
+            drop_location: endLocation,
+            booking_id: bookingId,
+            booking_date: formData.dateTime,
+            plate_number: plateNumber,
+            model: selectedModel
         };
         emailjs
-        .send(
-            'service_bulp1em',
-            'template_sm6k6ag',
-            templateParams,
-            'xvlC_Tt8GhRFq5k5R'
-        )
-        .then(
-            () => {
-                console.log('send mail')
-            },
-            (err) => console.log('Failed to send message', err)
-        );
+            .send(
+                'service_bulp1em',
+                'template_sm6k6ag',
+                templateParams,
+                'xvlC_Tt8GhRFq5k5R'
+            )
+            .then(
+                () => {
+                    console.log('send mail')
+                },
+                (err) => console.log('Failed to send message', err)
+            );
     };
 
     //check a valid user
     const checkValidUser = async () => {
         if (!isValid) return;
-        const userId= localStorage.getItem('id');
-        try{
+        const userId = localStorage.getItem('id');
+        try {
             const response = await fetch(`${process.env.REACT_APP_BACS_URL}/user?userId=${userId}`, {
                 method: 'GET',
                 headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
             })
             const jsonData = await response.json();
-            if(response.ok){
-                if(jsonData.data){
+            if (response.ok) {
+                if (jsonData.data) {
                     placeBooking(new Event("click"));
                 }
-                else{
+                else {
                     ifValidUserSetAlert(true);
                     setFormData({
                         name: "",
                         contact: "",
                         email: "",
                         dateTime: "",
-            
+
                     });
                     setStartCity("");
                     setEndCity("");
@@ -366,7 +373,7 @@ function Booking() {
                 }
             }
 
-        }catch(error){
+        } catch (error) {
             console.log(error)
         }
     }
@@ -390,97 +397,97 @@ function Booking() {
             status: 'Confirmed',
         }
         console.log(bookingRequest)
-        try{
+        try {
             const response = await fetch(`${process.env.REACT_APP_BACS_URL}/booking/save`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-              },
-              body: JSON.stringify(bookingRequest),
-          })
-          const responseData = await response.json();
-          if(response.ok){
-            payment(responseData.data.bookingId);
-            confirmBookingSetAlertVisible(true);
-            setFormData({
-                name: "",
-                contact: "",
-                email: "",
-                dateTime: "",
-    
-            });
-            setStartCity("");
-            setEndCity("");
-            setDistance("");
-            setTotal("");
-            setHours("");
-            sendMail(startCity,endCity,responseData.data.bookingId)
-            setTimeout(() => {
-                confirmBookingSetAlertVisible(false);
-            }, 3000);
-          }
-        }catch(error){
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify(bookingRequest),
+            })
+            const responseData = await response.json();
+            if (response.ok) {
+                payment(responseData.data.bookingId);
+                confirmBookingSetAlertVisible(true);
+                setFormData({
+                    name: "",
+                    contact: "",
+                    email: "",
+                    dateTime: "",
+
+                });
+                setStartCity("");
+                setEndCity("");
+                setDistance("");
+                setTotal("");
+                setHours("");
+                sendMail(startCity, endCity, responseData.data.bookingId)
+                setTimeout(() => {
+                    confirmBookingSetAlertVisible(false);
+                }, 3000);
+            }
+        } catch (error) {
             console.log(error)
             setError(true);
             setTimeout(() => {
                 setError(false);
-              setStartCity("");
-              setEndCity("");
-              setDistance("");
-              setTotal("");
-              setHours("");
-              setFormData({
-                name: "",
-                contact: "",
-                email: "",
-                dateTime: "",
-    
-            });
+                setStartCity("");
+                setEndCity("");
+                setDistance("");
+                setTotal("");
+                setHours("");
+                setFormData({
+                    name: "",
+                    contact: "",
+                    email: "",
+                    dateTime: "",
+
+                });
             }, 3000);
         }
     };
 
-// Payment function
-const payment = async (bookingId) => {
-    const paymentRequest = {
-        bookingId: bookingId,
-        amount: pricePerKm * distance,
-        date: currentDate,
-        paymentMethod: 'visa',
-        currency: 'lkr',
-        customerId: localStorage.getItem('id'),
-        vehicleId: vehicleId,
-        status: 'paid',
-    };
+    // Payment function
+    const payment = async (bookingId) => {
+        const paymentRequest = {
+            bookingId: bookingId,
+            amount: pricePerKm * distance,
+            date: currentDate,
+            paymentMethod: 'visa',
+            currency: 'lkr',
+            customerId: localStorage.getItem('id'),
+            vehicleId: vehicleId,
+            status: 'paid',
+        };
 
-    try {
-        const response = await fetch(`${process.env.REACT_APP_BACS_URL}/payment/save`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
-            body: JSON.stringify(paymentRequest),
-        });
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/payment/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify(paymentRequest),
+            });
 
-        const responseData = await response.json();
-        if (response.ok) {
-            console.log(responseData);
+            const responseData = await response.json();
+            if (response.ok) {
+                console.log(responseData);
 
-            // Save paymentId to localStorage
-            localStorage.setItem('paymentId', responseData.data.payment.paymentId);
+                // Save paymentId to localStorage
+                localStorage.setItem('paymentId', responseData.data.payment.paymentId);
 
-            // Open Stripe Payment Page in a New Tab
-            window.location.href = responseData.data.sessionUrl;
+                // Open Stripe Payment Page in a New Tab
+                window.location.href = responseData.data.sessionUrl;
 
-        } else {
-            throw new Error('Failed to save payment');
+            } else {
+                throw new Error('Failed to save payment');
+            }
+        } catch (error) {
+            console.error("Error processing payment:", error);
         }
-    } catch (error) {
-        console.error("Error processing payment:", error);
-    }
-};
+    };
     return (
         <div className="container mx-auto bg-slate-100 shadow-xl rounded-xl mt-32 px-4 py-8" id="booking">
             <div className="flex flex-col">
@@ -514,10 +521,10 @@ const payment = async (bookingId) => {
                         <button
                             key={index}
                             type="button"
-                            onClick={() => { setSelectedModel(model); getRandomlyVehicle(model) }} 
+                            onClick={() => { setSelectedModel(model); getRandomlyVehicle(model) }}
                             className={`px-4 py-2 font-medium transition-all border-2 border-[#0D3B66] rounded-md
                                     ${selectedModel === model
-                                    ? 'bg-[#0D3B66] text-white'  
+                                    ? 'bg-[#0D3B66] text-white'
                                     : 'bg-white text-[#0D3B66] hover:bg-[#FCA000] hover:text-[#0D3B66]'}`
                             }
                         >
@@ -718,6 +725,22 @@ const payment = async (bookingId) => {
                                             />
                                         </div>
                                     ))}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Checkbox
+                                            checked={checked}
+                                            onChange={handleChecked}
+                                            style={{ fontSize: '30px', color: '#fff' }}
+                                        />
+
+                                        <span
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#term"
+                                            style={{ fontSize: '18px', color: '#fff', cursor: 'pointer' }}
+                                        >
+                                            Agree to terms and conditions
+                                        </span>
+                                    </div>
+
 
                                     <button
                                         type="button"
@@ -746,8 +769,8 @@ const payment = async (bookingId) => {
                         {/* Map Section */}
                         <div className="w-full lg:w-1/2 relative h-[400px] lg:h-auto">
                             <MapContainer
-                                center={[51.505, -0.09]}
-                                zoom={13}
+                                center={[7.8731, 80.7718]} // Set the center to Sri Lanka
+                                zoom={8} // Adjust the zoom level to focus on Sri Lanka
                                 className="w-full h-full rounded-lg"
                             >
                                 <TileLayer
@@ -800,6 +823,65 @@ const payment = async (bookingId) => {
                     </div>
                 </div>
             </div>
+
+
+            {/* model */}
+            <div className="modal fade" id="term" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1 className="modal-title fs-5" id="exampleModalLabel">Terms & Conditions</h1>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body p-6 text-justify leading-relaxed text-gray-800 max-h-96 overflow-y-auto">
+                            <p className="mb-4">
+                                By confirming your booking and completing the payment, you acknowledge and agree to the
+                                following terms and conditions. Once a booking is confirmed and payment is processed,
+                                <strong>no refunds will be issued</strong>, even if you choose to cancel the booking.
+                            </p>
+
+                            <p className="mb-4">
+                                Upon confirmation, a bill will be issued for your booking. You must present this bill
+                                to the driver before boarding the cab. <strong>Failure to show the bill may result in
+                                    denial of service without a refund.</strong>
+                            </p>
+
+                            <p className="mb-4">
+                                The driver will be dispatched to your designated start location at the agreed pick-up time
+                                and will wait for a maximum of <strong>15 minutes</strong>. If you fail to arrive within
+                                this waiting period, the booking will be considered canceled, and no refund will be provided.
+                            </p>
+
+                            <p className="mb-4">
+                                It is the customer’s responsibility to ensure all booking details are accurate and
+                                to be present at the specified location on time. The service provider reserves the right
+                                to cancel bookings due to unforeseen circumstances such as <strong>driver unavailability,
+                                    vehicle issues, or extreme weather conditions</strong>, and any refunds in such cases
+                                will be at the sole discretion of the service provider.
+                            </p>
+
+                            <p className="mb-4">
+                                Delays caused by traffic, road conditions, or other external factors are beyond the
+                                service provider’s control, and no liability will be accepted for such delays.
+                            </p>
+
+                            <p className="mb-4">
+                                Additionally, customers must behave respectfully toward drivers and comply with
+                                safety instructions. The driver reserves the right to <strong>terminate the service
+                                    without a refund</strong> in case of inappropriate behavior.
+                            </p>
+
+                            <p className="font-semibold text-center">
+                                By confirming your booking, you accept and agree to these terms and conditions in full.
+                            </p>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+
         </div>
     );
 }

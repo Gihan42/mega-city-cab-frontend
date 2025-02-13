@@ -9,6 +9,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import Papa from 'papaparse';
 import { Alert, Button, Space } from 'antd';
+import Checkbox from '@mui/material/Checkbox';
 
 function Vehicle() {
     const [pdfAndCsvAlertVisible, pdfCsvSetAlertVisible] = useState(false);
@@ -112,7 +113,7 @@ function Vehicle() {
         if (item.image) {
             if (item.image.startsWith("data:image")) {
                 setSelectedImage(item.image);
-            } 
+            }
             else if (typeof item.image === 'string') {
                 setSelectedImage(`data:image/jpeg;base64,${item.image.trim()}`);
             }
@@ -211,7 +212,7 @@ function Vehicle() {
     const saveVehicle = async (event) => {
         event.preventDefault();
 
-        console.log("Search Filters:", searchFilters);
+        if (!validateForm()) return;
 
         const formData = new FormData();
         formData.append("plateNumber", searchFilters.plateNumber);
@@ -262,6 +263,7 @@ function Vehicle() {
     //update vehicle
     const updateVehicle = async (event) => {
         event.preventDefault();
+        if (!validateForm()) return;
         const formData = new FormData();
         formData.append("vehicleId", searchFilters.vehicleId);
         formData.append("plateNumber", searchFilters.plateNumber);
@@ -341,6 +343,77 @@ function Vehicle() {
     useEffect(() => {
         getAllVehicles();
     }, []);
+
+    const [validationErrors, setValidationErrors] = useState({
+        vehicleId: '',
+        model: '',
+        plateNumber: '',
+        pricePerKm: '',
+        passengersCount: '',
+        category: '',
+    });
+
+    const validateForm = () => {
+        const errors = {};
+        let isValid = true;
+
+        // Validate Vehicle Model (No numbers, max 20 characters)
+        if (!searchFilters.model) {
+            errors.model = 'Vehicle model Name is required';
+            isValid = false;
+        } else if (!/^[A-Za-z\s]+$/.test(searchFilters.model)) {
+            errors.model = 'Vehicle model cannot contain numbers';
+            isValid = false;
+        } else if (searchFilters.model.length > 20) {
+            errors.model = 'Vehicle model must be at most 20 characters';
+            isValid = false;
+        }
+
+        // Validate Plate Number (Exactly 3 letters, one "-", and up to 5 numbers)
+        if (!searchFilters.plateNumber) {
+            errors.plateNumber = 'Vehicle plate number is required';
+            isValid = false;
+        } else if (!/^[A-Za-z]{3}-\d{1,5}$/.test(searchFilters.plateNumber)) {
+            errors.plateNumber = 'Vehicle plate number must be in format "XXX-12345" (3 letters, "-", up to 5 numbers)';
+            isValid = false;
+        }
+
+
+        // Validate Price Per Km (Only numbers)
+        if (!searchFilters.pricePerKm) {
+            errors.pricePerKm = 'Price per km is required';
+            isValid = false;
+        } else if (!/^\d+(\.\d{1,2})?$/.test(searchFilters.pricePerKm)) {
+            errors.pricePerKm = 'Price per km must be a valid number';
+            isValid = false;
+        }
+
+        // Validate Passengers Count (Only numbers & <30)
+        if (!searchFilters.passengersCount) {
+            errors.passengersCount = 'Passengers count is required';
+            isValid = false;
+        } else if (!/^\d+$/.test(searchFilters.passengersCount)) {
+            errors.passengersCount = 'Passengers count must be a number';
+            isValid = false;
+        } else if (parseInt(searchFilters.passengersCount, 10) >= 30) {
+            errors.passengersCount = 'Passengers count must be less than 30';
+            isValid = false;
+        }
+
+
+        if (!searchFilters.category) {
+            errors.category = 'category is required';
+            isValid = false;
+        } else if (!/^[A-Za-z\s]+$/.test(searchFilters.category)) {
+            errors.category = 'Vehicle category must be at most 20 characters';
+            isValid = false;
+        }
+
+        setValidationErrors(errors);
+        return isValid;
+    };
+
+
 
     return (
         <div className='h-full w-full p-4 md:p-8 lg:p-12'>
@@ -447,6 +520,8 @@ function Vehicle() {
                                 fullWidth
                                 value={searchFilters.model}
                                 onChange={handleInputChange}
+                                error={!!validationErrors.model}
+                                helperText={validationErrors.model}
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
@@ -463,6 +538,8 @@ function Vehicle() {
                                 fullWidth
                                 value={searchFilters.plateNumber}
                                 onChange={handleInputChange}
+                                error={!!validationErrors.plateNumber}
+                                helperText={validationErrors.plateNumber}
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
@@ -479,6 +556,8 @@ function Vehicle() {
                                 fullWidth
                                 value={searchFilters.pricePerKm}
                                 onChange={handleInputChange}
+                                error={!!validationErrors.pricePerKm}
+                                helperText={validationErrors.pricePerKm}
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
@@ -495,6 +574,8 @@ function Vehicle() {
                                 fullWidth
                                 value={searchFilters.passengersCount}
                                 onChange={handleInputChange}
+                                error={!!validationErrors.passengersCount}
+                                helperText={validationErrors.passengersCount}
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (
@@ -511,6 +592,8 @@ function Vehicle() {
                                 fullWidth
                                 value={searchFilters.category}
                                 onChange={handleInputChange}
+                                error={!!validationErrors.category}
+                                helperText={validationErrors.category}
                                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                 InputProps={{
                                     endAdornment: (

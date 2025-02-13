@@ -11,7 +11,8 @@ import {
   ProfileOutlined,
   LineChartOutlined,
   CarOutlined,
-  CommentOutlined
+  CommentOutlined,
+  MailOutlined
 } from '@ant-design/icons';
 
 import { Button, Layout, Menu, theme } from 'antd';
@@ -27,16 +28,13 @@ import Comments from '../component/comments/comments';
 import { useNavigate } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Badge, Avatar, Space } from "antd";
-
-
-
-
 const { Header, Sider, Content } = Layout;
 
 function MainPage() {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState('Dashboard');
   const [isScreenSupported, setIsScreenSupported] = useState(true);
+  const [adminName,setAdminName]=useState('');
   const navigate = useNavigate();
   const [bookingsCount,setBookingCount] = useState('');;
 
@@ -44,7 +42,14 @@ function MainPage() {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+
+  const getAdminName = () =>{
+    const name =localStorage.getItem('name');
+    setAdminName(name);
+  }
+
   useEffect(() => {
+    getAdminName();
     getPendingBookingCount();
     const checkScreenSize = () => {
       setIsScreenSupported(window.innerWidth > 1030);
@@ -78,6 +83,14 @@ function MainPage() {
     }
   };
   
+  const checkMail = () => {
+    const email = localStorage.getItem('email');
+    if (email) {
+      window.location.href = `mailto:${email}`;
+    } else {
+      alert("No email found in localStorage!");
+    }
+  };
 
 
   const menuItems = [
@@ -169,10 +182,17 @@ function MainPage() {
               onClick={() => setCollapsed(!collapsed)}
               style={{ fontSize: '16px', width: 64, height: 64 }}
             />
+
                   <div className='w-full  flex justify-end items-center pr-4 '>
+                      <div className='mr-8  bg-sky-950 hover:bg-sky-800 hover:cursor-pointer w-56 flex justify-center items-center gap-2 rounded-xl  shadow-lg p-2 text-lg'
+                       onClick={checkMail}
+                       >
+                      <MailOutlined style={{ fontSize: '30px',color: '#fff' }} />
+                      <h1 className='text-lg font-bold text-white mt-2 hover:cursor-pointer'>check your mails</h1>
+                        </div>
                         <div className=' bg-sky-950 w-36 flex justify-center items-center gap-2 rounded-xl  shadow-lg p-2 text-lg'>
                           <AccountCircleIcon fontSize="large" sx={{ color: '#fff' }}/>
-                          <h1 className='text-lg font-bold text-white mt-2'>Admin</h1>
+                          <h1 className='text-lg font-bold text-white mt-2'>{adminName}</h1>
                         </div>
                   </div>
           </Header>

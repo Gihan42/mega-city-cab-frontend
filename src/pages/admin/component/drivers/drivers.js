@@ -89,7 +89,11 @@ function Drivers() {
       ...prev,
       [id]: value,
     }));
-  };
+    setValidationErrors((prev) => ({
+      ...prev,
+      [id]: '',
+    }));
+  }
   const handleRowClick = (item) => {
     setSearchFilters({
       driverId: item.driverId,
@@ -197,6 +201,7 @@ function Drivers() {
   // save driver
   const saveDriver = async (event) => {
     event.preventDefault();
+    if (!validateForm()) return;
     const driverRequest = {
       name: searchFilters.driverName,
       age: searchFilters.driverAge,
@@ -238,6 +243,7 @@ function Drivers() {
   // update driver
   const updateDriver = async (event) => {
     event.preventDefault();
+    if (!validateForm()) return;
     const dId=searchFilters.driverId.split('D-')[1];
     const driverRequest = {
       driverId:dId ,
@@ -308,6 +314,87 @@ function Drivers() {
 
   useEffect(() => { getAllDrivers(); }, []);
 
+  const [validationErrors, setValidationErrors] = useState({
+    driverName: '',
+    driverAge: '',
+    driverEmail: '',
+    driverLicenseNumber: '',
+    driverNicNumber: '',
+    driverContact: '',
+    driverAddress: ''
+  });
+
+  const validateForm = () => {
+    const errors = {};
+    let isValid = true;
+  
+    // Validate Driver Name (No numbers & max length 20)
+    if (!searchFilters.driverName) {
+      errors.driverName = 'Driver Name is required';
+      isValid = false;
+    } else if (!/^[A-Za-z\s]+$/.test(searchFilters.driverName)) {
+      errors.driverName = 'Driver Name cannot contain numbers';
+      isValid = false;
+    } else if (searchFilters.driverName.length > 20) {
+      errors.driverName = 'Driver Name must be at most 20 characters';
+      isValid = false;
+    }
+  
+    // Validate Driver Age (Only numbers & <75)
+    if (!searchFilters.driverAge) {
+      errors.driverAge = 'Driver Age is required';
+      isValid = false;
+    } else if (!/^\d+$/.test(searchFilters.driverAge)) {
+      errors.driverAge = 'Driver Age must be a number';
+      isValid = false;
+    } else if (parseInt(searchFilters.driverAge, 10) >= 75) {
+      errors.driverAge = 'Driver Age must be less than 75';
+      isValid = false;
+    }
+  
+    // Validate Driver Email
+    if (!searchFilters.driverEmail) {
+      errors.driverEmail = 'Driver Email is required';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(searchFilters.driverEmail)) {
+      errors.driverEmail = 'Driver Email is invalid';
+      isValid = false;
+    }
+  
+    // Validate Driver License Number (Only 10 characters)
+    if (!searchFilters.driverLicenseNumber) {
+      errors.driverLicenseNumber = 'License Number is required';
+      isValid = false;
+    } else if (!/^[A-Za-z0-9]{10}$/.test(searchFilters.driverLicenseNumber)) {
+      errors.driverLicenseNumber = 'License Number must be exactly 10 characters';
+      isValid = false;
+    }
+  
+    // Validate NIC (11 numbers or 11 numbers + "V")
+    if (!searchFilters.driverNicNumber) {
+      errors.driverNicNumber = 'NIC Number is required';
+      isValid = false;
+    } 
+  
+    // Validate Contact Number (Exactly 10 digits & must start with specific prefixes)
+    if (!searchFilters.driverContact) {
+      errors.driverContact = 'Contact Number is required';
+      isValid = false;
+    } else if (!/^(077|076|078|072|075|074|071)\d{7}$/.test(searchFilters.driverContact)) {
+      errors.driverContact = 'Contact Number must be 10 digits and start with 077, 076, 078, 072, 075, 074, or 071';
+      isValid = false;
+    }
+  
+    // Validate Address
+    if (!searchFilters.driverAddress) {
+      errors.driverAddress = 'Address is required';
+      isValid = false;
+    }
+  
+    setValidationErrors(errors);
+    return isValid;
+  };
+  
 
   return (
     <div className='h-full w-full p-4 md:p-8 lg:p-12'>
@@ -412,6 +499,8 @@ function Drivers() {
                 fullWidth
                 value={searchFilters.driverName}
                 onChange={handleInputChange}
+                error={!!validationErrors.driverName}
+                helperText={validationErrors.driverName}
                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                 InputProps={{
                   endAdornment: (
@@ -428,6 +517,8 @@ function Drivers() {
                 fullWidth
                 value={searchFilters.driverAge}
                 onChange={handleInputChange}
+                error={!!validationErrors.driverAge}
+                helperText={validationErrors.driverAge}
                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                 InputProps={{
                   endAdornment: (
@@ -444,6 +535,8 @@ function Drivers() {
                 fullWidth
                 value={searchFilters.driverEmail}
                 onChange={handleInputChange}
+                error={!!validationErrors.driverEmail}
+                helperText={validationErrors.driverEmail}
                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                 InputProps={{
                   endAdornment: (
@@ -459,6 +552,8 @@ function Drivers() {
                 variant="outlined"
                 fullWidth
                 value={searchFilters.driverLicenseNumber}
+                error={!!validationErrors.driverLicenseNumber}
+                helperText={validationErrors.driverLicenseNumber}
                 onChange={handleInputChange}
                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                 InputProps={{
@@ -476,6 +571,8 @@ function Drivers() {
                 fullWidth
                 value={searchFilters.driverNicNumber}
                 onChange={handleInputChange}
+                error={!!validationErrors.driverNicNumber}
+                helperText={validationErrors.driverNicNumber}
                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                 InputProps={{
                   endAdornment: (
@@ -494,6 +591,8 @@ function Drivers() {
                 fullWidth
                 value={searchFilters.driverContact}
                 onChange={handleInputChange}
+                error={!!validationErrors.driverContact}
+                helperText={validationErrors.driverContact}
                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                 InputProps={{
                   endAdornment: (
@@ -510,6 +609,8 @@ function Drivers() {
                 fullWidth
                 value={searchFilters.driverAddress}
                 onChange={handleInputChange}
+                error={!!validationErrors.driverAddress}
+                helperText={validationErrors.driverAddress}
                 sx={{ marginBottom: '1rem', '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                 InputProps={{
                   endAdornment: (
