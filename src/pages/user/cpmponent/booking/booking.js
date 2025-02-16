@@ -37,6 +37,7 @@ function Booking() {
     const [error, setError] = useState(null);
     const [minDateTime, setMinDateTime] = useState("");
     const [confirmBooking, confirmBookingSetAlertVisible] = useState(false);
+    const [driverNotAailable,driverNotAvailableSetAlert]=useState(false);
     const [ifValidUser, ifValidUserSetAlert] = useState(false);
     const navigate = useNavigate();
     const [checked, setChecked] = useState(false);
@@ -349,6 +350,13 @@ function Booking() {
             const jsonData = await response.json();
             if (response.ok) {
                 if (jsonData.data) {
+                    if(dName == '' || dName == null || dName =='null'){
+                        driverNotAvailableSetAlert(true);
+                        setTimeout(() => {
+                            driverNotAvailableSetAlert(false);
+                        }, 6000);
+                        return
+                    }
                     placeBooking(new Event("click"));
                 }
                 else {
@@ -614,6 +622,22 @@ function Booking() {
                         className='w-96 mb-5'
                         message="Confirm Your Booking"
                         type="success"
+                        showIcon
+                        action={
+                            <Button size="small" type="text">
+                                UNDO
+                            </Button>
+                        }
+                        closable
+                    />
+                )}
+            </div>
+            <div className='flex justify-center items-center animate__animated animate__backInDown'>
+                {driverNotAailable && (
+                    <Alert
+                        className='w-96 mb-5'
+                        message="driver not availble"
+                        type="warning"
                         showIcon
                         action={
                             <Button size="small" type="text">
