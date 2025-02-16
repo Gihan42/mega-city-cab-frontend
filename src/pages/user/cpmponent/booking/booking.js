@@ -17,6 +17,8 @@ import emailjs from 'emailjs-com';
 import { useNavigate } from "react-router-dom";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import moment from 'moment';
+
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -37,7 +39,7 @@ function Booking() {
     const [error, setError] = useState(null);
     const [minDateTime, setMinDateTime] = useState("");
     const [confirmBooking, confirmBookingSetAlertVisible] = useState(false);
-    const [driverNotAailable,driverNotAvailableSetAlert]=useState(false);
+    const [driverNotAailable, driverNotAvailableSetAlert] = useState(false);
     const [ifValidUser, ifValidUserSetAlert] = useState(false);
     const navigate = useNavigate();
     const [checked, setChecked] = useState(false);
@@ -284,9 +286,17 @@ function Booking() {
 
     const [isValid, setIsValid] = useState(false);
 
+    const formatDateTime = (dateTimeString) => {
+        const date = new Date(dateTimeString);
+        const utcDateTime = moment(date).utc().format('YYYY-MM-DD HH:mm:ss.SSSSSS');
+        return utcDateTime;
+    };
+    
+
     // Handle input changes
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
     };
 
     useEffect(() => {
@@ -304,6 +314,7 @@ function Booking() {
         );
     }, [formData, distance, hours, total, checked]);
 
+    const formattedDateTime = formatDateTime(formData.dateTime);
 
     //send mail
     const sendMail = (startLocation,
@@ -316,7 +327,7 @@ function Booking() {
             pickup_location: startLocation,
             drop_location: endLocation,
             booking_id: bookingId,
-            booking_date: formData.dateTime,
+            booking_date: formattedDateTime,
             plate_number: plateNumber,
             model: selectedModel
         };
@@ -335,6 +346,7 @@ function Booking() {
             );
     };
 
+
     //check a valid user
     const checkValidUser = async () => {
         if (!isValid) return;
@@ -350,7 +362,7 @@ function Booking() {
             const jsonData = await response.json();
             if (response.ok) {
                 if (jsonData.data) {
-                    if(dName == '' || dName == null || dName =='null'){
+                    if (dName == '' || dName == null || dName == 'null') {
                         driverNotAvailableSetAlert(true);
                         setTimeout(() => {
                             driverNotAvailableSetAlert(false);
@@ -364,8 +376,7 @@ function Booking() {
                     setFormData({
                         name: "",
                         contact: "",
-                        email: "",
-                        dateTime: "",
+                        email: ""
 
                     });
                     setStartCity("");
@@ -400,7 +411,7 @@ function Booking() {
             dropLocation: endCity,
             hours: hours,
             totalKm: distance,
-            bookingDateTime: formData.dateTime,
+            bookingDateTime: formattedDateTime,
             amount: pricePerKm * distance,
             status: 'Confirmed',
         }
@@ -421,8 +432,8 @@ function Booking() {
                 setFormData({
                     name: "",
                     contact: "",
-                    email: "",
-                    dateTime: "",
+                    email: ""
+
 
                 });
                 setStartCity("");
@@ -468,6 +479,7 @@ function Booking() {
             vehicleId: vehicleId,
             status: 'paid',
         };
+        console.log(paymentRequest)
 
         try {
             const response = await fetch(`${process.env.REACT_APP_BACS_URL}/payment/save`, {
@@ -755,7 +767,6 @@ function Booking() {
                                             onChange={handleChecked}
                                             style={{ fontSize: '30px', color: '#fff' }}
                                         />
-
                                         <span
                                             data-bs-toggle="modal"
                                             data-bs-target="#term"
@@ -764,8 +775,6 @@ function Booking() {
                                             Agree to terms and conditions
                                         </span>
                                     </div>
-
-
                                     <button
                                         type="button"
                                         className={`btn btn-primary text-xl mt-6 ${isValid ? "" : "opacity-50 cursor-not-allowed"}`}
