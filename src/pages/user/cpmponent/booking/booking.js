@@ -43,6 +43,8 @@ function Booking() {
     const [ifValidUser, ifValidUserSetAlert] = useState(false);
     const navigate = useNavigate();
     const [checked, setChecked] = useState(false);
+    const [bookingDate, setBookingDate] = useState("");
+
 
 
 
@@ -219,6 +221,7 @@ function Booking() {
 
     //get randomly vehicle
     const getRandomlyVehicle = async (model) => {
+
         try {
             const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle?model=${model}`, {
                 method: 'GET',
@@ -234,6 +237,7 @@ function Booking() {
             if (response.ok) {
                 console.log("Response Data cars:", responseData.data, vehicleId);
                 setVehicleId(responseData.data.vehicleId)
+                getBookingDateTimeByVehicleId(responseData.data.vehicleId);
                 const base64Image = `data:image/jpeg;base64,${responseData.data.image}`;
                 setCabImage(base64Image);
                 setPlateNumber(responseData.data.plateNumber);
@@ -242,6 +246,28 @@ function Booking() {
             }
         } catch (error) {
             console.log(error)
+        }
+    };
+
+    const getBookingDateTimeByVehicleId = async (vehicleId) => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACS_URL}/booking?vehicleId=${vehicleId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+
+            const responseData = await response.json();
+            if (response.ok) {
+                // Ensure responseData.data is an array
+                const datesArray = Array.isArray(responseData.data) ? responseData.data : [];
+                setBookingDate(datesArray);
+            }
+        } catch (error) {
+            console.log(error);
+            setBookingDate([]); // Set to empty array in case of error
         }
     };
 
@@ -291,7 +317,7 @@ function Booking() {
         const utcDateTime = moment(date).utc().format('YYYY-MM-DD HH:mm:ss.SSSSSS');
         return utcDateTime;
     };
-    
+
 
     // Handle input changes
     const handleChange = (e) => {
@@ -555,19 +581,73 @@ function Booking() {
                     <p>Please select a category to see the models.</p>
                 )}
             </div>
-            <div className="flex flex-col  mt-4 p-4 justify-center items-center bg-white shadow-xl rounded-4">
-                <div
-                    className="w-1/2 rounded-5 shadow-lg"
-                    style={{
-                        backgroundImage: cabImage ? `url(${cabImage})` : 'none',
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        height: '400px',
-                    }}
-                >
+            <div className="flex flex-col md:flex-row mt-4 p-2 md:p-4 bg-white shadow-xl rounded-lg gap-4">
+                {/* Image Container - Full width on mobile, half on desktop */}
+                <div className="w-full md:w-1/2 h-48 md:h-[400px] rounded-lg shadow-lg overflow-hidden">
+                    <div
+                        className="w-full h-full bg-cover bg-center"
+                        style={{
+                            backgroundImage: cabImage ? `url(${cabImage})` : 'none'
+                        }}
+                    />
+                </div>
 
+                {/* Booking Dates Container */}
+                <div className="w-full md:w-1/2 flex flex-col bg-gray-100 shadow-md p-3 rounded-lg min-h-[200px] md:h-[400px]">
+                    {/* Header */}
+                    <div className="text-sky-900 text-lg font-semibold mb-3 sticky top-0 bg-gray-100 py-2 px-2">
+                        Booking Dates
+                    </div>
+
+                    {/* Scrollable Content */}
+                    <div className="overflow-y-auto flex-1">
+                        {Array.isArray(bookingDate) && bookingDate.length > 0 ? (
+                            <div className="space-y-2 p-2">
+                                {bookingDate.map((date, index) => {
+                                    const dateObj = new Date(date);
+                                    const formattedDate = dateObj.toISOString().split('T')[0];
+                                    const formattedTime = dateObj.toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    });
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="flex items-center justify-between bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="text-sky-900 font-medium">{formattedDate}</span>
+                                                <span className="text-sm text-gray-500">{formattedTime}</span>
+                                            </div>
+                                            <span className="text-blue-500">
+                                                <svg
+                                                    className="w-5 h-5"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                    />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center h-full">
+                                <span className="text-sky-900 font-medium">Not Available Any Day</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
+
             <div className="flex md:flex-row gap-4 justify-center items-center mt-4  p-6 flex-wrap mb-4 ">
                 <Card sx={{ minWidth: 375 }}
                     className=" cursor-pointer  border-1 text-white shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
