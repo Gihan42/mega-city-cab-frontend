@@ -43,4 +43,25 @@
   .modal-body::-webkit-scrollbar-thumb:hover {
     background: #0D3B66; 
   }
+
+  /* Custom Scrollbar */
+.scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: #0D3B66; /* Tailwind sky-400 */
+  border-radius: 10px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #0D3B66; /* Tailwind blue-500 */
+}
+
   

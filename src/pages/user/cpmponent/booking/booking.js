@@ -37,28 +37,22 @@ function Booking() {
     const [hours, setHours] = useState(null);
     const [total, setTotal] = useState(null);
     const [error, setError] = useState(null);
-    const [minDateTime, setMinDateTime] = useState("");
+    const [minDateTime, setMinDateTime] = useState('');
     const [confirmBooking, confirmBookingSetAlertVisible] = useState(false);
     const [driverNotAailable, driverNotAvailableSetAlert] = useState(false);
     const [ifValidUser, ifValidUserSetAlert] = useState(false);
     const navigate = useNavigate();
     const [checked, setChecked] = useState(false);
-    const [bookingDate, setBookingDate] = useState("");
-
-
-
+    const [bookingDate, setBookingDate] = useState('');
 
     const fetchCoordinates = async (city) => {
         try {
-            const response = await axios.get(
-                'https://api.opencagedata.com/geocode/v1/json',
-                {
-                    params: {
-                        key: '93beb5a1898643dc93c44f5a067910c3',
-                        q: city,
-                    },
-                }
-            );
+            const response = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
+                params: {
+                    key: '93beb5a1898643dc93c44f5a067910c3',
+                    q: city,
+                },
+            });
 
             if (response.data.results.length > 0) {
                 const { lat, lng } = response.data.results[0].geometry;
@@ -84,25 +78,19 @@ function Booking() {
             setStartCoords(start);
             setEndCoords(end);
 
-            const response = await axios.get(
-                `https://api.openrouteservice.org/v2/directions/driving-car`,
-                {
-                    params: {
-                        api_key: '5b3ce3597851110001cf6248689430d1c5f14947bf211dce0d76348d',
-                        start: `${start.lng},${start.lat}`,
-                        end: `${end.lng},${end.lat}`,
-                    },
-                }
-            );
+            const response = await axios.get(`https://api.openrouteservice.org/v2/directions/driving-car`, {
+                params: {
+                    api_key: '5b3ce3597851110001cf6248689430d1c5f14947bf211dce0d76348d',
+                    start: `${start.lng},${start.lat}`,
+                    end: `${end.lng},${end.lat}`,
+                },
+            });
 
-            const distanceInKm =
-                response.data.features[0].properties.segments[0].distance / 1000;
+            const distanceInKm = response.data.features[0].properties.segments[0].distance / 1000;
             setDistance(distanceInKm);
             setTotal(distanceInKm * 100);
 
-
-            const durationInSec =
-                response.data.features[0].properties.segments[0].duration;
+            const durationInSec = response.data.features[0].properties.segments[0].duration;
             const durationInHours = (durationInSec / 3600).toFixed(2); // Convert seconds to hours
 
             // Set the calculated hours
@@ -118,8 +106,6 @@ function Booking() {
             setError(error.message || 'Error calculating distance. Please try again.');
         }
     };
-
-    const [today, setToday] = useState('');
 
     useEffect(() => {
         const now = new Date();
@@ -137,10 +123,8 @@ function Booking() {
     const [dName, setDname] = useState(null);
     const [dContact, setDContact] = useState(null);
     const [vehicleId, setVehicleId] = useState(null);
-    const [dId, setDId] = useState(null)
-    const [currentDate, setCurrentDate] = useState("");
-
-
+    const [dId, setDId] = useState(null);
+    const [currentDate, setCurrentDate] = useState('');
 
     const handleChecked = () => {
         setChecked(!checked); // Toggle the checked state
@@ -157,7 +141,6 @@ function Booking() {
         return () => clearInterval(interval);
     }, []);
 
-
     // Fetch all car categories
     const getAllVehicleCategories = async () => {
         try {
@@ -172,7 +155,7 @@ function Booking() {
             const responseData = await response.json();
 
             if (response.ok) {
-                console.log("Response Data (Categories):", responseData.data);
+                console.log('Response Data (Categories):', responseData.data);
                 setCarCategories(responseData.data);
 
                 // Set default selected category if categories exist
@@ -183,13 +166,13 @@ function Booking() {
                 }
             }
         } catch (error) {
-            console.error("Error fetching vehicle categories:", error);
+            console.error('Error fetching vehicle categories:', error);
         }
     };
 
     // Fetch car models for a selected category
     const getAllCarModels = async (category) => {
-        console.log("Fetching models for category:", category);
+        console.log('Fetching models for category:', category);
 
         try {
             const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle?categoryName=${category}`, {
@@ -203,25 +186,23 @@ function Booking() {
             const responseData = await response.json();
 
             if (response.ok) {
-                console.log("Response Data (Car Models):", responseData.data);
-                setCarModels(prevModels => ({
+                console.log('Response Data (Car Models):', responseData.data);
+                setCarModels((prevModels) => ({
                     ...prevModels,
-                    [category]: responseData.data
+                    [category]: responseData.data,
                 }));
                 if (responseData.data.length > 0) {
                     setSelectedModel(responseData.data[0]);
-                    getRandomlyVehicle(responseData.data[0])
-
+                    getRandomlyVehicle(responseData.data[0]);
                 }
             }
         } catch (error) {
-            console.error("Error fetching car models:", error);
+            console.error('Error fetching car models:', error);
         }
     };
 
-    //get randomly vehicle
+    // Get randomly vehicle
     const getRandomlyVehicle = async (model) => {
-
         try {
             const response = await fetch(`${process.env.REACT_APP_BACS_URL}/vehicle?model=${model}`, {
                 method: 'GET',
@@ -233,19 +214,17 @@ function Booking() {
 
             const responseData = await response.json();
 
-
             if (response.ok) {
-                console.log("Response Data cars:", responseData.data, vehicleId);
-                setVehicleId(responseData.data.vehicleId)
+                console.log('Response Data cars:', responseData.data, vehicleId);
+                setVehicleId(responseData.data.vehicleId);
                 getBookingDateTimeByVehicleId(responseData.data.vehicleId);
                 const base64Image = `data:image/jpeg;base64,${responseData.data.image}`;
                 setCabImage(base64Image);
                 setPlateNumber(responseData.data.plateNumber);
                 setPricerPerKm(responseData.data.pricePerKm);
-
             }
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     };
 
@@ -271,7 +250,7 @@ function Booking() {
         }
     };
 
-    //get randomly driver
+    // Get randomly driver
     const getRandomlyDriver = async () => {
         try {
             const response = await fetch(`${process.env.REACT_APP_BACS_URL}/driver/getDriver`, {
@@ -284,16 +263,15 @@ function Booking() {
 
             const responseData = await response.json();
             if (response.ok) {
-                console.log(responseData.data)
+                console.log(responseData.data);
                 setDname(responseData.data.name);
                 setDContact(responseData.data.contactNumber);
-                setDId(responseData.data.driverId)
+                setDId(responseData.data.driverId);
             }
-
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-    }
+    };
 
     useEffect(() => {
         getAllVehicleCategories();
@@ -305,9 +283,9 @@ function Booking() {
 
     const [formData, setFormData] = useState({
         name: localStorage.getItem('name'),
-        contact: "",
+        contact: '',
         email: localStorage.getItem('email'),
-        dateTime: "",
+        dateTime: '',
     });
 
     const [isValid, setIsValid] = useState(false);
@@ -318,7 +296,6 @@ function Booking() {
         return utcDateTime;
     };
 
-
     // Handle input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -328,13 +305,16 @@ function Booking() {
     useEffect(() => {
         const { name, contact, email, dateTime } = formData;
 
+        // Extract numeric hours from the `hours` string
+        const numericHours = parseFloat(hours?.split(' ')[0] || 0); // Extracts the first part (e.g., "2" from "2 hours 68 seconds")
+
         setIsValid(
-            name.trim() !== "" &&
-            contact.trim() !== "" &&
-            email.trim() !== "" &&
-            dateTime.trim() !== "" &&
+            name.trim() !== '' &&
+            contact.trim() !== '' &&
+            email.trim() !== '' &&
+            dateTime.trim() !== '' &&
             Number(distance) > 0 &&
-            Number(hours) > 0 &&
+            numericHours > 0 && // Use numericHours instead of Number(hours)
             Number(total) > 0 &&
             checked
         );
@@ -342,9 +322,8 @@ function Booking() {
 
     const formattedDateTime = formatDateTime(formData.dateTime);
 
-    //send mail
-    const sendMail = (startLocation,
-        endLocation, bookingId) => {
+    // Send mail
+    const sendMail = (startLocation, endLocation, bookingId) => {
         const templateParams = {
             driver_name: dName,
             contact_email: formData.email,
@@ -355,25 +334,19 @@ function Booking() {
             booking_id: bookingId,
             booking_date: formattedDateTime,
             plate_number: plateNumber,
-            model: selectedModel
+            model: selectedModel,
         };
         emailjs
-            .send(
-                'service_bulp1em',
-                'template_sm6k6ag',
-                templateParams,
-                'xvlC_Tt8GhRFq5k5R'
-            )
+            .send('service_bulp1em', 'template_sm6k6ag', templateParams, 'xvlC_Tt8GhRFq5k5R')
             .then(
                 () => {
-                    console.log('send mail')
+                    console.log('send mail');
                 },
                 (err) => console.log('Failed to send message', err)
             );
     };
 
-
-    //check a valid user
+    // Check a valid user
     const checkValidUser = async () => {
         if (!isValid) return;
         const userId = localStorage.getItem('id');
@@ -384,7 +357,7 @@ function Booking() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
-            })
+            });
             const jsonData = await response.json();
             if (response.ok) {
                 if (jsonData.data) {
@@ -393,41 +366,37 @@ function Booking() {
                         setTimeout(() => {
                             driverNotAvailableSetAlert(false);
                         }, 6000);
-                        return
+                        return;
                     }
-                    placeBooking(new Event("click"));
-                }
-                else {
+                    placeBooking(new Event('click'));
+                } else {
                     ifValidUserSetAlert(true);
                     setFormData({
-                        name: "",
-                        contact: "",
-                        email: ""
-
+                        name: '',
+                        contact: '',
+                        email: '',
                     });
-                    setStartCity("");
-                    setEndCity("");
-                    setDistance("");
-                    setTotal("");
-                    setHours("");
+                    setStartCity('');
+                    setEndCity('');
+                    setDistance('');
+                    setTotal('');
+                    setHours('');
                     setTimeout(() => {
                         ifValidUserSetAlert(false);
-                        navigate('/profile')
+                        navigate('/profile');
                     }, 6000);
-
                 }
             }
-
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-    }
+    };
 
     // Confirm booking
     const placeBooking = async (event) => {
         if (!isValid) return;
         event.preventDefault();
-        console.log("Booking Details:", formData);
+        console.log('Booking Details:', formData);
 
         const bookingRequest = {
             customerId: localStorage.getItem('id'),
@@ -440,8 +409,8 @@ function Booking() {
             bookingDateTime: formattedDateTime,
             amount: pricePerKm * distance,
             status: 'Confirmed',
-        }
-        console.log(bookingRequest)
+        };
+        console.log(bookingRequest);
         try {
             const response = await fetch(`${process.env.REACT_APP_BACS_URL}/booking/save`, {
                 method: 'POST',
@@ -450,44 +419,41 @@ function Booking() {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
                 body: JSON.stringify(bookingRequest),
-            })
+            });
             const responseData = await response.json();
             if (response.ok) {
                 payment(responseData.data.bookingId);
                 confirmBookingSetAlertVisible(true);
                 setFormData({
-                    name: "",
-                    contact: "",
-                    email: ""
-
-
+                    name: '',
+                    contact: '',
+                    email: '',
                 });
-                setStartCity("");
-                setEndCity("");
-                setDistance("");
-                setTotal("");
-                setHours("");
-                sendMail(startCity, endCity, responseData.data.bookingId)
+                setStartCity('');
+                setEndCity('');
+                setDistance('');
+                setTotal('');
+                setHours('');
+                sendMail(startCity, endCity, responseData.data.bookingId);
                 setTimeout(() => {
                     confirmBookingSetAlertVisible(false);
                 }, 3000);
             }
         } catch (error) {
-            console.log(error)
+            console.log(error);
             setError(true);
             setTimeout(() => {
                 setError(false);
-                setStartCity("");
-                setEndCity("");
-                setDistance("");
-                setTotal("");
-                setHours("");
+                setStartCity('');
+                setEndCity('');
+                setDistance('');
+                setTotal('');
+                setHours('');
                 setFormData({
-                    name: "",
-                    contact: "",
-                    email: "",
-                    dateTime: "",
-
+                    name: '',
+                    contact: '',
+                    email: '',
+                    dateTime: '',
                 });
             }, 3000);
         }
@@ -590,6 +556,7 @@ function Booking() {
                             backgroundImage: cabImage ? `url(${cabImage})` : 'none'
                         }}
                     />
+                    
                 </div>
 
                 {/* Booking Dates Container */}
@@ -600,7 +567,7 @@ function Booking() {
                     </div>
 
                     {/* Scrollable Content */}
-                    <div className="overflow-y-auto flex-1">
+                    <div className="overflow-y-auto flex-1 scrollbar">
                         {Array.isArray(bookingDate) && bookingDate.length > 0 ? (
                             <div className="space-y-2 p-2">
                                 {bookingDate.map((date, index) => {
@@ -645,9 +612,9 @@ function Booking() {
                             </div>
                         )}
                     </div>
+
                 </div>
             </div>
-
             <div className="flex md:flex-row gap-4 justify-center items-center mt-4  p-6 flex-wrap mb-4 ">
                 <Card sx={{ minWidth: 375 }}
                     className=" cursor-pointer  border-1 text-white shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
