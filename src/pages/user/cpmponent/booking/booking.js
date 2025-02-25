@@ -521,7 +521,7 @@ function Booking() {
     };
     return (
         <div className="container mx-auto bg-slate-100 shadow-xl rounded-xl mt-32 px-4 py-8" id="booking">
-                <div className="text-center mb-16">
+             <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold mb-4">Booking Now</h2>
                         <div className="w-24 h-1 bg-[#FCA000] mx-auto"></div>
                     </div>

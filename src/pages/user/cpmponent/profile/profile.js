@@ -117,7 +117,7 @@ function Profile() {
             case 'userName':
                 if (!value.trim()) return 'User Name is required';
                 if (value.length < 3) return 'User Name must be at least 3 characters';
-                if (!/^[A-Za-z\s]+$/.test(value)) return 'User Name cannot contain numbers' 
+                if (!/^[A-Za-z\s]+$/.test(value)) return 'User Name cannot contain numbers'
                 return '';
             case 'nic':
                 if (!value.trim()) return 'NIC is required';
@@ -277,6 +277,10 @@ function Profile() {
 
     return (
         <div className="container mx-auto  mb-4 px-4 py-8" id="profile">
+            <div className="text-center mb-16">
+                <h2 className="text-4xl font-bold mb-4">Update Profile</h2>
+                <div className="w-24 h-1 bg-[#FCA000] mx-auto"></div>
+            </div>
             <div className='flex justify-center items-center animate__animated animate__backInDown'>
                 {error && (
                     <Alert
@@ -304,8 +308,6 @@ function Profile() {
                 )}
             </div>
             <div className="flex flex-col">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-normal text-sky-900">Profile</h1>
-                <hr className="border-t-4 border-black w-1/3" />
                 <div className='flex justify-end items-end mb-2 gap-6 animate__animated animate__backInRight'>
                     <button
                         className="btn btn-danger "
@@ -343,7 +345,7 @@ function Profile() {
                     <form className="flex flex-col  justify-center items-center  h-auto w-full">
                         <div
                             className='flex flex-col md:flex-row justify-center items-center p-2 h-auto gap-4 md:gap-20 w-full '>
-                                                        <TextField
+                            <TextField
                                 id="userId"
                                 label="User ID"
                                 variant="outlined"

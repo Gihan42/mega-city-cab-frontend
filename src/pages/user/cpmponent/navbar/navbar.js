@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Link as ScrollLink } from 'react-scroll';
-import { Link as RouterLink, useNavigate } from 'react-router-dom'; // Import RouterLink
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Logo from '../../../../assets/Mega_City_Cab_Logo.jpg';
 
 function Navbar() {
   const [isMobile, setIsMobile] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to control mobile menu visibility
   const navigate = useNavigate();
 
   // Handle screen resizing for mobile/desktop detection
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
+
+      // Close menu when switching from mobile to desktop
+      if (window.innerWidth > 768) {
+        setIsMenuOpen(false);
+      }
     };
 
     window.addEventListener('resize', handleResize);
-
     handleResize(); // Initialize based on initial screen size
 
     return () => {
@@ -49,141 +54,186 @@ function Navbar() {
     navigate('/');
   }
 
+  // Toggle mobile menu
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Handle mobile menu item click (close menu when item clicked)
+  const handleMobileItemClick = () => {
+    setIsMenuOpen(false);
+  };
 
   return (
-      <div className="w-full h-auto fixed top-0 left-0 z-50">
-        <nav
-            className={`navbar navbar-expand-lg ${isScrolled ? 'bg-white' : 'bg-white'} transition-all`}
-            style={{
-              boxShadow: isScrolled ? '0 2px 2px -2px gray' : 'none', // Optional: Add shadow when scrolled
-            }}
-        >
-          <div className="container-fluid">
+    <div className="w-full h-auto fixed top-0 left-0 z-50">
+      <nav
+        className={`navbar ${isScrolled ? 'bg-white' : 'bg-white'} transition-all`}
+        style={{
+          boxShadow: isScrolled ? '0 2px 2px -2px gray' : 'none',
+        }}
+      >
+        <div className="container-fluid px-4">
+          <div className="flex items-center justify-between w-full">
+            {/* Logo */}
             <a className="navbar-brand" href="#">
-              {/* Logo */}
               <div
-                  className="w-12 h-12 border-1 ml-2 mt-1 border-black rounded-full bg-cover bg-center"
-                  style={{
-                    backgroundImage: `url(${Logo})`,
-                  }}
+                className="w-12 h-12 border-1 border-black rounded-full bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(${Logo})`,
+                }}
               ></div>
             </a>
 
-            {/* Left side links */}
+            {/* Desktop Navigation Links */}
             {!isMobile && (
-                <div className="flex gap-4 justify-center text-white w-full">
+              <div className="flex items-center justify-center gap-6 mx-auto">
+                <ScrollLink
+                  to="home"
+                  smooth={true}
+                  duration={500}
+                  className="navbar-brand navbar-links text-[#FCA000] relative text-[#011c2f] hover:text-blue-500 cursor-pointer group"
+                  style={{ fontSize: '20px', transition: 'color 0.3s' }}
+                >
+                  Home
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FCA000] transition-all duration-300 group-hover:w-full"></span>
+                </ScrollLink>
+                <ScrollLink
+                  to="aboutUs"
+                  smooth={true}
+                  duration={500}
+                  className="navbar-brand navbar-links text-[#FCA000] relative text-[#011c2f] hover:text-blue-500 cursor-pointer group"
+                  style={{ fontSize: '20px', transition: 'color 0.3s' }}
+                >
+                  About Us
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FCA000] transition-all duration-300 group-hover:w-full"></span>
+                </ScrollLink>
+                <ScrollLink
+                  to="booking"
+                  smooth={true}
+                  duration={500}
+                  className="navbar-brand navbar-links text-[#FCA000] relative text-[#011c2f] hover:text-blue-500 cursor-pointer group"
+                  style={{ fontSize: '20px', transition: 'color 0.3s' }}
+                >
+                  Booking
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FCA000] transition-all duration-300 group-hover:w-full"></span>
+                </ScrollLink>
+                <ScrollLink
+                  to="clients"
+                  smooth={true}
+                  duration={500}
+                  className="navbar-brand navbar-links text-[#FCA000] relative text-[#011c2f] hover:text-blue-500 cursor-pointer group"
+                  style={{ fontSize: '20px', transition: 'color 0.3s' }}
+                >
+                  Clients
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FCA000] transition-all duration-300 group-hover:w-full"></span>
+                </ScrollLink>
+                <RouterLink
+                  to="/profile"
+                  className="navbar-brand navbar-links text-[#FCA000] relative text-[#011c2f] hover:text-blue-500 cursor-pointer group"
+                  style={{ fontSize: '20px', transition: 'color 0.3s' }}
+                >
+                  Profile
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FCA000] transition-all duration-300 group-hover:w-full"></span>
+                </RouterLink>
+              </div>
+            )}
+
+            {/* Mobile Menu Button */}
+            {isMobile && (
+              <button
+                className="border-0 bg-transparent flex items-center"
+                onClick={toggleMenu}
+                aria-label="Toggle navigation"
+              >
+                <span className="navbar-toggler-icon"></span>
+              </button>
+            )}
+
+            {/* Logout button */}
+            <button
+              className="btn"
+              style={{
+                backgroundColor: '#0D3B66',
+                color: '#fff',
+                padding: '10px 20px',
+                borderRadius: '10px',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              onClick={logOut}
+            >
+              Logout
+            </button>
+          </div>
+
+          {/* Mobile Menu - Absolute positioned below the navbar */}
+          {isMobile && isMenuOpen && (
+            <div className="w-full bg-white mt-2 rounded shadow-lg absolute left-0 z-50 overflow-hidden transition-all duration-300">
+              <ul className="list-none m-0 p-0">
+                <li className="border-b border-gray-100">
                   <ScrollLink
-                      style={{ color: '#011c2f', transition: 'color 0.3s', fontSize: '20px' }}
-                      className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer"
-                      to="home"
-                      smooth={true}
-                      duration={500}
+                    className="navbar-brand navbar-links text-[#FCA000] block px-4 py-3 text-[#011c2f] hover:text-blue-500 hover:bg-gray-50 relative group"
+                    to="home"
+                    smooth={true}
+                    duration={500}
+                    onClick={handleMobileItemClick}
                   >
                     Home
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                   </ScrollLink>
+                </li>
+                <li className="border-b border-gray-100">
                   <ScrollLink
-                      style={{ color: '#011c2f', transition: 'color 0.3s', fontSize: '20px' }}
-                      className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer"
-                      to="aboutUs"
-                      smooth={true}
-                      duration={500}
+                    className="navbar-brand navbar-links text-[#FCA000] block px-4 py-3 text-[#011c2f] hover:text-blue-500 hover:bg-gray-50 relative group"
+                    to="aboutUs"
+                    smooth={true}
+                    duration={500}
+                    onClick={handleMobileItemClick}
                   >
                     About Us
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                   </ScrollLink>
+                </li>
+                <li className="border-b border-gray-100">
                   <ScrollLink
-                      style={{ color: '#011c2f', transition: 'color 0.3s', fontSize: '20px' }}
-                      className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer"
-                      to="booking"
-                      smooth={true}
-                      duration={500}
+                    className="navbar-brand navbar-links text-[#FCA000] block px-4 py-3 text-[#011c2f] hover:text-blue-500 hover:bg-gray-50 relative group"
+                    to="booking"
+                    smooth={true}
+                    duration={500}
+                    onClick={handleMobileItemClick}
                   >
                     Booking
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                   </ScrollLink>
+                </li>
+                <li className="border-b border-gray-100">
                   <ScrollLink
-                      style={{ color: '#011c2f', transition: 'color 0.3s', fontSize: '20px' }}
-                      className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer"
-                      to="clients"
-                      smooth={true}
-                      duration={500}
+                    className="navbar-brand navbar-links text-[#FCA000] block px-4 py-3 text-[#011c2f] hover:text-blue-500 hover:bg-gray-50 relative group"
+                    to="clients"
+                    smooth={true}
+                    duration={500}
+                    onClick={handleMobileItemClick}
                   >
                     Clients
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                   </ScrollLink>
+                </li>
+                <li>
                   <RouterLink
-                      style={{ color: '#011c2f', transition: 'color 0.3s', fontSize: '20px' }}
-                      className="navbar-brand navbar-links text-[#FCA000] hover:text-blue-500 active:text-red-500 cursor-pointer"
-                      to="/profile"
+                    className="navbar-brand navbar-links text-[#FCA000] block px-4 py-3 text-[#011c2f] hover:text-blue-500 hover:bg-gray-50 relative group"
+                    to="/profile"
+                    onClick={handleMobileItemClick}
                   >
                     Profile
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                   </RouterLink>
-                </div>
-            )}
-
-            {/* Mobile menu */}
-            {isMobile && (
-                <>
-                  <button
-                      className="navbar-toggler"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#navbarNav"
-                      aria-controls="navbarNav"
-                      aria-expanded="false"
-                      aria-label="Toggle navigation"
-                  >
-                    <span className="navbar-toggler-icon"></span>
-                  </button>
-                  <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav">
-                      <li className="nav-item">
-                        <ScrollLink className="nav-link" to="home" smooth={true} duration={500}>
-                          Home
-                        </ScrollLink>
-                      </li>
-                      <li className="nav-item">
-                        <ScrollLink className="nav-link" to="aboutUs" smooth={true} duration={500}>
-                          About Us
-                        </ScrollLink>
-                      </li>
-                      <li className="nav-item">
-                        <ScrollLink className="nav-link" to="booking" smooth={true} duration={500}>
-                          Booking
-                        </ScrollLink>
-                      </li>
-                      <li className="nav-item">
-                        <ScrollLink className="nav-link" to="clients" smooth={true} duration={500}>
-                          Clients
-                        </ScrollLink>
-                      </li>
-                      <li className="nav-item">
-                        <RouterLink className="nav-link" to="/profile">
-                          Profile
-                        </RouterLink>
-                      </li>
-                    </ul>
-                  </div>
-                </>
-            )}
-
-            {/* Logout button aligned to the right */}
-            <div className="ml-auto">
-              <button
-                  className="btn btn-danger"
-                  style={{
-                    backgroundColor: '#0D3B66',
-                    color: '#fff',
-                    padding: '10px 20px',
-                    borderRadius: '10px',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
-                  onClick={logOut}
-              >
-                Logout
-              </button>
+                </li>
+              </ul>
             </div>
-          </div>
-        </nav>
-      </div>
+          )}
+        </div>
+      </nav>
+    </div>
   );
 }
 
