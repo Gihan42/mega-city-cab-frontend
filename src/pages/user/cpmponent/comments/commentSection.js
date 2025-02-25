@@ -45,7 +45,7 @@ function CommentSection() {
             <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold mb-4">Customer Reviews
                 </h2>
-                <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
+                <div className="w-24 h-1 bg-[#FCA000] mx-auto"></div>
             </div>
             {/* Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 ">

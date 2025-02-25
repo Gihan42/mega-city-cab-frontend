@@ -523,7 +523,7 @@ function Booking() {
         <div className="container mx-auto bg-slate-100 shadow-xl rounded-xl mt-32 px-4 py-8" id="booking">
                 <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold mb-4">Booking Now</h2>
-                        <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
+                        <div className="w-24 h-1 bg-[#FCA000] mx-auto"></div>
                     </div>
             <h1 className="text-2xl md:text-lg lg:text-xl mb-4 font-normal text-black">Select Car Category</h1>
             <div className="flex md:flex-row gap-4  p-4 flex-wrap mb-4 bg-white shadow-xl rounded-4  ">

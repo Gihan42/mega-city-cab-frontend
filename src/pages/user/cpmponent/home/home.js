@@ -55,9 +55,9 @@ function Home() {
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
                 {/* Content on top of the video */}
-                <div className="relative flex flex-col items-center justify-center h-full text-white text-center">
+                <div className="relative flex flex-col items-center justify-center h-full text-white text-center ">
                     <h1
-                        className="text-3xl font-bold"
+                        className="text-3xl font-bold "
                         ref={typedRef}
                     ></h1>
                 </div>
@@ -68,7 +68,7 @@ function Home() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold mb-4">Our Services</h2>
-                        <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
+                        <div className="w-24 h-1 bg-[#FCA000] mx-auto"></div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
