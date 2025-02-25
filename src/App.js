@@ -33,7 +33,7 @@ function AppRoutes() {
     const token = localStorage.getItem('token');
 
     if (token && isTokenExpired(token)) {
-      alert('Your session has expired. Please log in again.');
+      //alert('Your session has expired. Please log in again.');
       navigate('/');
     } else {
       const role = localStorage.getItem('role');

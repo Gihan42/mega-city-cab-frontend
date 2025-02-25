@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';import { LocalPhone, MarkEmailUnread, LinkedIn, Instagram, Facebook } from '@mui/icons-material';
 import {useNavigate} from "react-router-dom";
-
+import { Phone, Mail, MapPin } from "lucide-react";
 function Footer() {
     const navigate = useNavigate();
     function logOut(){
@@ -9,138 +9,72 @@ function Footer() {
 
     return (
         <div className="carousel slide mt-32 w-full h-full" id="carouselExampleControlsNoTouching" data-bs-touch="false">
-            <footer
-                className="text-center text-lg-start text-white"
-                style={{ backgroundColor: '#0A2136', width: '100%' }}
-            >
-                <div className="container-fluid p-4 pb-0">
-                    <section>
-                        <div className="row">
-                            <div className="col-lg-4 col-md-6 mb-4 mb-md-0">
-                                <h5 className="text-uppercase">MEGA CITY CAB</h5>
-
-                                <p>
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                    Molestiae modi cum ipsam ad, illo possimus laborum ut
-                                    reiciendis obcaecati. Ducimus, quas. Corrupti, pariatur eaque?
-                                    Reiciendis assumenda iusto sapiente inventore animi?
-                                </p>
-                            </div>
-
-                            <div className="col-lg-2 col-md-6 mb-4 mb-md-0">
-                                <h5 className="text-uppercase">Links</h5>
-
-                                <ul className="list-unstyled mb-0">
-                                    <li>
-                                        <a href="#!" className="text-white">Link 1</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 2</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 3</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 4</a>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div className="col-lg-2 col-md-6 mb-4 mb-md-0">
-                                <h5 className="text-uppercase">Links</h5>
-
-                                <ul className="list-unstyled mb-0">
-                                    <li>
-                                        <a href="#!" className="text-white">Link 1</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 2</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 3</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 4</a>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div className="col-lg-2 col-md-6 mb-4 mb-md-0">
-                                <h5 className="text-uppercase">Links</h5>
-
-                                <ul className="list-unstyled mb-0">
-                                    <li>
-                                        <a href="#!" className="text-white">Link 1</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 2</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 3</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 4</a>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div className="col-lg-2 col-md-6 mb-4 mb-md-0">
-                                <h5 className="text-uppercase">Links</h5>
-
-                                <ul className="list-unstyled mb-0">
-                                    <li>
-                                        <a href="#!" className="text-white">Link 1</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 2</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 3</a>
-                                    </li>
-                                    <li>
-                                        <a href="#!" className="text-white">Link 4</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </section>
-
-                    <hr className="mb-4" />
-
-                    <section>
-                        <p className="d-flex justify-content-center align-items-center">
-                            <span className="me-3">Good bye</span>
-                            <button type="button" className="btn btn-outline-light btn-rounded" onClick={logOut}>
-                                Sign out!
-                            </button>
-                        </p>
-                    </section>
-
-                    <hr className="mb-4" />
-
-                    <section className="mb-4 text-center">
-                        <a className="btn btn-outline-light btn-floating m-1" href="#!" role="button">
-                            <LinkedIn/>
-                        </a>
-
-                        <a className="btn btn-outline-light btn-floating m-1" href="#!" role="button">
-                            <Facebook/>
-                        </a>
-
-                        <a className="btn btn-outline-light btn-floating m-1" href="#!" role="button">
-                            <Instagram/>
-                        </a>
-
-                    </section>
-                </div>
-
-                <div className="text-center p-3" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
-                    © 2020 Copyright:
-                    <a className="text-white" href="https://mdbootstrap.com/">
-                        gihan.com
-                    </a>
-                </div>
-            </footer>
+            <footer className="bg-gray-900 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-8 w-8 text-blue-400" />
+              <span className="font-bold text-xl">Mega City Cab</span>
+            </div>
+            <p className="text-gray-400">
+              Your trusted taxi service in Colombo
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
+            <ul className="space-y-2">
+              <li>
+                <a href="#" className="text-gray-400 hover:text-white">
+                  Home
+                </a>
+              </li>
+              <li>
+                <a href="#about" className="text-gray-400 hover:text-white">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="#reviews" className="text-gray-400 hover:text-white">
+                  Reviews
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Contact</h3>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2 text-gray-400">
+                <Phone className="h-5 w-5" />
+                <span>+94 11 234 5678</span>
+              </li>
+              <li className="flex items-center gap-2 text-gray-400">
+                <Mail className="h-5 w-5" />
+                <span>info@megacitycab.com</span>
+              </li>
+              <li className="flex items-center gap-2 text-gray-400">
+                <MapPin className="h-5 w-5" />
+                <span>Colombo, Sri Lanka</span>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Business Hours</h3>
+            <p className="text-gray-400">
+              24/7 Service Available
+              <br />
+              Always ready to serve you
+            </p>
+          </div>
+        </div>
+        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+          <p>
+            &copy; {new Date().getFullYear()} Mega City Cab. All rights
+            reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
         </div>
     );
 }

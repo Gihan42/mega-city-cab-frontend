@@ -6,6 +6,7 @@ import 'animate.css';
 import { LocalPhone, MarkEmailUnread, LinkedIn, Instagram, Facebook } from '@mui/icons-material';
 import emailjs from 'emailjs-com';
 import { Card, CardActions, CardContent, CardMedia, Typography, TextField } from '@mui/material';
+import { MapPinIcon, ClockIcon, ShieldCheckIcon, StarIcon, CheckCircle2Icon, ArrowRightIcon } from "lucide-react";
 
 
 function AboutUs() {
@@ -15,16 +16,16 @@ function AboutUs() {
     const [comment, setComment] = useState('');
     const [currentDate, setCurrentDate] = useState("");
 
-  useEffect(() => {
-    const updateDate = () => {
-      setCurrentDate(new Date().toISOString().split('T')[0]);
-    };
+    useEffect(() => {
+        const updateDate = () => {
+            setCurrentDate(new Date().toISOString().split('T')[0]);
+        };
 
-    updateDate(); 
-    const interval = setInterval(updateDate, 1000); 
+        updateDate();
+        const interval = setInterval(updateDate, 1000);
 
-    return () => clearInterval(interval); 
-  }, []);
+        return () => clearInterval(interval);
+    }, []);
 
 
     const clearContactFormTextFields = () => {
@@ -115,6 +116,10 @@ function AboutUs() {
 
     return (
         <div className="container mx-auto px-4 py-8" id='aboutUs'>
+            <div className="text-center mb-16">
+                <h2 className="text-4xl font-bold mb-4">Avout Us</h2>
+                <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
+            </div>
             <div className='flex justify-center items-center animate__animated animate__backInDown'>
                 {saveCommentAlert && (
                     <Alert
@@ -144,10 +149,6 @@ function AboutUs() {
             <div className="flex flex-col lg:flex-row gap-6 items-center">
                 {/* About Section */}
                 <div className="w-full lg:w-1/2 space-y-6 animate__animated animate__backInLeft">
-                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-normal text-sky-900">
-                        About Us
-                    </h1>
-                    <hr className="border-t-4 border-black w-1/2" />
                     <p className="text-base md:text-lg lg:text-2xl font-normal text-sky-900 text-justify">
                         Welcome to Mega City Cab, your trusted partner for reliable,
                         affordable, and convenient transportation services. We are
@@ -341,6 +342,46 @@ function AboutUs() {
                     </div>
                 </div>
             </div>
+            {/* About Section with Parallax */}
+            <section id="about" className="relative py-24 bg-fixed bg-cover bg-center mt-5" style={{
+                backgroundImage: "url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=2070&h=1200')",
+            }}>
+                <div className="absolute inset-0  bg-sky-900/90"></div>
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div className="space-y-6">
+                            <h2 className="text-4xl font-bold">Why Choose Us?</h2>
+                            <div className="space-y-4">
+                                {[
+                                    {
+                                        title: "Professional Drivers",
+                                        description: "Experienced and vetted drivers for your safety",
+                                    },
+                                    {
+                                        title: "24/7 Service",
+                                        description: "Available round the clock for your convenience",
+                                    },
+                                    {
+                                        title: "Modern Fleet",
+                                        description: "Well-maintained vehicles with latest amenities",
+                                    },
+                                ].map((feature, index) => (
+                                    <div key={index} className="flex items-start gap-4">
+                                        <CheckCircle2Icon className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-1" />
+                                        <div>
+                                            <h3 className="font-semibold text-xl">{feature.title}</h3>
+                                            <p className="text-gray-300">{feature.description}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=300&h=400" alt="Service 1" className="rounded-lg shadow-2xl transform -rotate-3" />
+                            <img src="https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80&w=300&h=400" alt="Service 2" className="rounded-lg shadow-2xl transform translate-y-8 rotate-3" />            </div>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

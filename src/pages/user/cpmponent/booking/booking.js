@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import moment from 'moment';
+import { message } from 'antd';
 
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -44,6 +45,9 @@ function Booking() {
     const navigate = useNavigate();
     const [checked, setChecked] = useState(false);
     const [bookingDate, setBookingDate] = useState('');
+    const [messageApi, contextHolder] = message.useMessage();
+
+
 
     const fetchCoordinates = async (city) => {
         try {
@@ -240,7 +244,8 @@ function Booking() {
 
             const responseData = await response.json();
             if (response.ok) {
-                // Ensure responseData.data is an array
+                // Ensure responseData.data is an array]
+                console.log(responseData.data)
                 const datesArray = Array.isArray(responseData.data) ? responseData.data : [];
                 setBookingDate(datesArray);
             }
@@ -423,7 +428,15 @@ function Booking() {
             const responseData = await response.json();
             if (response.ok) {
                 payment(responseData.data.bookingId);
-                confirmBookingSetAlertVisible(true);
+                messageApi.open({
+                    type: 'success',
+                    content: 'Place Your Booking',
+                    className: 'custom-class',
+                    style: {
+                        marginTop: '20vh',
+                    },
+                });
+
                 setFormData({
                     name: '',
                     contact: '',
@@ -435,9 +448,15 @@ function Booking() {
                 setTotal('');
                 setHours('');
                 sendMail(startCity, endCity, responseData.data.bookingId);
-                setTimeout(() => {
-                    confirmBookingSetAlertVisible(false);
-                }, 3000);
+            } else {
+                messageApi.open({
+                    type: 'error',
+                    content: 'Not Place Your Booking Please Try Another Time',
+                    className: 'custom-class',
+                    style: {
+                        marginTop: '20vh',
+                    },
+                });
             }
         } catch (error) {
             console.log(error);
@@ -502,10 +521,10 @@ function Booking() {
     };
     return (
         <div className="container mx-auto bg-slate-100 shadow-xl rounded-xl mt-32 px-4 py-8" id="booking">
-            <div className="flex flex-col">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-normal text-sky-900">Booking Now</h1>
-                <hr className="border-t-4 border-black w-1/3" />
-            </div>
+                <div className="text-center mb-16">
+                        <h2 className="text-4xl font-bold mb-4">Booking Now</h2>
+                        <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
+                    </div>
             <h1 className="text-2xl md:text-lg lg:text-xl mb-4 font-normal text-black">Select Car Category</h1>
             <div className="flex md:flex-row gap-4  p-4 flex-wrap mb-4 bg-white shadow-xl rounded-4  ">
                 {carCategories.map((category, index) => (
@@ -556,7 +575,7 @@ function Booking() {
                             backgroundImage: cabImage ? `url(${cabImage})` : 'none'
                         }}
                     />
-                    
+
                 </div>
 
                 {/* Booking Dates Container */}
@@ -571,9 +590,19 @@ function Booking() {
                         {Array.isArray(bookingDate) && bookingDate.length > 0 ? (
                             <div className="space-y-2 p-2">
                                 {bookingDate.map((date, index) => {
-                                    const dateObj = new Date(date);
-                                    const formattedDate = dateObj.toISOString().split('T')[0];
-                                    const formattedTime = dateObj.toLocaleTimeString([], {
+                                    const bookingDateObj = new Date(date.bookingDate);
+                                    const estimatedBookingDateObj = new Date(date.estimatedBookingDate);
+
+                                    // Format booking date and time
+                                    const formattedBookingDate = bookingDateObj.toISOString().split('T')[0];
+                                    const formattedBookingTime = bookingDateObj.toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    });
+
+                                    // Format estimated booking date and time
+                                    const formattedEstimatedBookingDate = estimatedBookingDateObj.toISOString().split('T')[0];
+                                    const formattedEstimatedBookingTime = estimatedBookingDateObj.toLocaleTimeString([], {
                                         hour: '2-digit',
                                         minute: '2-digit'
                                     });
@@ -584,8 +613,19 @@ function Booking() {
                                             className="flex items-center justify-between bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
                                         >
                                             <div className="flex flex-col">
-                                                <span className="text-sky-900 font-medium">{formattedDate}</span>
-                                                <span className="text-sm text-gray-500">{formattedTime}</span>
+                                                <div className="flex items-center space-x-4">
+                                                    <div>
+                                                        <span className="text-sky-900 font-medium">{formattedBookingDate}</span>
+                                                        <span className="text-sm text-gray-500 ml-2">{formattedBookingTime}</span>
+                                                    </div>
+                                                    <div>
+                                                    <span className="text-sky-900 font-medium ml-2 mr-2"> To </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-sky-900 font-medium"> {formattedEstimatedBookingDate}</span>
+                                                        <span className="text-sm text-gray-500 ml-2">{formattedEstimatedBookingTime}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <span className="text-blue-500">
                                                 <svg
@@ -822,6 +862,7 @@ function Booking() {
                                             Agree to terms and conditions
                                         </span>
                                     </div>
+                                    {contextHolder}
                                     <button
                                         type="button"
                                         className={`btn btn-primary text-xl mt-6 ${isValid ? "" : "opacity-50 cursor-not-allowed"}`}
