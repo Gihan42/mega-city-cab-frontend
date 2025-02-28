@@ -19,6 +19,10 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import moment from 'moment';
 import { message } from 'antd';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'; 
+import LocalAtmIcon from '@mui/icons-material/LocalAtm'; 
+import PersonIcon from '@mui/icons-material/Person'; 
+
 
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -655,57 +659,76 @@ function Booking() {
 
                 </div>
             </div>
-            <div className="flex md:flex-row gap-4 justify-center items-center mt-4  p-6 flex-wrap mb-4 ">
-                <Card sx={{ minWidth: 375 }}
-                    className=" cursor-pointer  border-1 text-white shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
-                    <CardContent className='justify-center text-white bg-sky-950 items-center flex flex-col gap-2'>
-                        <Typography gutterBottom sx={{ color: 'white', fontSize: 35 }}>
-                            Vehicle
-                        </Typography>
-                        <Typography variant="h5" component="div">
-                            {selectedModel}
-                        </Typography>
-                        <Typography variant="h5" component="div">
-                            {plateNumber}
-                        </Typography>
 
-                    </CardContent>
-                </Card>
-                <Card sx={{ minWidth: 375 }}
-                    className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
-                    <CardContent className='justify-center text-white bg-sky-950 items-center flex flex-col gap-12'>
-                        <Typography gutterBottom sx={{ color: 'white', fontSize: 35 }}>
-                            Price / Per KM
-                        </Typography>
-                        <Typography variant="h5" component="div" sx={{ color: 'white', fontSize: 25 }}>
-                            RS {pricePerKm}.00
-                        </Typography>
-
-                    </CardContent>
-
-                </Card>
-                <Card sx={{ minWidth: 375 }}
-                    className=" cursor-pointer bg-slate-100 border-1 shadow-xl rounded-4 transform transition-transform duration-300 hover:scale-105">
-                    <CardContent className='justify-center items-center bg-sky-950 flex flex-col gap-2'>
-                        <Typography gutterBottom sx={{ color: 'white', fontSize: 35 }}>
-                            Driver
-                        </Typography>
-                        <Typography variant="h5" component="div" sx={{ color: 'white' }}>
-                            Mr {dName}
-                        </Typography>
-                        <Typography variant="h5" component="div" sx={{ color: 'white' }}
-                            className='flex justify-center items-center w-full gap-4'>
-                            {dContact}
-                            <div
-                                className="rounded-full p-1 hover:bg-sky-900  hover:text-white transition-all duration-300">
-                                <PhoneForwardedIcon className="text-[#FCA000] hover:text-white" />
-                            </div>
-
-
-                        </Typography>
-                    </CardContent>
-                </Card>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-6">
+    {/* Vehicle Card */}
+    <div
+        className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+    >
+        {/* Card Header */}
+        <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center">
+                <DirectionsCarIcon className="w-8 h-8 text-sky-900" /> {/* Vehicle Icon */}
             </div>
+            <div>
+                <h3 className="font-semibold text-lg text-sky-900">Vehicle</h3>
+                <p className="text-gray-600">Details</p>
+            </div>
+        </div>
+
+        {/* Card Content - Inline Data */}
+        <div className="text-gray-600 flex items-center gap-2">
+            <p className="text-lg">{selectedModel}</p>
+            <span className="text-lg"></span>
+            <p className="text-lg">{plateNumber}</p>
+        </div>
+    </div>
+
+    {/* Price Per KM Card */}
+    <div
+        className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+    >
+        {/* Card Header */}
+        <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center">
+                <LocalAtmIcon className="w-8 h-8 text-sky-900" /> {/* Price/KM Icon */}
+            </div>
+            <div>
+                <h3 className="font-semibold text-lg text-sky-900">Price / Per KM</h3>
+                <p className="text-gray-600">Rate</p>
+            </div>
+        </div>
+
+        {/* Card Content - Inline Data */}
+        <p className="text-gray-600 text-lg">LKR {pricePerKm}.00</p>
+    </div>
+
+    {/* Driver Card */}
+    <div
+        className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+    >
+        {/* Card Header */}
+        <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center">
+                <PersonIcon className="w-8 h-8 text-sky-900" /> {/* Driver Icon */}
+            </div>
+            <div>
+                <h3 className="font-semibold text-lg text-sky-900">Driver</h3>
+                <p className="text-gray-600">Contact</p>
+            </div>
+        </div>
+
+        {/* Card Content - Inline Data */}
+        <div className="text-gray-600 flex items-center gap-2">
+            <p className="text-lg">Mr {dName}</p>
+            <span className="text-lg"></span> 
+            <p className="text-lg text-sky-900">{dContact}</p>
+            {/* <div className="rounded-full p-1 hover:bg-sky-900 hover:text-white transition-all duration-300">
+                <PhoneForwardedIcon className="text-[#FCA000] hover:text-white" />
+            </div> */}
+        </div>
+    </div>
+</div>
             <div className="flex md:flex-row gap-4 mt-4  p-4 flex-wrap mb-4 justify-center items-center  ">
                 <button
                     type="button"
