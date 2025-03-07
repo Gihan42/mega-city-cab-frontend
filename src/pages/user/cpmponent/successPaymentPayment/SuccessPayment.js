@@ -6,10 +6,33 @@ import { useNavigate } from 'react-router-dom';
 function SuccessPayment() {
   const navigate = useNavigate();
   useEffect(() => {
-    const paymentId=localStorage.getItem('paymentId')
-    exportBill(paymentId)
+    const paymentId=localStorage.getItem('paymentId');
+    updateStatusNotConfirmBookingWherePaymentId(paymentId);
+    // exportBill(paymentId)
     
     }, [])
+
+const  updateStatusNotConfirmBookingWherePaymentId =async (paymentId) => {
+  try {
+    const response = await fetch(`${process.env.REACT_APP_BACS_URL}/booking?pId=${paymentId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ paymentId: paymentId }),
+    });
+
+    if (response.ok) {
+      console.log("Update status not confirm booking successful");
+      exportBill(paymentId);
+    } else {
+      throw new Error('Failed to update status not confirm booking');
+    }
+  } catch (error) {
+    console.error("Error updating status not confirm booking:", error);
+  }
+}
 
 const exportBill = async (paymentId) => {
   try {
@@ -43,7 +66,7 @@ const exportBill = async (paymentId) => {
 };
 
 const handleBackToHome = () => {
-  navigate('/User'); // Navigate to the home page
+  navigate('/User'); 
 };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-400 to-blue-500">

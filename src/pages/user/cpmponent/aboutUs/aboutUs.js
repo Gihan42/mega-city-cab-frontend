@@ -117,7 +117,7 @@ function AboutUs() {
     return (
         <div className="container mx-auto px-4 py-8" id='aboutUs'>
             <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold mb-4">Avout Us</h2>
+                <h2 className="text-4xl font-bold">About Us</h2>
                 <div className="w-24 h-1 bg-[#FCA000] mx-auto"></div>
             </div>
             <div className='flex justify-center items-center animate__animated animate__backInDown'>

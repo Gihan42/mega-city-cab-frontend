@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Col, Row } from 'antd';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -164,24 +164,24 @@ function Booking() {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
-  
+
       const responseData = await response.json();
-  
+
       if (response.ok) {
         console.log(responseData);
-        
+
         const mappedData = responseData.data.map((item) => ({
           bookingId: `BID-${item.bookingId}`,
-          customer: `${item.customerName}-${item.customerId}` ,
-          driver: `${item.driverName}-${item.driverId}` ,
+          customer: `${item.customerName}-${item.customerId}`,
+          driver: `${item.driverName}-${item.driverId}`,
           vehicle: `${item.vehicleModel} - ${item.vehiclePlateNumber}`,
           date: item.bookingDate.split("T")[0],
-          pickUpLocation: item.pickupLocation ,
-          destination: item.dropLocation ,
+          pickUpLocation: item.pickupLocation,
+          destination: item.dropLocation,
           totalAmount: item.amount,
           status: item.status
         }));
-  
+
         setFilteredData(mappedData);
       }
     } catch (error) {
@@ -192,7 +192,7 @@ function Booking() {
   const handleUpdateClick = (bookingId) => {
     // Extract the booking number from the bookingId
     const bookingNumber = bookingId.split('BID-')[1];
-    
+
     // Update the booking status by sending the bookingNumber as a query parameter
     const updateBookingStatus = async () => {
       try {
@@ -203,9 +203,9 @@ function Booking() {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
         });
-  
+
         const responseData = await response.json();
-  
+
         if (response.ok) {
           console.log(responseData);
           getBookingDetails();
@@ -214,10 +214,10 @@ function Booking() {
         console.log(error);
       }
     };
-  
+
     updateBookingStatus(); // Call the function
   };
-  
+
 
 
   useEffect(() => { getBookingDetails(); }, []);
@@ -347,6 +347,7 @@ function Booking() {
               </MenuItem>
               <MenuItem value={'Pending'}>Pending</MenuItem>
               <MenuItem value={'Confirmed'}>Close</MenuItem>
+              <MenuItem value={'Booking not close'}>Booking not close</MenuItem>
             </Select>
 
           </form>
@@ -449,14 +450,41 @@ function Booking() {
                     <td className="border px-4 py-2">{item.totalAmount}</td>
                     <td className="border px-4 py-2">{item.status}</td>
                     <td className="border px-4 py-2">
-                      <button type="button"
-                        className="btn btn-success"
-                        disabled={item.status !== 'Pending'}
-                        onClick={() => handleUpdateClick(item.bookingId)}
-                        >update</button>
+                      {item.status === 'Booking not close' ? (
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          style={{
+                            backgroundColor: '#FF0000',
+                            color: '#fff',
+                            padding: '5px 10px',
+                            borderRadius: '5px',
+                            border: 'none',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => handleUpdateClick(item.bookingId)}
+                        >
+                          delete
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn btn-success"
+                          disabled={item.status !== 'Pending'}
+                          style={{
+                            backgroundColor: item.status !== 'Pending' ? '#cccccc' : '#28a745',
+                            color: '#fff',
+                            padding: '5px 10px',
+                            borderRadius: '5px',
+                            border: 'none',
+                            cursor: item.status !== 'Pending' ? 'not-allowed' : 'pointer'
+                          }}
+                          onClick={() => handleUpdateClick(item.bookingId)}
+                        >
+                          update
+                        </button>
+                      )}
                     </td>
-
-
                   </tr>
                 ))}
               </tbody>
